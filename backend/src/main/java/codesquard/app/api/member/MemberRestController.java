@@ -1,4 +1,4 @@
-package codesquard.app.api.member.controller;
+package codesquard.app.api.member;
 
 import org.springframework.web.bind.annotation.RestController;
 

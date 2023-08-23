@@ -1,4 +1,4 @@
-package codesquard.app.domain.item.entity;
+package codesquard.app.domain.item;
 
 import java.time.LocalDateTime;
 
