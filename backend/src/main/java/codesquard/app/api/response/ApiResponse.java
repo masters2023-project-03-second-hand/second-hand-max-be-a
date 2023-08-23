@@ -2,22 +2,18 @@ package codesquard.app.api.response;
 
 import org.springframework.http.HttpStatus;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import codesquard.app.api.errors.errorcode.ErrorCode;
 
 public class ApiResponse<T> {
 	private final int statusCode;
-	@JsonIgnore
-	private final HttpStatus status;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private final String message;
 	private final T data;
 
 	public ApiResponse(HttpStatus status, String message, T data) {
 		this.statusCode = status.value();
-		this.status = status;
 		this.message = message;
 		this.data = data;
 	}
