@@ -2,8 +2,10 @@ package codesquard.app.api.errors.errorcode;
 
 import org.springframework.http.HttpStatus;
 
+import lombok.Getter;
 import lombok.ToString;
 
+@Getter
 @ToString
 public enum MemberErrorCode implements ErrorCode {
 
@@ -20,15 +22,5 @@ public enum MemberErrorCode implements ErrorCode {
 	@Override
 	public String getName() {
 		return name();
-	}
-
-	@Override
-	public HttpStatus getHttpStatus() {
-		return null;
-	}
-
-	@Override
-	public String getMessage() {
-		return null;
 	}
 }
