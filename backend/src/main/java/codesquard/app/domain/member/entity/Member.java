@@ -11,6 +11,6 @@ public class Member {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String avatarUrl;
-	private String social_login_id;
+	private String socialLoginId;
 	private String nickname;
 }
