@@ -12,7 +12,7 @@ import codesquard.app.api.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RequestMapping(path = "/api/auth")
+@RequestMapping("/api/auth")
 @RestController
 public class OauthRestController {
 
@@ -21,7 +21,7 @@ public class OauthRestController {
 	@PostMapping("/login")
 	public ApiResponse<OauthLoginResponse> login(@Valid @RequestBody OauthLoginRequest request,
 		@RequestParam String code) {
-		OauthLoginResponse response = oauthService.login(request);
+		OauthLoginResponse response = oauthService.login(request, code);
 		return ApiResponse.ok(response);
 	}
 }
