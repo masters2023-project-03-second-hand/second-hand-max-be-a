@@ -10,6 +10,7 @@ services:
     environment:
       - TZ=Asia/Seoul
     depends_on:
+      - db
       - redis
   db:
     container_name: second_hand_db
