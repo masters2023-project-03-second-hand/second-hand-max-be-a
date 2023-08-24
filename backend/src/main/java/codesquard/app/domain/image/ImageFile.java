@@ -2,6 +2,8 @@ package codesquard.app.domain.image;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -52,6 +54,16 @@ public class ImageFile {
 
 	public static ImageFile from(MultipartFile multipartFile) {
 		return new ImageFile(multipartFile);
+	}
+
+	public static List<ImageFile> from(List<MultipartFile> files) {
+		List<ImageFile> imageFiles = new ArrayList<>();
+		for (MultipartFile multipartFile : files) {
+			if (!multipartFile.isEmpty()) {
+				imageFiles.add(new ImageFile(multipartFile));
+			}
+		}
+		return imageFiles;
 	}
 
 	@Getter
