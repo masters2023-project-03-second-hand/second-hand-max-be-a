@@ -1,4 +1,4 @@
-package codesquard.app.api.member.service;
+package codesquard.app.api.member;
 
 import org.springframework.stereotype.Service;
 

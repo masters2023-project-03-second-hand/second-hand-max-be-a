@@ -1,0 +1,62 @@
+spring:
+  profiles:
+    group:
+      local: local, secret
+      dev: dev, secret
+    default: local
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: ${db.local.datasource.url}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${db.local.datasource.username}
+    password: ${db.local.datasource.password}
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+cloud:
+  aws:
+    credentials:
+      access-key: ${aws.access-key}
+      secret-key: ${aws.secret-key}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3:
+      bucket: ${aws.s3.bucket}
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: ${db.dev.datasource.url}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${db.dev.datasource.username}
+    password: ${db.dev.datasource.password}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${aws.access-key}
+      secret-key: ${aws.secret-key}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3:
+      bucket: ${aws.s3.bucket}
