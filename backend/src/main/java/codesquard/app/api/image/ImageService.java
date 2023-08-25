@@ -22,8 +22,8 @@ public class ImageService {
 	public String uploadImage(MultipartFile file) {
 		ImageFile imageFile = ImageFile.from(file);
 
-		String fileName = UPLOADED_IMAGES_DIR + imageFile.getFileName();
-		return imageUploader.uploadImageToS3(imageFile, fileName);
+		String filePath = UPLOADED_IMAGES_DIR + imageFile.getFileName();
+		return imageUploader.uploadImageToS3(imageFile, filePath);
 	}
 
 	@Transactional
