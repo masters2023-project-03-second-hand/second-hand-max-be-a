@@ -5,11 +5,14 @@ import org.springframework.http.HttpStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import codesquard.app.api.errors.errorcode.ErrorCode;
+import lombok.Getter;
 
+@Getter
 public class ApiResponse<T> {
 	private final int statusCode;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private final String message;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private final T data;
 
 	public ApiResponse(HttpStatus status, String message, T data) {
@@ -24,6 +27,10 @@ public class ApiResponse<T> {
 
 	public static <T> ApiResponse<T> ok(T data) {
 		return new ApiResponse<>(HttpStatus.OK, HttpStatus.OK.name(), data);
+	}
+
+	public static <T> ApiResponse<T> created(T data) {
+		return new ApiResponse<>(HttpStatus.CREATED, HttpStatus.CREATED.name(), data);
 	}
 
 	public static <T> ApiResponse<T> error(ErrorCode errorCode) {
