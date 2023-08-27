@@ -40,6 +40,5 @@ public class OauthPropertiesTest extends IntegrationTestSupport {
 				.isEqualTo("https://openapi.naver.com/v1/nid/me");
 			softAssertions.assertAll();
 		});
-
 	}
 }

@@ -22,8 +22,7 @@ public enum OauthAttributes {
 	}
 
 	private static String convertToNicknameFrom(String email) {
-		final int LOGIN_ID_INDEX = 0;
-		return email.split("@")[LOGIN_ID_INDEX];
+		return email.split("@")[0];
 	}
 
 	public static OauthUserProfileResponse extract(String providerName, Map<String, Object> attributes) {
