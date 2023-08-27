@@ -11,7 +11,7 @@ public enum OauthAttributes {
 		public OauthUserProfileResponse of(Map<String, Object> attributes) {
 			Map<String, Object> responseMap = (Map<String, Object>)attributes.get("response");
 			String socialLoginId = convertToNicknameFrom((String)responseMap.get("email"));
-			return new OauthUserProfileResponse(socialLoginId);
+			return OauthUserProfileResponse.create(socialLoginId);
 		}
 	};
 

@@ -49,6 +49,6 @@ public class OauthService {
 		Member member = request.toEntity(userProfileResponse.getSocialLoginId());
 		Member saveMember = memberRepository.save(member);
 
-		return OauthSignUpResponse.of(saveMember);
+		return OauthSignUpResponse.from(saveMember);
 	}
 }

@@ -13,15 +13,19 @@ public class OauthSignUpResponse {
 
 	private final String nickname;
 
-	public OauthSignUpResponse(Long id, String avatarUrl, String socialLoginId, String nickname) {
+	private OauthSignUpResponse(Long id, String avatarUrl, String socialLoginId, String nickname) {
 		this.id = id;
 		this.avatarUrl = avatarUrl;
 		this.socialLoginId = socialLoginId;
 		this.nickname = nickname;
 	}
 
-	public static OauthSignUpResponse of(Member member) {
+	public static OauthSignUpResponse from(Member member) {
 		return new OauthSignUpResponse(member.getId(), member.getAvatarUrl(), member.getSocialLoginId(),
 			member.getNickname());
+	}
+
+	public static OauthSignUpResponse create(Long id, String avatarUrl, String socialLoginId, String nickname) {
+		return new OauthSignUpResponse(id, avatarUrl, socialLoginId, nickname);
 	}
 }

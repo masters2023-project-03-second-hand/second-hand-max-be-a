@@ -17,10 +17,13 @@ public class OauthAccessTokenResponse {
 	@JsonProperty("token_type")
 	private String tokenType;
 
-	public OauthAccessTokenResponse(String accessToken, String scope, String tokenType) {
+	private OauthAccessTokenResponse(String accessToken, String scope, String tokenType) {
 		this.accessToken = accessToken;
 		this.scope = scope;
 		this.tokenType = tokenType;
 	}
 
+	public static OauthAccessTokenResponse create(String accessToken, String scope, String tokenType) {
+		return new OauthAccessTokenResponse(accessToken, scope, tokenType);
+	}
 }
