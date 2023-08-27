@@ -20,6 +20,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+logging:
+  level:
+    codesquard: debug
 ---
 
 spring:
