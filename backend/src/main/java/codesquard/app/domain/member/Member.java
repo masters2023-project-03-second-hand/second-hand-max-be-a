@@ -10,7 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import codesquard.app.domain.member_town.MemberTown;
+import codesquard.app.domain.membertown.MemberTown;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

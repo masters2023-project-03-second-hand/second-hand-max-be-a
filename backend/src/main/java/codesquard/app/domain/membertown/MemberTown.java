@@ -1,4 +1,4 @@
-package codesquard.app.domain.member_town;
+package codesquard.app.domain.membertown;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

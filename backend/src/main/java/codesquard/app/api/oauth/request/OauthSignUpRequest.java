@@ -4,7 +4,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.member_town.MemberTown;
+import codesquard.app.domain.membertown.MemberTown;
 import lombok.Getter;
 import lombok.ToString;
 

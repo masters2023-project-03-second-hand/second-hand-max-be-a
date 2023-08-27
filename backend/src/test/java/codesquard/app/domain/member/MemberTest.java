@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.IntegrationTestSupport;
-import codesquard.app.domain.member_town.MemberTown;
+import codesquard.app.domain.membertown.MemberTown;
 
 @Transactional
 class MemberTest extends IntegrationTestSupport {
