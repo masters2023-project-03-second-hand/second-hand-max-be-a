@@ -1,12 +1,10 @@
 package codesquard.app.api.oauth;
 
+import static codesquard.app.api.oauth.OauthFixedFactory.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +16,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
-import codesquard.app.api.oauth.response.OauthSignUpResponse;
 
 class OauthRestControllerTest extends ControllerTestSupport {
 
@@ -35,19 +32,11 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@Test
 	public void signup() throws Exception {
 		// given
-		String filename = "profile";
-		String originalFilename = "profile.jpg";
-		String contentType = "image/jpeg";
-		String content = "테스트 이미지 데이터";
-		ByteArrayInputStream mockInputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
-		MockMultipartFile mockProfile = new MockMultipartFile(filename, originalFilename, contentType, mockInputStream);
-		String requestJson = objectMapper.writeValueAsString(OauthSignUpRequest.create("23Yong", "가락 1동"));
-		MockMultipartFile mockSignupData = new MockMultipartFile("signupData", "signupData", "application/json",
-			requestJson.getBytes(StandardCharsets.UTF_8));
-
+		MockMultipartFile mockProfile = createFixedProfile();
+		MockMultipartFile mockSignupData = createFixedSignUpData();
 		// mocking
 		when(oauthService.signUp(any(OauthSignUpRequest.class), anyString(), anyString()))
-			.thenReturn(OauthSignUpResponse.create(1L, "avatarUrlValue", "23Yong1234", "23Yong"));
+			.thenReturn(createdFixedOauthSignUpResponse());
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
 				.file(mockProfile)

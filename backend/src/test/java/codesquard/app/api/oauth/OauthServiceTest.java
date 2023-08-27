@@ -1,5 +1,6 @@
 package codesquard.app.api.oauth;
 
+import static codesquard.app.api.oauth.OauthFixedFactory.*;
 import static org.mockito.Mockito.*;
 
 import org.assertj.core.api.Assertions;
@@ -33,10 +34,9 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// given
 		String provider = "naver";
 		String code = "1234";
-		OauthSignUpRequest request = OauthSignUpRequest.create("23Yong", "가락 1동");
-		OauthAccessTokenResponse mockAccessTokenResponse = OauthAccessTokenResponse.create(
-			"accessTokenValue", "scopeValue", "Bearer");
-		OauthUserProfileResponse mockUserProfileResponse = OauthUserProfileResponse.create("23Yong1234");
+		OauthSignUpRequest request = createFixedOauthSignUpRequest();
+		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
+		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
 		// mocking
 		when(oauthClient.exchangeAccessTokenByAuthorizationCode(
 			any(OauthProvider.class), anyString()))
@@ -70,7 +70,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// given
 		String provider = "github";
 		String code = "1234";
-		OauthSignUpRequest request = OauthSignUpRequest.create("23Yong", "가락 1동");
+		OauthSignUpRequest request = createFixedOauthSignUpRequest();
 		// when
 		Throwable throwable = Assertions.catchThrowable(() -> oauthService.signUp(request, provider, code));
 		// then
@@ -87,9 +87,8 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// given
 		String provider = "naver";
 		String code = "1234";
-		OauthSignUpRequest request = OauthSignUpRequest.create("23Yong", "가락 1동");
-		OauthAccessTokenResponse mockAccessTokenResponse = OauthAccessTokenResponse.create(
-			"accessTokenValue", "scopeValue", "Bearer");
+		OauthSignUpRequest request = createFixedOauthSignUpRequest();
+		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		// mocking
 		when(oauthClient.exchangeAccessTokenByAuthorizationCode(
 			any(OauthProvider.class), anyString()))
