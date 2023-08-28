@@ -11,6 +11,7 @@ import lombok.ToString;
 @Getter
 @ToString
 public class OauthSignUpRequest {
+	@NotEmpty(message = "아이디는 띄어쓰기 없이 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.")
 	@Pattern(regexp = "^[a-zA-Z0-9]{2,12}$", message = "아이디는 띄어쓰기 없이 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.")
 	private String loginId;
 	@NotEmpty(message = "동네는 필수 정보입니다.")
