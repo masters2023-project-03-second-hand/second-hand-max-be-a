@@ -1,4 +1,4 @@
-package codesquard.app.api.oauth.client;
+package codesquard.app.domain.oauth.client;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,22 +15,27 @@ import org.springframework.web.reactive.function.client.WebClient;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.oauth.OauthAttributes;
-import codesquard.app.domain.oauth.OauthProvider;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-@Component
 public class OauthClient {
 
-	private static final Logger log = LoggerFactory.getLogger(OauthClient.class);
+	Logger log = LoggerFactory.getLogger(OauthClient.class);
+
+	private final String clientId;
+	private final String clientSecret;
+	private final String tokenUri;
+	private final String userInfoUri;
+	private final String redirectUri;
+
+	public OauthClient(String clientId, String clientSecret, String tokenUri, String userInfoUri, String redirectUri) {
+		this.clientId = clientId;
+		this.clientSecret = clientSecret;
+		this.tokenUri = tokenUri;
+		this.userInfoUri = userInfoUri;
+		this.redirectUri = redirectUri;
+	}
 
 	// accessToken을 Oauth 서버로부터 발급받는다
-	public OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(OauthProvider oauthProvider,
-		String authorizationCode) {
-		String tokenUri = oauthProvider.getTokenUri();
-		String clientId = oauthProvider.getClientId();
-		String clientSecret = oauthProvider.getClientSecret();
-		String redirectUri = oauthProvider.getRedirectUri();
+	public OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(String authorizationCode) {
 		MultiValueMap<String, String> formData = createFormData(redirectUri, authorizationCode);
 
 		return WebClient.create()
@@ -39,7 +43,7 @@ public class OauthClient {
 			.uri(tokenUri)
 			.headers(header -> {
 				header.setBasicAuth(clientId, clientSecret);
-				header.setContentType(MediaType.APPLICATION_FORM_URLENCODED); // application/x-www-form-urlencoded
+				header.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 				header.setAccept(List.of(MediaType.APPLICATION_JSON));
 				header.setAcceptCharset(List.of(StandardCharsets.UTF_8));
 			})
@@ -58,11 +62,8 @@ public class OauthClient {
 	}
 
 	// Oauth 리소스 서버로부터 유저의 프로필 가져온다
-	public OauthUserProfileResponse getUserProfileByAccessToken(
-		String providerName,
-		OauthProvider oauthProvider,
+	public OauthUserProfileResponse getUserProfileByAccessToken(String providerName,
 		OauthAccessTokenResponse accessTokenResponse) {
-		String userInfoUri = oauthProvider.getUserInfoUri();
 		Map<String, Object> userProfileMap = getUserAttributes(userInfoUri, accessTokenResponse);
 		log.debug("userProfileMap : {}", userProfileMap);
 		return OauthAttributes.extract(providerName, userProfileMap);
