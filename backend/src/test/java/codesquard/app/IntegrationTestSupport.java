@@ -5,6 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import codesquard.app.api.oauth.OauthService;
 import codesquard.app.domain.member.MemberRepository;
+import codesquard.app.domain.membertown.MemberTownRepository;
 
 @SpringBootTest
 public abstract class IntegrationTestSupport {
@@ -14,4 +15,7 @@ public abstract class IntegrationTestSupport {
 
 	@Autowired
 	protected MemberRepository memberRepository;
+
+	@Autowired
+	protected MemberTownRepository memberTownRepository;
 }

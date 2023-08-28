@@ -23,13 +23,8 @@ class MemberTest extends IntegrationTestSupport {
 	@Test
 	public void addMemberTown() {
 		// given
-		Member member = Member.builder()
-			.nickname("23Yong")
-			.socialLoginId("23Yong1234")
-			.build();
-		MemberTown town = MemberTown.builder()
-			.name("가락 1동")
-			.build();
+		Member member = Member.create(null, "23Yong1234@gmail.com", "23Yong");
+		MemberTown town = MemberTown.create("가락 1동");
 		// when
 		member.addMemberTown(town);
 		// then

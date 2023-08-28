@@ -47,7 +47,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("message").value(Matchers.equalTo("CREATED")))
 			.andExpect(jsonPath("data.id").value(Matchers.equalTo(1)))
 			.andExpect(jsonPath("data.avatarUrl").value(Matchers.equalTo("avatarUrlValue")))
-			.andExpect(jsonPath("data.socialLoginId").value(Matchers.equalTo("23Yong1234")))
-			.andExpect(jsonPath("data.nickname").value(Matchers.equalTo("23Yong")));
+			.andExpect(jsonPath("data.email").value(Matchers.equalTo("23Yong@gmail.com")))
+			.andExpect(jsonPath("data.loginId").value(Matchers.equalTo("23Yong")));
 	}
 }

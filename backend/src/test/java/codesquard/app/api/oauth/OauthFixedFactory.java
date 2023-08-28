@@ -22,7 +22,7 @@ public class OauthFixedFactory {
 	private static final String SCOPE = "scopeValue";
 	private static final String TOKEN_TYPE = "Bearer";
 
-	private static final String SOCIAL_LOGIN_ID = "23Yong1234";
+	private static final String EMAIL = "23Yong@gmail.com";
 
 	private static final String AVATAR_URL = "avatarUrlValue";
 
@@ -35,11 +35,11 @@ public class OauthFixedFactory {
 	}
 
 	public static OauthUserProfileResponse createOauthUserProfileResponse() {
-		return OauthUserProfileResponse.create(SOCIAL_LOGIN_ID);
+		return OauthUserProfileResponse.create(EMAIL);
 	}
 
 	public static OauthSignUpResponse createdFixedOauthSignUpResponse() {
-		return OauthSignUpResponse.create(1L, AVATAR_URL, SOCIAL_LOGIN_ID, LOGIN_ID);
+		return OauthSignUpResponse.create(1L, AVATAR_URL, EMAIL, LOGIN_ID);
 	}
 
 	public static MockMultipartFile createFixedProfile() throws IOException {
