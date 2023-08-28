@@ -59,7 +59,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	public void signupWhenInvalidLoginId(String loginId) throws Exception {
 		// given
 		MockMultipartFile mockProfile = createFixedProfile();
-		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest(loginId));
+		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest(loginId, "가락 1동"));
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
 				.file(mockProfile)
@@ -73,6 +73,26 @@ class OauthRestControllerTest extends ControllerTestSupport {
 				Matchers.equalTo("아이디는 띄어쓰기 없이 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.")));
 	}
 
+	@DisplayName("비어 있는 주소를 전달하여 회원가입을 요청할 때 에러를 응답한다")
+	@MethodSource(value = "provideInvalidAddrName")
+	@ParameterizedTest
+	public void signupWhenInvalidAddrName(String addrName) throws Exception {
+		// given
+		MockMultipartFile mockProfile = createFixedProfile();
+		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest("23Yong", addrName));
+		// when & then
+		mockMvc.perform(multipart("/api/auth/naver/signup")
+				.file(mockProfile)
+				.file(mockSignupData)
+				.param("code", "1234"))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(400)))
+			.andExpect(jsonPath("message").value(Matchers.equalTo("유효하지 않은 입력형식입니다.")))
+			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("addrName")))
+			.andExpect(jsonPath("data[0].defaultMessage").value(
+				Matchers.equalTo("동네는 필수 정보입니다.")));
+	}
+
 	private static Stream<Arguments> provideInvalidLoginId() {
 		return Stream.of(
 			Arguments.of((Object)null),
@@ -81,6 +101,13 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			Arguments.of("네모네모"),
 			Arguments.of("aaaaaaaaaaaaaaaaaaaaaa"),
 			Arguments.of("!@#!#AWEfa")
+		);
+	}
+
+	private static Stream<Arguments> provideInvalidAddrName() {
+		return Stream.of(
+			Arguments.of((Object)null),
+			Arguments.of("")
 		);
 	}
 }

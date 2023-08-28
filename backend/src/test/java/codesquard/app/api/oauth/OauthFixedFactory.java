@@ -33,8 +33,8 @@ public class OauthFixedFactory {
 		return OauthSignUpRequest.create(LOGIN_ID, ADDR_NAME);
 	}
 
-	public static OauthSignUpRequest createFixedOauthSignUpRequest(String loginId) {
-		return OauthSignUpRequest.create(loginId, ADDR_NAME);
+	public static OauthSignUpRequest createFixedOauthSignUpRequest(String loginId, String addrName) {
+		return OauthSignUpRequest.create(loginId, addrName);
 	}
 
 	public static OauthAccessTokenResponse createFixedOauthAccessTokenResponse() {
