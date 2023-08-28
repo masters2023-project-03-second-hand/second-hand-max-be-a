@@ -33,7 +33,7 @@ public class OauthRestController {
 	@PostMapping(value = "/{provider}/signup", consumes = {MediaType.APPLICATION_JSON_VALUE,
 		MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<ApiResponse<OauthSignUpResponse>> signUp(
-		@PathVariable(value = "provider") String provider,
+		@PathVariable String provider,
 		@RequestParam String code,
 		@RequestPart(value = "profile", required = false) MultipartFile profile,
 		@Valid @RequestPart(value = "signupData") OauthSignUpRequest request) {
