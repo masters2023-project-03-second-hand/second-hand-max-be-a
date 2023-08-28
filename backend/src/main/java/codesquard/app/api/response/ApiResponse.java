@@ -25,12 +25,12 @@ public class ApiResponse<T> {
 		return new ApiResponse<>(httpStatus, message, data);
 	}
 
-	public static <T> ApiResponse<T> ok(T data) {
-		return new ApiResponse<>(HttpStatus.OK, HttpStatus.OK.name(), data);
+	public static <T> ApiResponse<T> ok() {
+		return new ApiResponse<>(HttpStatus.OK, null, null);
 	}
 
-	public static <T> ApiResponse<T> created(T data) {
-		return new ApiResponse<>(HttpStatus.CREATED, HttpStatus.CREATED.name(), data);
+	public static <T> ApiResponse<T> created() {
+		return new ApiResponse<>(HttpStatus.CREATED, null, null);
 	}
 
 	public static <T> ApiResponse<T> error(ErrorCode errorCode) {

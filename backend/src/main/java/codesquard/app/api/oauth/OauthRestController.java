@@ -39,8 +39,8 @@ public class OauthRestController {
 		@Valid @RequestPart(value = "signupData") OauthSignUpRequest request) {
 		log.info("provider : {}, code : {}, profile : {}, request : {}", provider, code, profile, request);
 
-		OauthSignUpResponse response = oauthService.signUp(profile, request, provider, code);
+		oauthService.signUp(profile, request, provider, code);
 		return ResponseEntity.status(CREATED)
-			.body(ApiResponse.created(response));
+			.body(ApiResponse.created());
 	}
 }
