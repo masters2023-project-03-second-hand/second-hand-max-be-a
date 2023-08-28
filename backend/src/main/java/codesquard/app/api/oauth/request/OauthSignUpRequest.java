@@ -29,8 +29,8 @@ public class OauthSignUpRequest {
 		return new OauthSignUpRequest(loginId, addrName);
 	}
 
-	public Member toEntity(String email) {
-		Member member = Member.create(null, email, loginId);
+	public Member toEntity(String avatarUrl, String email) {
+		Member member = Member.create(avatarUrl, email, loginId);
 		MemberTown town = MemberTown.create(addrName);
 		member.addMemberTown(town);
 		return member;
