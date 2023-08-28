@@ -31,6 +31,10 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // S3
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.518'
+    testImplementation 'com.amazonaws:aws-java-sdk-s3:1.12.518'
 }
 
 tasks.named('test') {
@@ -41,3 +45,4 @@ tasks.named('test') {
 jar {
     enabled = false
 }
+
