@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +30,8 @@ public class OauthRestController {
 
 	private final OauthService oauthService;
 
-	@PostMapping("/{provider}/signup")
+	@PostMapping(value = "/{provider}/signup", consumes = {MediaType.APPLICATION_JSON_VALUE,
+		MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<ApiResponse<OauthSignUpResponse>> signUp(
 		@PathVariable(value = "provider") String provider,
 		@RequestParam String code,
@@ -37,7 +39,7 @@ public class OauthRestController {
 		@Valid @RequestPart(value = "signupData") OauthSignUpRequest request) {
 		log.info("provider : {}, code : {}, profile : {}, request : {}", provider, code, profile, request);
 
-		OauthSignUpResponse response = oauthService.signUp(request, provider, code);
+		OauthSignUpResponse response = oauthService.signUp(profile, request, provider, code);
 		return ResponseEntity.status(CREATED)
 			.body(ApiResponse.created(response));
 	}

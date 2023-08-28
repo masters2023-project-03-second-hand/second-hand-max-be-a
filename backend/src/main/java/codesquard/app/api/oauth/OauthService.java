@@ -4,7 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import codesquard.app.api.errors.errorcode.MemberErrorCode;
+import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.image.ImageService;
 import codesquard.app.api.oauth.client.OauthClient;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
@@ -26,8 +30,10 @@ public class OauthService {
 	private final ProviderRepository providerRepository;
 	private final MemberRepository memberRepository;
 	private final OauthClient oauthClient;
+	private final ImageService imageService;
 
-	public OauthSignUpResponse signUp(OauthSignUpRequest request, String provider, String authorizationCode) {
+	public OauthSignUpResponse signUp(MultipartFile profile, OauthSignUpRequest request, String provider,
+		String authorizationCode) {
 		log.info("OauthSignUpRequest : {}, provider : {}, authorizationCode : {}", request, provider,
 			authorizationCode);
 
@@ -45,10 +51,27 @@ public class OauthService {
 			oauthClient.getUserProfileByAccessToken(provider, oauthProvider, accessTokenResponse);
 		log.debug("userProfileResponse : {}", userProfileResponse);
 
-		// 회원 정보를 DB에 저장
-		Member member = request.toEntity(userProfileResponse.getSocialLoginId());
+		// 프로필 사진 업로드
+		String avatarUrl = null;
+		if (profile != null) {
+			avatarUrl = imageService.uploadImage(profile);
+			log.debug("avatarUrl : {}", avatarUrl);
+		}
+
+		Member member = request.toEntity(avatarUrl, userProfileResponse.getEmail());
+
+		// 중복 로그인 아이디 검증
+		validateDuplicateLoginId(member.getLoginId());
+
+		// 회원 저장
 		Member saveMember = memberRepository.save(member);
 
 		return OauthSignUpResponse.from(saveMember);
+	}
+
+	private void validateDuplicateLoginId(String loginId) {
+		if (memberRepository.existsMemberByLoginIdIs(loginId)) {
+			throw new RestApiException(MemberErrorCode.ALREADY_EXIST_ID);
+		}
 	}
 }
