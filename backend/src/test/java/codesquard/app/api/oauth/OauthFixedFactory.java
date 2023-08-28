@@ -1,9 +1,12 @@
 package codesquard.app.api.oauth;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,11 +46,12 @@ public class OauthFixedFactory {
 	}
 
 	public static MockMultipartFile createFixedProfile() throws IOException {
-		String filename = "profile";
-		String originalFilename = "profile.jpg";
-		String contentType = "image/jpeg";
-		String content = "테스트 이미지 데이터";
-		ByteArrayInputStream mockInputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+		File catFile = new ClassPathResource("cat.png").getFile();
+		String filename = catFile.getName().split("\\.")[0];
+		String originalFilename = catFile.getName();
+		String contentType = "multipart/form-data";
+		byte[] content = Files.readAllBytes(catFile.toPath());
+		ByteArrayInputStream mockInputStream = new ByteArrayInputStream(content);
 		return new MockMultipartFile(filename, originalFilename, contentType, mockInputStream);
 	}
 

@@ -35,7 +35,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		MockMultipartFile mockProfile = createFixedProfile();
 		MockMultipartFile mockSignupData = createFixedSignUpData();
 		// mocking
-		when(oauthService.signUp(any(OauthSignUpRequest.class), anyString(), anyString()))
+		when(oauthService.signUp(any(), any(OauthSignUpRequest.class), anyString(), anyString()))
 			.thenReturn(createdFixedOauthSignUpResponse());
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
