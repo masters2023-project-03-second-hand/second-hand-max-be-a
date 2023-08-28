@@ -10,8 +10,8 @@ public enum OauthAttributes {
 		@Override
 		public OauthUserProfileResponse of(Map<String, Object> attributes) {
 			Map<String, Object> responseMap = (Map<String, Object>)attributes.get("response");
-			String socialLoginId = (String)responseMap.get("email");
-			return OauthUserProfileResponse.create(socialLoginId);
+			String email = (String)responseMap.get("email");
+			return OauthUserProfileResponse.create(email);
 		}
 	};
 
