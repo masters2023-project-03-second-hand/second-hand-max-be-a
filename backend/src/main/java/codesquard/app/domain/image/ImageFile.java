@@ -1,11 +1,16 @@
 package codesquard.app.domain.image;
 
+import static codesquard.app.domain.image.ImageFile.ImageContentType.*;
+import static org.springframework.util.StringUtils.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.errors.errorcode.ImageErrorCode;
@@ -16,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class ImageFile {
+
+	private static final Logger log = LoggerFactory.getLogger(ImageFile.class);
 
 	private final String fileName;
 	private final String contentType;
@@ -40,8 +47,12 @@ public class ImageFile {
 		return originalFilename.substring(pos + 1);
 	}
 
+	/**
+	 * 파일 이름에서 확장자를 가져옵니다.
+	 * ex) cat.png -> png
+	 */
 	private String getImageContentType(MultipartFile multipartFile) {
-		return ImageContentType.findEnum(multipartFile.getContentType()).getContentType();
+		return findEnum(getFilenameExtension(multipartFile.getOriginalFilename()));
 	}
 
 	public InputStream getImageInputStream(MultipartFile multipartFile) {
@@ -70,17 +81,19 @@ public class ImageFile {
 	@RequiredArgsConstructor
 	enum ImageContentType {
 
-		JPEG("image/jpeg"),
-		JPG("image/jpg"),
-		PNG("image/png"),
-		SVG("image/svg");
+		JPEG("jpeg"),
+		JPG("jpg"),
+		PNG("png"),
+		SVG("svg");
 
 		private final String contentType;
 
-		public static ImageContentType findEnum(String contentType) {
-			for (ImageContentType imageContentType : ImageContentType.values()) {
+		public static String findEnum(String contentType) {
+			log.info("ContentType : {}", contentType);
+
+			for (ImageContentType imageContentType : values()) {
 				if (imageContentType.getContentType().equals(contentType)) {
-					return imageContentType;
+					return imageContentType.getContentType();
 				}
 			}
 			throw new RestApiException(ImageErrorCode.INVALID_FILE_EXTENSION);
