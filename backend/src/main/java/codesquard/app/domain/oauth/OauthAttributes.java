@@ -10,7 +10,7 @@ public enum OauthAttributes {
 		@Override
 		public OauthUserProfileResponse of(Map<String, Object> attributes) {
 			Map<String, Object> responseMap = (Map<String, Object>)attributes.get("response");
-			String socialLoginId = convertToNicknameFrom((String)responseMap.get("email"));
+			String socialLoginId = (String)responseMap.get("email");
 			return OauthUserProfileResponse.create(socialLoginId);
 		}
 	};
@@ -19,10 +19,6 @@ public enum OauthAttributes {
 
 	OauthAttributes(String providerName) {
 		this.providerName = providerName;
-	}
-
-	private static String convertToNicknameFrom(String email) {
-		return email.split("@")[0];
 	}
 
 	public static OauthUserProfileResponse extract(String providerName, Map<String, Object> attributes) {

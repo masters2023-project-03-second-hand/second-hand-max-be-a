@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @ToString
 public class OauthSignUpRequest {
-	@Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,12}$", message = "아이디는 띄어쓰기 없이 한글, 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.")
+	@Pattern(regexp = "^[a-zA-Z0-9]{2,12}$", message = "아이디는 띄어쓰기 없이 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.")
 	private String loginId;
 	@NotEmpty(message = "동네는 필수 정보입니다.")
 	private String addrName;
@@ -29,14 +29,9 @@ public class OauthSignUpRequest {
 		return new OauthSignUpRequest(loginId, addrName);
 	}
 
-	public Member toEntity(String socialLoginId) {
-		Member member = Member.builder()
-			.socialLoginId(socialLoginId)
-			.nickname(loginId)
-			.build();
-		MemberTown town = MemberTown.builder()
-			.name(addrName)
-			.build();
+	public Member toEntity(String email) {
+		Member member = Member.create(null, email, loginId);
+		MemberTown town = MemberTown.create(addrName);
 		member.addMemberTown(town);
 		return member;
 	}

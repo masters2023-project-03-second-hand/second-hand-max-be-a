@@ -9,23 +9,23 @@ public class OauthSignUpResponse {
 
 	private final String avatarUrl;
 
-	private final String socialLoginId;
+	private final String email;
 
-	private final String nickname;
+	private final String loginId;
 
-	private OauthSignUpResponse(Long id, String avatarUrl, String socialLoginId, String nickname) {
+	private OauthSignUpResponse(Long id, String avatarUrl, String email, String loginId) {
 		this.id = id;
 		this.avatarUrl = avatarUrl;
-		this.socialLoginId = socialLoginId;
-		this.nickname = nickname;
+		this.email = email;
+		this.loginId = loginId;
 	}
 
 	public static OauthSignUpResponse from(Member member) {
-		return new OauthSignUpResponse(member.getId(), member.getAvatarUrl(), member.getSocialLoginId(),
-			member.getNickname());
+		return new OauthSignUpResponse(member.getId(), member.getAvatarUrl(), member.getEmail(),
+			member.getLoginId());
 	}
 
-	public static OauthSignUpResponse create(Long id, String avatarUrl, String socialLoginId, String nickname) {
-		return new OauthSignUpResponse(id, avatarUrl, socialLoginId, nickname);
+	public static OauthSignUpResponse create(Long id, String avatarUrl, String email, String loginId) {
+		return new OauthSignUpResponse(id, avatarUrl, email, loginId);
 	}
 }

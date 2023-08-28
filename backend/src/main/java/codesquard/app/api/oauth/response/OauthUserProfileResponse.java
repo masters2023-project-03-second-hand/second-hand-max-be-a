@@ -6,13 +6,13 @@ import lombok.ToString;
 @Getter
 @ToString
 public class OauthUserProfileResponse {
-	private final String socialLoginId;
+	private final String email;
 
-	private OauthUserProfileResponse(String socialLoginId) {
-		this.socialLoginId = socialLoginId;
+	private OauthUserProfileResponse(String email) {
+		this.email = email;
 	}
 
-	public static OauthUserProfileResponse create(String socialLoginId) {
-		return new OauthUserProfileResponse(socialLoginId);
+	public static OauthUserProfileResponse create(String email) {
+		return new OauthUserProfileResponse(email);
 	}
 }

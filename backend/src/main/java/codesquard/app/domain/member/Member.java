@@ -26,18 +26,22 @@ public class Member {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id; // 회원 등록번호
 	private String avatarUrl; // 프로필 사진
-	private String socialLoginId; // 소셜 로그인 아이디
-	private String nickname; // 닉네임
+	private String email; // 소셜 사용자의 이메일
+	private String loginId; // 닉네임
 
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<MemberTown> towns = new ArrayList<>(); // 동네
 
 	@Builder
-	public Member(String avatarUrl, String socialLoginId, String nickname) {
+	public Member(String avatarUrl, String email, String loginId) {
 		this.avatarUrl = avatarUrl;
-		this.socialLoginId = socialLoginId;
-		this.nickname = nickname;
+		this.email = email;
+		this.loginId = loginId;
 		this.towns = new ArrayList<>();
+	}
+
+	public static Member create(String avatarUrl, String email, String loginId) {
+		return new Member(avatarUrl, email, loginId);
 	}
 
 	public void addMemberTown(MemberTown town) {
