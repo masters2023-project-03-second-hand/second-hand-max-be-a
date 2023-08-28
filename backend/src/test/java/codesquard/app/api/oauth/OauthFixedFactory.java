@@ -33,6 +33,10 @@ public class OauthFixedFactory {
 		return OauthSignUpRequest.create(LOGIN_ID, ADDR_NAME);
 	}
 
+	public static OauthSignUpRequest createFixedOauthSignUpRequest(String loginId) {
+		return OauthSignUpRequest.create(loginId, ADDR_NAME);
+	}
+
 	public static OauthAccessTokenResponse createFixedOauthAccessTokenResponse() {
 		return OauthAccessTokenResponse.create(ACCESS_TOKEN, SCOPE, TOKEN_TYPE);
 	}
@@ -55,9 +59,9 @@ public class OauthFixedFactory {
 		return new MockMultipartFile(filename, originalFilename, contentType, mockInputStream);
 	}
 
-	public static MockMultipartFile createFixedSignUpData() throws JsonProcessingException {
+	public static MockMultipartFile createFixedSignUpData(OauthSignUpRequest request) throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
-		String requestJson = objectMapper.writeValueAsString(createFixedOauthSignUpRequest());
+		String requestJson = objectMapper.writeValueAsString(request);
 		return new MockMultipartFile("signupData", "signupData", "application/json",
 			requestJson.getBytes(StandardCharsets.UTF_8));
 	}
