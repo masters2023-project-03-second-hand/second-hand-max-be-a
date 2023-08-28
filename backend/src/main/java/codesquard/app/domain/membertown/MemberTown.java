@@ -25,4 +25,8 @@ public class MemberTown {
 	public MemberTown(String name) {
 		this.name = name;
 	}
+
+	public static MemberTown create(String name) {
+		return new MemberTown(name);
+	}
 }
