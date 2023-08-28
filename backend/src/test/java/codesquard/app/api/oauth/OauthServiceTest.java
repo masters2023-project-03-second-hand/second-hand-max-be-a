@@ -7,12 +7,12 @@ import java.io.IOException;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
@@ -26,16 +26,11 @@ import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.OauthProvider;
 
+@Transactional
 class OauthServiceTest extends IntegrationTestSupport {
 
 	@MockBean
 	private OauthClient oauthClient;
-
-	@BeforeEach
-	void cleanup() {
-		memberTownRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
-	}
 
 	@DisplayName("로그인 아이디와 소셜 로그인을 하여 회원가입을 한다")
 	@Test
