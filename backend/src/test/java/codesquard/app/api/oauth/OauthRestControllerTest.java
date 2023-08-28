@@ -41,9 +41,11 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		// given
 		MockMultipartFile mockProfile = createFixedProfile();
 		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest());
+
 		// mocking
 		when(oauthService.signUp(any(), any(OauthSignUpRequest.class), anyString(), anyString()))
 			.thenReturn(createdFixedOauthSignUpResponse());
+
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
 				.file(mockProfile)
@@ -60,6 +62,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		// given
 		MockMultipartFile mockProfile = createFixedProfile();
 		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest(loginId, "가락 1동"));
+
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
 				.file(mockProfile)
@@ -80,6 +83,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		// given
 		MockMultipartFile mockProfile = createFixedProfile();
 		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest("23Yong", addrName));
+
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
 				.file(mockProfile)

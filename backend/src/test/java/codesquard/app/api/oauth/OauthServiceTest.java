@@ -1,14 +1,15 @@
 package codesquard.app.api.oauth;
 
 import static codesquard.app.api.oauth.OauthFixedFactory.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
@@ -17,19 +18,22 @@ import org.springframework.transaction.annotation.Transactional;
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
-import codesquard.app.api.oauth.client.OauthClient;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
-import codesquard.app.domain.oauth.OauthProvider;
+import codesquard.app.domain.oauth.client.OauthClient;
+import codesquard.app.domain.oauth.repository.OauthClientRepository;
 
 @Transactional
 class OauthServiceTest extends IntegrationTestSupport {
 
 	@MockBean
+	private OauthClientRepository oauthClientRepository;
+
+	@Mock
 	private OauthClient oauthClient;
 
 	@DisplayName("로그인 아이디와 소셜 로그인을 하여 회원가입을 한다")
@@ -42,17 +46,20 @@ class OauthServiceTest extends IntegrationTestSupport {
 		OauthSignUpRequest request = createFixedOauthSignUpRequest();
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
+
 		// mocking
-		when(oauthClient.exchangeAccessTokenByAuthorizationCode(
-			any(OauthProvider.class), anyString()))
+		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
+		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
 			.thenReturn(mockAccessTokenResponse);
 		when(oauthClient.getUserProfileByAccessToken(
-			anyString(), any(OauthProvider.class), any(OauthAccessTokenResponse.class)))
+			anyString(), any(OauthAccessTokenResponse.class)))
 			.thenReturn(mockUserProfileResponse);
+
 		// when
 		OauthSignUpResponse response = oauthService.signUp(profile, request, provider, code);
+
 		// then
-		Member findMember = memberRepository.findMemberByLoginIdIs("23Yong");
+		Member findMember = memberRepository.findMemberByLoginId("23Yong");
 
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
@@ -79,10 +86,15 @@ class OauthServiceTest extends IntegrationTestSupport {
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
 		OauthSignUpRequest request = createFixedOauthSignUpRequest();
+
+		// mocking
+		when(oauthClientRepository.findOneBy(anyString())).thenThrow(
+			new RestApiException(OauthErrorCode.NOT_FOUND_PROVIDER));
 		// when
-		Throwable throwable = Assertions.catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
+		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
+
 		// then
-		Assertions.assertThat(throwable)
+		assertThat(throwable)
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode")
 			.extracting("name", "httpStatus", "message")
@@ -98,17 +110,19 @@ class OauthServiceTest extends IntegrationTestSupport {
 		MockMultipartFile profile = createFixedProfile();
 		OauthSignUpRequest request = createFixedOauthSignUpRequest();
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
+
 		// mocking
-		when(oauthClient.exchangeAccessTokenByAuthorizationCode(
-			any(OauthProvider.class), anyString()))
+		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
+		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
 			.thenReturn(mockAccessTokenResponse);
-		when(oauthClient.getUserProfileByAccessToken(anyString(), any(OauthProvider.class),
-			any(OauthAccessTokenResponse.class)))
+		when(oauthClient.getUserProfileByAccessToken(anyString(), any(OauthAccessTokenResponse.class)))
 			.thenThrow(new RestApiException(OauthErrorCode.WRONG_AUTHORIZATION_CODE));
+
 		// when
-		Throwable throwable = Assertions.catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
+		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
+
 		// then
-		Assertions.assertThat(throwable)
+		assertThat(throwable)
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode")
 			.extracting("name", "httpStatus", "message")
@@ -130,15 +144,19 @@ class OauthServiceTest extends IntegrationTestSupport {
 		OauthSignUpRequest request = createFixedOauthSignUpRequest();
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
+
 		// mocking
-		when(oauthClient.exchangeAccessTokenByAuthorizationCode(
-			any(OauthProvider.class), anyString()))
+		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
+		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
 			.thenReturn(mockAccessTokenResponse);
-		when(oauthClient.getUserProfileByAccessToken(
-			anyString(), any(OauthProvider.class), any(OauthAccessTokenResponse.class)))
+		when(oauthClient.getUserProfileByAccessToken(anyString(), any(OauthAccessTokenResponse.class)))
 			.thenReturn(mockUserProfileResponse);
-		// when // then
-		Assertions.assertThatThrownBy(() -> oauthService.signUp(profile, request, provider, code))
+
+		// when
+		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
+
+		// then
+		assertThat(throwable)
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("이미 존재하는 아이디입니다.");
