@@ -10,6 +10,8 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
@@ -18,8 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
+import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.member.Member;
@@ -29,6 +33,8 @@ import codesquard.app.domain.oauth.repository.OauthClientRepository;
 
 @Transactional
 class OauthServiceTest extends IntegrationTestSupport {
+
+	private static final Logger log = LoggerFactory.getLogger(OauthServiceTest.class);
 
 	@MockBean
 	private OauthClientRepository oauthClientRepository;
@@ -160,5 +166,42 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("이미 존재하는 아이디입니다.");
+	}
+
+	@DisplayName("로그인 아이디와 인가코드를 가지고 소셜 로그인을 한다")
+	@Test
+	public void login() {
+		// given
+		String avatarUrl = "avatarUrlValue";
+		String loginId = "23Yong";
+		String email = "23Yong@gmail.com";
+		Member member = Member.create(avatarUrl, email, loginId);
+		memberRepository.save(member);
+
+		OauthLoginRequest request = OauthFixedFactory.createFixedOauthLoginRequest();
+		String provider = "naver";
+		String code = "1234";
+		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
+		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
+
+		// mocking
+		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
+		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
+			.thenReturn(mockAccessTokenResponse);
+		when(oauthClient.getUserProfileByAccessToken(anyString(), any(OauthAccessTokenResponse.class)))
+			.thenReturn(mockUserProfileResponse);
+
+		// when
+		OauthLoginResponse response = oauthService.login(request, provider, code);
+		log.debug("response : {}", response);
+
+		// then
+		SoftAssertions.assertSoftly(softAssertions -> {
+			softAssertions.assertThat(response)
+				.extracting("user.email", "user.loginId", "user.profileUrl")
+				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
+			softAssertions.assertAll();
+		});
+
 	}
 }
