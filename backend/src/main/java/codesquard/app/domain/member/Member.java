@@ -13,7 +13,6 @@ import javax.persistence.OneToMany;
 
 import codesquard.app.domain.membertown.MemberTown;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -34,8 +33,7 @@ public class Member {
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<MemberTown> towns = new ArrayList<>(); // 동네
 
-	@Builder
-	public Member(String avatarUrl, String email, String loginId) {
+	private Member(String avatarUrl, String email, String loginId) {
 		this.avatarUrl = avatarUrl;
 		this.email = email;
 		this.loginId = loginId;
