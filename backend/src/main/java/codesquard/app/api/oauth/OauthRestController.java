@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthLogoutRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
+import codesquard.app.api.oauth.resolver.Login;
 import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.response.ApiResponse;
@@ -63,7 +64,8 @@ public class OauthRestController {
 	}
 
 	@PostMapping(value = "/logout")
-	public ResponseEntity<ApiResponse<Void>> logout(AuthenticateMember authMember) {
+	public ResponseEntity<ApiResponse<Void>> logout(@Login AuthenticateMember authMember) {
+		log.info("authMember : {}", authMember);
 		Jwt jwt = jwtProvider.createJwtBasedOnAuthenticateMember(authMember);
 		OauthLogoutRequest request = OauthLogoutRequest.create(authMember, jwt);
 		oauthService.logout(request);

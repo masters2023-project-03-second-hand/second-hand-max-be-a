@@ -1,7 +1,5 @@
 package codesquard.app.domain.member;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import lombok.ToString;
 
@@ -9,10 +7,8 @@ import lombok.ToString;
 @ToString
 public class AuthenticateMember {
 
-	@JsonIgnore
 	private Long id;
 
-	@JsonIgnore
 	private String email;
 
 	private String loginId;
