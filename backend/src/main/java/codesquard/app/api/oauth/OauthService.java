@@ -14,9 +14,11 @@ import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageService;
 import codesquard.app.api.oauth.request.OauthLoginRequest;
+import codesquard.app.api.oauth.request.OauthLogoutRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthLoginResponse;
+import codesquard.app.api.oauth.response.OauthLogoutResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.jwt.Jwt;
@@ -127,5 +129,20 @@ public class OauthService {
 			throw new RestApiException(OauthErrorCode.FAIL_LOGIN);
 		}
 		return member;
+	}
+
+	public OauthLogoutResponse logout(OauthLogoutRequest request) {
+		log.info("request : {}", request);
+		AuthenticateMember authMember = request.getAuthMember();
+		Jwt jwt = request.getJwt();
+		// Redis에 유저 email로 저장된 RefreshToken이 있는지 확인
+		if (redisTemplate.opsForValue().get(authMember.createRedisKey()) != null) {
+			// RefreshToken 삭제
+			redisTemplate.delete(authMember.createRedisKey());
+		}
+		// 해당 액세스 토큰 유효시간을 가지고 와서 블랙리스트에 저장하기
+		long expiration = jwt.getExpireDateAccessTokenTime();
+		redisTemplate.opsForValue().set(jwt.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
+		return OauthLogoutResponse.from(authMember);
 	}
 }
