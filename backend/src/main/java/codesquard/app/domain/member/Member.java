@@ -33,6 +33,10 @@ public class Member {
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<MemberTown> towns = new ArrayList<>(); // 동네
 
+	public Member(Long id) {
+		this.id = id;
+	}
+
 	private Member(String avatarUrl, String email, String loginId) {
 		this.avatarUrl = avatarUrl;
 		this.email = email;
