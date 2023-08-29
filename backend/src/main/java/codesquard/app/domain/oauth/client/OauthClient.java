@@ -3,6 +3,7 @@ package codesquard.app.domain.oauth.client;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import codesquard.app.api.errors.errorcode.OauthErrorCode;
+import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 
@@ -37,7 +40,7 @@ public abstract class OauthClient {
 	public OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(String authorizationCode) {
 		MultiValueMap<String, String> formData = createFormData(redirectUri, authorizationCode);
 
-		return WebClient.create()
+		OauthAccessTokenResponse response = WebClient.create()
 			.post()
 			.uri(tokenUri)
 			.headers(header -> {
@@ -50,6 +53,12 @@ public abstract class OauthClient {
 			.retrieve() // ResponseEntity를 받아 디코딩
 			.bodyToMono(OauthAccessTokenResponse.class) // 주어진 타입으로 디코딩
 			.block();
+
+		if (Objects.requireNonNull(response).getAccessToken() == null) {
+			throw new RestApiException(OauthErrorCode.WRONG_AUTHORIZATION_CODE);
+		}
+
+		return response;
 	}
 
 	private MultiValueMap<String, String> createFormData(String redirectUri, String authorizationCode) {
