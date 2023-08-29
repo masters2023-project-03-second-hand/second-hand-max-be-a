@@ -1,8 +1,8 @@
 spring:
   profiles:
     group:
-      local: local, secret
-      dev: dev, secret
+      local: local, secret, s3
+      dev: dev, secret, s3
     default: local
 ---
 spring:
@@ -20,17 +20,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
-cloud:
-  aws:
-    credentials:
-      access-key: ${aws.access-key}
-      secret-key: ${aws.secret-key}
-    region:
-      static: ap-northeast-2
-    stack:
-      auto: false
-    s3:
-      bucket: ${aws.s3.bucket}
+
+logging:
+  level:
+    codesquard: debug
 ---
 
 spring:
@@ -48,6 +41,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: s3
 
 cloud:
   aws:

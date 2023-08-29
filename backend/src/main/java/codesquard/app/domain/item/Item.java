@@ -19,5 +19,7 @@ public class Item {
 	private String region;
 	private LocalDateTime createdAt;
 
+	private LocalDateTime modifiedAt;
+
 	private String imageUrl;
 }
