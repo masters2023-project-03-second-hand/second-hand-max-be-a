@@ -1,6 +1,7 @@
 package codesquard.app.domain.member;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,5 +57,36 @@ class MemberRepositoryTest extends IntegrationTestSupport {
 
 		// then
 		Assertions.assertThat(result).isTrue();
+	}
+
+	@DisplayName("로그인 아이디와 이메일을 가지고 회원을 조회한다")
+	@Test
+	public void findMemberByLoginIdAndAndEmail() {
+		// given
+		String loginId = "23Yong";
+		String email = "23Yong1234@gmail.com";
+		Member member = Member.create(null, email, loginId);
+		memberRepository.save(member);
+		// when
+		Member findMember = memberRepository.findMemberByLoginIdAndAndEmail(loginId, email);
+		// then
+		SoftAssertions.assertSoftly(softAssertions -> {
+			softAssertions.assertThat(findMember)
+				.extracting("loginId", "email")
+				.contains(loginId, email);
+			softAssertions.assertAll();
+		});
+	}
+
+	@DisplayName("로그인 아이디와 이메일을 가지고 회원을 조회할때 회원이 없는 경우 null을 반환한다")
+	@Test
+	public void findMemberByLoginIdAndAndEmailWhenMemberIsNotExist() {
+		// given
+		String loginId = "23Yong";
+		String email = "23Yong1234@gmail.com";
+		// when
+		Member findMember = memberRepository.findMemberByLoginIdAndAndEmail(loginId, email);
+		// then
+		Assertions.assertThat(findMember).isNull();
 	}
 }
