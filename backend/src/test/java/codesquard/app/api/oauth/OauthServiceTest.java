@@ -132,7 +132,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode")
 			.extracting("name", "httpStatus", "message")
-			.containsExactlyInAnyOrder("WRONG_AUTHORIZATION_CODE", HttpStatus.BAD_REQUEST, "잘못된 인가 코드입니다.");
+			.containsExactlyInAnyOrder("WRONG_AUTHORIZATION_CODE", HttpStatus.UNAUTHORIZED, "잘못된 인가 코드입니다.");
 	}
 
 	@DisplayName("로그인 아이디가 중복되는 경우 회원가입을 할 수 없다")
