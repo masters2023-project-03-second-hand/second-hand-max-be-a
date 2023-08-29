@@ -14,9 +14,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
-import codesquard.app.domain.oauth.OauthAttributes;
 
-public class OauthClient {
+public abstract class OauthClient {
 
 	Logger log = LoggerFactory.getLogger(OauthClient.class);
 
@@ -66,7 +65,7 @@ public class OauthClient {
 		OauthAccessTokenResponse accessTokenResponse) {
 		Map<String, Object> userProfileMap = getUserAttributes(userInfoUri, accessTokenResponse);
 		log.debug("userProfileMap : {}", userProfileMap);
-		return OauthAttributes.extract(providerName, userProfileMap);
+		return createOauthUserProfileResponse(userProfileMap);
 	}
 
 	private Map<String, Object> getUserAttributes(String userInfoUri, OauthAccessTokenResponse accessTokenResponse) {
@@ -80,4 +79,6 @@ public class OauthClient {
 				})
 			.block();
 	}
+
+	public abstract OauthUserProfileResponse createOauthUserProfileResponse(Map<String, Object> attributes);
 }
