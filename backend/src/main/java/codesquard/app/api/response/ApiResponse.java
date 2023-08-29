@@ -9,6 +9,7 @@ import lombok.Getter;
 
 @Getter
 public class ApiResponse<T> {
+
 	private final int statusCode;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private final String message;
@@ -25,15 +26,15 @@ public class ApiResponse<T> {
 		return new ApiResponse<>(httpStatus, message, data);
 	}
 
-	public static <T> ApiResponse<T> ok() {
+	public static <T> ApiResponse<T> ok(T data) {
 		return new ApiResponse<>(HttpStatus.OK, null, null);
-	}
-
-	public static <T> ApiResponse<T> created() {
-		return new ApiResponse<>(HttpStatus.CREATED, null, null);
 	}
 
 	public static <T> ApiResponse<T> error(ErrorCode errorCode) {
 		return new ApiResponse<>(errorCode.getHttpStatus(), errorCode.getMessage(), null);
+	}
+
+	public static <T> ApiResponse<T> created() {
+		return new ApiResponse<>(HttpStatus.CREATED, null, null);
 	}
 }
