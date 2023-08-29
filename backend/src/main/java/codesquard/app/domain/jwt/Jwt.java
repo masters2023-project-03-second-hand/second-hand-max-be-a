@@ -36,6 +36,11 @@ public class Jwt {
 	}
 
 	@JsonIgnore
+	public long getExpireDateAccessTokenTime() {
+		return expireDateAccessToken.getTime();
+	}
+
+	@JsonIgnore
 	public long getExpireDateRefreshTokenTime() {
 		return expireDateRefreshToken.getTime();
 	}

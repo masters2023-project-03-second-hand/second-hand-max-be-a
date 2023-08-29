@@ -8,6 +8,10 @@ import lombok.ToString;
 @Getter
 @ToString
 public class AuthenticateMember {
+
+	@JsonIgnore
+	private Long id;
+
 	@JsonIgnore
 	private String email;
 
@@ -19,14 +23,15 @@ public class AuthenticateMember {
 
 	}
 
-	private AuthenticateMember(String email, String loginId, String profileUrl) {
+	private AuthenticateMember(Long id, String email, String loginId, String profileUrl) {
+		this.id = id;
 		this.email = email;
 		this.loginId = loginId;
 		this.profileUrl = profileUrl;
 	}
 
 	public static AuthenticateMember from(Member member) {
-		return new AuthenticateMember(member.getEmail(), member.getLoginId(), member.getAvatarUrl());
+		return new AuthenticateMember(member.getId(), member.getEmail(), member.getLoginId(), member.getAvatarUrl());
 	}
 
 	public String createRedisKey() {
