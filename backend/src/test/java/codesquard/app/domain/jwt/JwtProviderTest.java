@@ -56,7 +56,7 @@ class JwtProviderTest extends IntegrationTestSupport {
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(jwt.getAccessToken()).isEqualTo(
-				"eyJhbGciOiJIUzI1NiJ9.eyJhdXRoTWVtYmVyIjoie1wibG9naW5JZFwiOlwiMjNZb25nXCIsXCJwcm9maWxlVXJsXCI6XCJhdmF0YXJVcmxcIn0iLCJleHAiOjE2OTMyNjcyMDB9.lPaLKR2BtQWDT842tGp_21GFjANPJX4O6U-MKktOEX8");
+				"eyJhbGciOiJIUzI1NiJ9.eyJhdXRoTWVtYmVyIjoie1wiaWRcIjpudWxsLFwiZW1haWxcIjpcIjIzWW9uZzEyMzRAZ21haWwuY29tXCIsXCJsb2dpbklkXCI6XCIyM1lvbmdcIixcInByb2ZpbGVVcmxcIjpcImF2YXRhclVybFwifSIsImV4cCI6MTY5MzI2NzIwMH0.2lon6-U1kj4xJxGTbWlZA5hPu-vX4sEIIPDimOhVnus");
 			softAssertions.assertThat(jwt.getRefreshToken()).isEqualTo(
 				"eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTMyNjcyMDB9.Lfukp8yOzpVtkPtKhezt54CuqbRuSe8zyLqF_14u8Hw");
 			softAssertions.assertAll();
