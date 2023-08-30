@@ -1,8 +1,5 @@
 package codesquard.app.domain.image;
 
-import static codesquard.app.domain.image.ImageFile.ImageContentType.*;
-import static org.springframework.util.StringUtils.*;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -11,6 +8,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.errors.errorcode.ImageErrorCode;
@@ -36,6 +34,20 @@ public class ImageFile {
 		this.fileSize = multipartFile.getSize();
 	}
 
+	public static ImageFile from(MultipartFile multipartFile) {
+		return new ImageFile(multipartFile);
+	}
+
+	public static List<ImageFile> from(List<MultipartFile> files) {
+		List<ImageFile> imageFiles = new ArrayList<>();
+		for (MultipartFile multipartFile : files) {
+			if (!multipartFile.isEmpty()) {
+				imageFiles.add(new ImageFile(multipartFile));
+			}
+		}
+		return imageFiles;
+	}
+
 	private String getFileName(MultipartFile multipartFile) {
 		String ext = extractExt(multipartFile.getOriginalFilename());
 		String uuid = UUID.randomUUID().toString();
@@ -52,7 +64,7 @@ public class ImageFile {
 	 * ex) cat.png -> png
 	 */
 	private String getImageContentType(MultipartFile multipartFile) {
-		return findEnum(getFilenameExtension(multipartFile.getOriginalFilename()));
+		return ImageContentType.findEnum(StringUtils.getFilenameExtension(multipartFile.getOriginalFilename()));
 	}
 
 	public InputStream getImageInputStream(MultipartFile multipartFile) {
@@ -61,20 +73,6 @@ public class ImageFile {
 		} catch (IOException e) {
 			throw new RestApiException(ImageErrorCode.FILE_IO_EXCEPTION);
 		}
-	}
-
-	public static ImageFile from(MultipartFile multipartFile) {
-		return new ImageFile(multipartFile);
-	}
-
-	public static List<ImageFile> from(List<MultipartFile> files) {
-		List<ImageFile> imageFiles = new ArrayList<>();
-		for (MultipartFile multipartFile : files) {
-			if (!multipartFile.isEmpty()) {
-				imageFiles.add(new ImageFile(multipartFile));
-			}
-		}
-		return imageFiles;
 	}
 
 	@Getter
@@ -91,7 +89,7 @@ public class ImageFile {
 		public static String findEnum(String contentType) {
 			log.info("ContentType : {}", contentType);
 
-			for (ImageContentType imageContentType : values()) {
+			for (ImageContentType imageContentType : ImageContentType.values()) {
 				if (imageContentType.getContentType().equals(contentType)) {
 					return imageContentType.getContentType();
 				}
