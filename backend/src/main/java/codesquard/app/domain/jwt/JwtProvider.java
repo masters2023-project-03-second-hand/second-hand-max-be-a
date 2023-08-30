@@ -8,13 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import codesquard.app.api.errors.errorcode.OauthErrorCode;
+import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
-import codesquard.app.domain.member.AuthenticateMember;
+import codesquard.app.domain.member.Member;
+import codesquard.app.domain.oauth.support.Principal;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -29,17 +29,8 @@ public class JwtProvider {
 		this.jwtProperties = jwtProperties;
 	}
 
-	public Jwt createJwtBasedOnAuthenticateMember(
-		AuthenticateMember authMember) {
-		Map<String, Object> claims = new HashMap<>();
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			claims.put("authMember", objectMapper.writeValueAsString(authMember));
-		} catch (JsonProcessingException e) {
-			log.error("authMember json 변환 에러 : {}", e.getMessage());
-			throw new RestApiException(OauthErrorCode.FAIL_LOGIN);
-		}
-
+	public Jwt createJwtBasedOnMember(Member member) {
+		Map<String, Object> claims = member.createClaims();
 		Date expireDateAccessToken = jwtProperties.getExpireDateAccessToken();
 		Date expireDateRefreshToken = jwtProperties.getExpireDateRefreshToken();
 		return createJwt(claims, expireDateAccessToken, expireDateRefreshToken);
@@ -83,4 +74,28 @@ public class JwtProvider {
 			.getBody();
 	}
 
+	public void validateToken(String token) {
+		try {
+			Jwts.parserBuilder()
+				.setSigningKey(jwtProperties.getKey())
+				.build()
+				.parseClaimsJws(token);
+		} catch (ExpiredJwtException e) {
+			throw new RestApiException(JwtTokenErrorCode.EXPIRE_TOKEN);
+		} catch (JwtException e) {
+			throw new RestApiException(JwtTokenErrorCode.INVALID_TOKEN);
+		}
+	}
+
+	public Principal extractPrincipal(String token) {
+		Claims claims = Jwts.parserBuilder()
+			.setSigningKey(jwtProperties.getKey())
+			.build()
+			.parseClaimsJws(token)
+			.getBody();
+
+		log.debug("claims : {}", claims);
+
+		return Principal.from(claims, token);
+	}
 }
