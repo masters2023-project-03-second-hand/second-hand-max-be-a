@@ -5,9 +5,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.Map;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +22,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.IntegrationTestSupport;
+import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.oauth.request.OauthLoginRequest;
@@ -33,13 +33,15 @@ import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthLogoutResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
-import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.jwt.JwtProperties;
-import codesquard.app.domain.member.AuthenticateMember;
+import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
+import codesquard.app.domain.oauth.support.Principal;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @Transactional
 class OauthServiceTest extends IntegrationTestSupport {
@@ -57,6 +59,9 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
+
+	@Autowired
+	private JwtProvider jwtProvider;
 
 	@DisplayName("로그인 아이디와 소셜 로그인을 하여 회원가입을 한다")
 	@Test
@@ -81,7 +86,8 @@ class OauthServiceTest extends IntegrationTestSupport {
 		OauthSignUpResponse response = oauthService.signUp(profile, request, provider, code);
 
 		// then
-		Member findMember = memberRepository.findMemberByLoginId("23Yong");
+		Member findMember = memberRepository.findMemberByLoginId("23Yong")
+			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
 
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
@@ -214,8 +220,8 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
-				.extracting("user.email", "user.loginId", "user.profileUrl")
-				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
+				.extracting("user.loginId", "user.profileUrl")
+				.contains("23Yong", "avatarUrlValue");
 			softAssertions.assertAll();
 		});
 	}
@@ -228,17 +234,13 @@ class OauthServiceTest extends IntegrationTestSupport {
 		String loginId = "23Yong";
 		String email = "23Yong@gmail.com";
 		Member member = Member.create(avatarUrl, email, loginId);
-		memberRepository.save(member);
+		Member saveMember = memberRepository.save(member);
 
-		long now = LocalDateTime.of(2023, 8, 29, 0, 0).toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli();
-		Date expireDateAccessToken = new Date(
-			now + jwtProperties.getAccessTokenExpirationMillisecond());
-		Date expireDateRefreshToken = new Date(
-			now + jwtProperties.getRefreshTokenExpirationMillisecond());
-
-		AuthenticateMember authMember = AuthenticateMember.from(member);
-		Jwt jwt = Jwt.create("accessTokenValue", "refreshTokenValue", expireDateAccessToken, expireDateRefreshToken);
-		OauthLogoutRequest request = OauthLogoutRequest.create(authMember, jwt);
+		Map<String, Object> claims = member.createClaims();
+		Date expireDateAccessToken = jwtProperties.getExpireDateAccessToken();
+		String accessToken = createToken(claims, expireDateAccessToken);
+		Principal principal = jwtProvider.extractPrincipal(accessToken);
+		OauthLogoutRequest request = OauthLogoutRequest.create(principal);
 
 		// when
 		OauthLogoutResponse response = oauthService.logout(request);
@@ -247,10 +249,19 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
-				.extracting("email", "loginId", "profileUrl")
-				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
-			softAssertions.assertThat(redisTemplate.opsForValue().get(jwt.getAccessToken())).isEqualTo("logout");
+				.extracting("id", "email")
+				.contains(saveMember.getId(), "23Yong@gmail.com");
+			softAssertions.assertThat(redisTemplate.opsForValue().get(principal.getAccessToken())).isEqualTo("logout");
 			softAssertions.assertAll();
 		});
+	}
+
+	private String createToken(Map<String, Object> claims, Date expireDate) {
+		// claims를 비밀키로 이용하여 암호화
+		return Jwts.builder()
+			.setClaims(claims)
+			.setExpiration(expireDate)
+			.signWith(jwtProperties.getKey(), SignatureAlgorithm.HS256)
+			.compact();
 	}
 }

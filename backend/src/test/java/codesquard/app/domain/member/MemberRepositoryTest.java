@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import codesquard.app.IntegrationTestSupport;
+import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 
@@ -27,7 +28,8 @@ class MemberRepositoryTest extends IntegrationTestSupport {
 		String loginId = "23Yong";
 
 		// when
-		Member findMember = memberRepository.findMemberByLoginId(loginId);
+		Member findMember = memberRepository.findMemberByLoginId(loginId)
+			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
 
 		// then
 		Assertions.assertThat(member.getLoginId()).isEqualTo(findMember.getLoginId());
@@ -40,7 +42,8 @@ class MemberRepositoryTest extends IntegrationTestSupport {
 		String loginId = "23Yong";
 
 		// when
-		Member findMember = memberRepository.findMemberByLoginId(loginId);
+		Member findMember = memberRepository.findMemberByLoginId(loginId)
+			.orElse(null);
 
 		// then
 		Assertions.assertThat(findMember).isNull();

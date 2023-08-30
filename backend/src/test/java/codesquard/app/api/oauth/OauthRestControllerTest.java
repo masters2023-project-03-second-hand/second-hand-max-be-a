@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.stream.Stream;
 
+import org.apache.http.HttpHeaders;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +41,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	public void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(new OauthRestController(oauthService, jwtProvider))
 			.setControllerAdvice(new GlobalExceptionHandler())
-			.addFilter(new JwtAuthorizationFilter(jwtProvider, objectMapper, redisTemplate))
+			.addFilter(new JwtAuthorizationFilter(jwtProvider, authenticationContext))
 			.alwaysDo(print())
 			.build();
 	}
@@ -128,7 +129,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(post("/api/auth/logout")
-				.header("Authorization", "Bearer accessTokenValue")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer accessTokenValue")
 			)
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(200)))
