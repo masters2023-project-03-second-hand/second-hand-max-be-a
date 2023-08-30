@@ -17,17 +17,18 @@ import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthLogoutRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
+import codesquard.app.api.oauth.response.OauthLoginMemberResponse;
 import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthLogoutResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.jwt.JwtProvider;
-import codesquard.app.domain.member.AuthenticateMember;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
+import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
 
 @Transactional
@@ -48,6 +49,28 @@ public class OauthService {
 		log.info("OauthSignUpRequest : {}, provider : {}, authorizationCode : {}", request, provider,
 			authorizationCode);
 
+		// 중복 로그인 아이디 검증
+		validateDuplicateLoginId(request.getLoginId());
+
+		// 액세스 토큰 발급 및 유저 정보 가져오기
+		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, authorizationCode);
+
+		// 프로필 사진 업로드
+		String avatarUrl = null;
+		if (profile != null) {
+			avatarUrl = imageService.uploadImage(profile);
+			log.debug("avatarUrl : {}", avatarUrl);
+		}
+
+		Member member = request.toEntity(avatarUrl, userProfileResponse.getEmail());
+
+		// 회원 저장
+		Member saveMember = memberRepository.save(member);
+
+		return OauthSignUpResponse.from(saveMember);
+	}
+
+	private OauthUserProfileResponse getOauthUserProfileResponse(String provider, String authorizationCode) {
 		// provider(naver, github, google...)등에 따른 oauth 정보를 가져온다
 		OauthClient oauthClient = oauthClientRepository.findOneBy(provider);
 		log.debug("oauthProvider : {}", oauthClient);
@@ -61,23 +84,7 @@ public class OauthService {
 		OauthUserProfileResponse userProfileResponse =
 			oauthClient.getUserProfileByAccessToken(provider, accessTokenResponse);
 		log.debug("userProfileResponse : {}", userProfileResponse);
-
-		// 프로필 사진 업로드
-		String avatarUrl = null;
-		if (profile != null) {
-			avatarUrl = imageService.uploadImage(profile);
-			log.debug("avatarUrl : {}", avatarUrl);
-		}
-
-		Member member = request.toEntity(avatarUrl, userProfileResponse.getEmail());
-
-		// 중복 로그인 아이디 검증
-		validateDuplicateLoginId(member.getLoginId());
-
-		// 회원 저장
-		Member saveMember = memberRepository.save(member);
-
-		return OauthSignUpResponse.from(saveMember);
+		return userProfileResponse;
 	}
 
 	private void validateDuplicateLoginId(String loginId) {
@@ -89,36 +96,24 @@ public class OauthService {
 	public OauthLoginResponse login(OauthLoginRequest request, String provider, String code) {
 		log.info("request : {}, provider : {}, code : {}", request, provider, code);
 
-		OauthClient oauthClient = oauthClientRepository.findOneBy(provider);
-
-		// 액세스 토큰 발급
-		OauthAccessTokenResponse tokenResponse = oauthClient.exchangeAccessTokenByAuthorizationCode(code);
-		log.debug("tokenResponse : {}", tokenResponse);
-
-		// 유저 정보 가져오기
-		OauthUserProfileResponse userProfileResponse = oauthClient.getUserProfileByAccessToken(provider, tokenResponse);
-		log.debug("userProfileResponse : {}", userProfileResponse);
+		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, code);
 
 		// 로그인 아이디와 이메일에 따른 회원 조회
 		Member member = getLoginMember(request, userProfileResponse);
 		log.debug("member : {}", member);
 
-		// 인증 객체 생성
-		AuthenticateMember authMember = AuthenticateMember.from(member);
-		log.debug("authMember : {}", authMember);
-
 		// JWT 객체 생성
-		Jwt jwt = jwtProvider.createJwtBasedOnAuthenticateMember(authMember);
+		Jwt jwt = jwtProvider.createJwtBasedOnMember(member);
 		log.debug("jwt : {}", jwt);
 
 		// 리프레쉬 토큰 저장
 		// key: "RT:" + email, value : 리프레쉬 토큰값
-		redisTemplate.opsForValue().set(authMember.createRedisKey(),
+		redisTemplate.opsForValue().set(member.createRedisKey(),
 			jwt.getRefreshToken(),
 			jwt.getExpireDateRefreshTokenTime(),
 			TimeUnit.MILLISECONDS);
 
-		return OauthLoginResponse.create(jwt, authMember);
+		return OauthLoginResponse.create(jwt, OauthLoginMemberResponse.from(member));
 	}
 
 	private Member getLoginMember(OauthLoginRequest request, OauthUserProfileResponse userProfileResponse) {
@@ -130,16 +125,16 @@ public class OauthService {
 
 	public OauthLogoutResponse logout(OauthLogoutRequest request) {
 		log.info("request : {}", request);
-		AuthenticateMember authMember = request.getAuthMember();
-		Jwt jwt = request.getJwt();
+		Principal principal = request.getPrincipal();
+
 		// Redis에 유저 email로 저장된 RefreshToken이 있는지 확인
-		if (redisTemplate.opsForValue().get(authMember.createRedisKey()) != null) {
+		if (redisTemplate.opsForValue().get(principal.createRedisKey()) != null) {
 			// RefreshToken 삭제
-			redisTemplate.delete(authMember.createRedisKey());
+			redisTemplate.delete(principal.createRedisKey());
 		}
 		// 해당 액세스 토큰 유효시간을 가지고 와서 블랙리스트에 저장하기
-		long expiration = jwt.getExpireDateAccessTokenTime();
-		redisTemplate.opsForValue().set(jwt.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
-		return OauthLogoutResponse.from(authMember);
+		long expiration = request.getPrincipal().getExpireDateAccessToken();
+		redisTemplate.opsForValue().set(principal.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
+		return OauthLogoutResponse.from(principal);
 	}
 }
