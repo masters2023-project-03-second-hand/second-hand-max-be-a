@@ -1,23 +1,20 @@
 package codesquard.app.api.oauth.request;
 
-import codesquard.app.domain.jwt.Jwt;
-import codesquard.app.domain.member.AuthenticateMember;
+import codesquard.app.domain.oauth.support.Principal;
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
 @ToString
 public class OauthLogoutRequest {
-	private AuthenticateMember authMember;
 
-	private Jwt jwt;
+	private final Principal principal;
 
-	private OauthLogoutRequest(AuthenticateMember authMember, Jwt jwt) {
-		this.authMember = authMember;
-		this.jwt = jwt;
+	private OauthLogoutRequest(Principal principal) {
+		this.principal = principal;
 	}
 
-	public static OauthLogoutRequest create(AuthenticateMember authMember, Jwt jwt) {
-		return new OauthLogoutRequest(authMember, jwt);
+	public static OauthLogoutRequest create(Principal principal) {
+		return new OauthLogoutRequest(principal);
 	}
 }
