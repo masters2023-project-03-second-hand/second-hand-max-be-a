@@ -20,13 +20,12 @@ import org.springframework.web.multipart.MultipartFile;
 import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthLogoutRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
-import codesquard.app.api.oauth.resolver.Login;
 import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.response.ApiResponse;
-import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.jwt.JwtProvider;
-import codesquard.app.domain.member.AuthenticateMember;
+import codesquard.app.domain.oauth.support.AuthPrincipal;
+import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -64,10 +63,9 @@ public class OauthRestController {
 	}
 
 	@PostMapping(value = "/logout")
-	public ResponseEntity<ApiResponse<Void>> logout(@Login AuthenticateMember authMember) {
-		log.info("authMember : {}", authMember);
-		Jwt jwt = jwtProvider.createJwtBasedOnAuthenticateMember(authMember);
-		OauthLogoutRequest request = OauthLogoutRequest.create(authMember, jwt);
+	public ResponseEntity<ApiResponse<Void>> logout(@AuthPrincipal Principal principal) {
+		log.info("principal : {}", principal);
+		OauthLogoutRequest request = OauthLogoutRequest.create(principal);
 		oauthService.logout(request);
 		return ResponseEntity.status(OK)
 			.body(ApiResponse.ok("로그아웃에 성공하였습니다.", null));
