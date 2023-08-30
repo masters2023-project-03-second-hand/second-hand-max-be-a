@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import codesquard.app.IntegrationTestSupport;
+import codesquard.app.api.errors.errorcode.OauthErrorCode;
+import codesquard.app.api.errors.exception.RestApiException;
 
 class MemberRepositoryTest extends IntegrationTestSupport {
 
@@ -68,7 +70,8 @@ class MemberRepositoryTest extends IntegrationTestSupport {
 		Member member = Member.create(null, email, loginId);
 		memberRepository.save(member);
 		// when
-		Member findMember = memberRepository.findMemberByLoginIdAndAndEmail(loginId, email);
+		Member findMember = memberRepository.findMemberByLoginIdAndEmail(loginId, email)
+			.orElseThrow(() -> new RestApiException(OauthErrorCode.FAIL_LOGIN));
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(findMember)
@@ -85,7 +88,8 @@ class MemberRepositoryTest extends IntegrationTestSupport {
 		String loginId = "23Yong";
 		String email = "23Yong1234@gmail.com";
 		// when
-		Member findMember = memberRepository.findMemberByLoginIdAndAndEmail(loginId, email);
+		Member findMember = memberRepository.findMemberByLoginIdAndEmail(loginId, email)
+			.orElse(null);
 		// then
 		Assertions.assertThat(findMember).isNull();
 	}

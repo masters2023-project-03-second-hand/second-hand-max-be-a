@@ -124,11 +124,8 @@ public class OauthService {
 	private Member getLoginMember(OauthLoginRequest request, OauthUserProfileResponse userProfileResponse) {
 		String loginId = request.getLoginId();
 		String email = userProfileResponse.getEmail();
-		Member member = memberRepository.findMemberByLoginIdAndAndEmail(loginId, email);
-		if (member == null) {
-			throw new RestApiException(OauthErrorCode.FAIL_LOGIN);
-		}
-		return member;
+		return memberRepository.findMemberByLoginIdAndEmail(loginId, email)
+			.orElseThrow(() -> new RestApiException(OauthErrorCode.FAIL_LOGIN));
 	}
 
 	public OauthLogoutResponse logout(OauthLogoutRequest request) {
