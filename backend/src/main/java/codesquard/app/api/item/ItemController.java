@@ -28,6 +28,6 @@ public class ItemController {
 		@RequestPart List<MultipartFile> itemImage,
 		@AuthPrincipal Principal principal) {
 		itemService.register(request, itemImage, principal.getMemberId());
-		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created());
+		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created("상품 등록이 완료되었습니다.", null));
 	}
 }
