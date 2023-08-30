@@ -85,7 +85,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.PRIVATE_KEY }}
           port: 22
-          source: "docker-compose-dev.yml"
+          source: "./backend/docker-compose-dev.yml"
           target: "/home/ec2-user/"
       # docker-compose 실행
       - name: Deploy to dev
