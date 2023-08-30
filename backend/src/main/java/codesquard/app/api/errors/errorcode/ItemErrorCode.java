@@ -3,19 +3,16 @@ package codesquard.app.api.errors.errorcode;
 import org.springframework.http.HttpStatus;
 
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
-public enum MemberErrorCode implements ErrorCode {
+public enum ItemErrorCode implements ErrorCode {
 
-	ALREADY_EXIST_ID(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
-	NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "회원을 찾지 못하였습니다.");
+	INVALID_STATUS(HttpStatus.BAD_REQUEST, "상태는 판매중, 예약중, 판매완료만 들어올 수 있습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
 
-	MemberErrorCode(HttpStatus httpStatus, String message) {
+	ItemErrorCode(HttpStatus httpStatus, String message) {
 		this.httpStatus = httpStatus;
 		this.message = message;
 	}

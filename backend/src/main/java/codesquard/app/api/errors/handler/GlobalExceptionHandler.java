@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
 					errors.put("field", error.getField());
 					errors.put("defaultMessage", error.getDefaultMessage());
 					return errors;
-				})
+				}).distinct()
 		);
 		return ResponseEntity.badRequest().body(body);
 	}

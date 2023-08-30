@@ -1,7 +1,9 @@
 package codesquard.app.domain.member;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -33,6 +35,10 @@ public class Member {
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<MemberTown> towns = new ArrayList<>(); // 동네
 
+	public Member(Long id) {
+		this.id = id;
+	}
+
 	private Member(String avatarUrl, String email, String loginId) {
 		this.avatarUrl = avatarUrl;
 		this.email = email;
@@ -46,5 +52,17 @@ public class Member {
 
 	public void addMemberTown(MemberTown town) {
 		towns.add(town);
+	}
+
+	public String createRedisKey() {
+		return "RT:" + email;
+	}
+
+	public Map<String, Object> createClaims() {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("memberId", id);
+		claims.put("email", email);
+		claims.put("loginId", loginId);
+		return claims;
 	}
 }

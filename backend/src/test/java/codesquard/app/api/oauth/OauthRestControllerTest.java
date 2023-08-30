@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.stream.Stream;
 
+import org.apache.http.HttpHeaders;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,15 +25,23 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import codesquard.app.ControllerTestSupport;
 import codesquard.app.api.errors.handler.GlobalExceptionHandler;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
+import codesquard.app.domain.member.AuthenticateMember;
+import codesquard.app.domain.member.Member;
+import codesquard.app.filter.JwtAuthorizationFilter;
+import io.jsonwebtoken.Claims;
 
 class OauthRestControllerTest extends ControllerTestSupport {
 
 	private MockMvc mockMvc;
 
+	@Mock
+	private ValueOperations<String, Object> valueOperations;
+
 	@BeforeEach
 	public void setup() {
-		mockMvc = MockMvcBuilders.standaloneSetup(new OauthRestController(oauthService))
+		mockMvc = MockMvcBuilders.standaloneSetup(new OauthRestController(oauthService, jwtProvider))
 			.setControllerAdvice(new GlobalExceptionHandler())
+			.addFilter(new JwtAuthorizationFilter(jwtProvider, authenticationContext))
 			.alwaysDo(print())
 			.build();
 	}
@@ -95,6 +106,35 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("addrName")))
 			.andExpect(jsonPath("data[0].defaultMessage").value(
 				Matchers.equalTo("동네는 필수 정보입니다.")));
+	}
+
+	@DisplayName("로그아웃을 요청한다")
+	@Test
+	public void logout() throws Exception {
+		// given
+		String avatarUrl = "avatarUrlValue";
+		String loginId = "23Yong";
+		String email = "23Yong@gmail.com";
+		Member member = Member.create(avatarUrl, email, loginId);
+		AuthenticateMember authMember = AuthenticateMember.from(member);
+
+		Claims claims = mock(Claims.class);
+		String authMemberJson = objectMapper.writeValueAsString(authMember);
+
+		// mocking
+		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+		when(valueOperations.get(anyString())).thenReturn(null);
+		when(jwtProvider.getClaims(anyString())).thenReturn(claims);
+		when(claims.get(anyString(), any())).thenReturn(authMemberJson);
+
+		// when & then
+		mockMvc.perform(post("/api/auth/logout")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer accessTokenValue")
+			)
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(200)))
+			.andExpect(jsonPath("message").value(Matchers.equalTo("로그아웃에 성공하였습니다.")))
+			.andExpect(jsonPath("data").value(Matchers.equalTo(null)));
 	}
 
 	private static Stream<Arguments> provideInvalidLoginId() {
