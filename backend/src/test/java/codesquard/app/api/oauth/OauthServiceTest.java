@@ -78,8 +78,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
 		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
 			.thenReturn(mockAccessTokenResponse);
-		when(oauthClient.getUserProfileByAccessToken(
-			anyString(), any(OauthAccessTokenResponse.class)))
+		when(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.thenReturn(mockUserProfileResponse);
 
 		// when
@@ -143,7 +142,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
 		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
 			.thenReturn(mockAccessTokenResponse);
-		when(oauthClient.getUserProfileByAccessToken(anyString(), any(OauthAccessTokenResponse.class)))
+		when(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.thenThrow(new RestApiException(OauthErrorCode.WRONG_AUTHORIZATION_CODE));
 
 		// when
@@ -177,7 +176,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
 		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
 			.thenReturn(mockAccessTokenResponse);
-		when(oauthClient.getUserProfileByAccessToken(anyString(), any(OauthAccessTokenResponse.class)))
+		when(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.thenReturn(mockUserProfileResponse);
 
 		// when
@@ -210,7 +209,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
 		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
 			.thenReturn(mockAccessTokenResponse);
-		when(oauthClient.getUserProfileByAccessToken(anyString(), any(OauthAccessTokenResponse.class)))
+		when(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.thenReturn(mockUserProfileResponse);
 
 		// when

@@ -82,7 +82,7 @@ public class OauthService {
 
 		// 발급받은 accessToken을 이용하여 유저 프로필 정보를 가져온다
 		OauthUserProfileResponse userProfileResponse =
-			oauthClient.getUserProfileByAccessToken(provider, accessTokenResponse);
+			oauthClient.getUserProfileByAccessToken(accessTokenResponse);
 		log.debug("userProfileResponse : {}", userProfileResponse);
 		return userProfileResponse;
 	}

@@ -70,8 +70,7 @@ public abstract class OauthClient {
 	}
 
 	// Oauth 리소스 서버로부터 유저의 프로필 가져온다
-	public OauthUserProfileResponse getUserProfileByAccessToken(String providerName,
-		OauthAccessTokenResponse accessTokenResponse) {
+	public OauthUserProfileResponse getUserProfileByAccessToken(OauthAccessTokenResponse accessTokenResponse) {
 		Map<String, Object> userProfileMap = getUserAttributes(userInfoUri, accessTokenResponse);
 		log.debug("userProfileMap : {}", userProfileMap);
 		return createOauthUserProfileResponse(userProfileMap);
