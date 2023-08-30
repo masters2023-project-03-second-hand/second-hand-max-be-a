@@ -1,26 +1,26 @@
 package codesquard.app.api.oauth.response;
 
 import codesquard.app.domain.jwt.Jwt;
-import codesquard.app.domain.member.AuthenticateMember;
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
 @ToString
 public class OauthLoginResponse {
+
 	private Jwt jwt;
-	private AuthenticateMember user;
+	private OauthLoginMemberResponse user;
 
 	private OauthLoginResponse() {
 
 	}
 
-	private OauthLoginResponse(Jwt jwt, AuthenticateMember user) {
+	private OauthLoginResponse(Jwt jwt, OauthLoginMemberResponse user) {
 		this.jwt = jwt;
 		this.user = user;
 	}
 
-	public static OauthLoginResponse create(Jwt jwt, AuthenticateMember authMember) {
-		return new OauthLoginResponse(jwt, authMember);
+	public static OauthLoginResponse create(Jwt jwt, OauthLoginMemberResponse user) {
+		return new OauthLoginResponse(jwt, user);
 	}
 }
