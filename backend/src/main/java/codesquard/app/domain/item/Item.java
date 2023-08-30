@@ -32,7 +32,7 @@ public class Item {
 	private String title;
 	private String content;
 	private Long price;
-	private String status;
+	private ItemStatus status;
 	private String region;
 	private LocalDateTime createdAt;
 	@OneToMany
@@ -45,7 +45,7 @@ public class Item {
 	@JoinColumn(name = "category_id")
 	private Category category;
 
-	public Item(String title, String content, Long price, String status, String region, Member member,
+	public Item(String title, String content, Long price, ItemStatus status, String region, Member member,
 		LocalDateTime createdAt) {
 		this.title = title;
 		this.content = content;
@@ -61,7 +61,7 @@ public class Item {
 			request.getTitle(),
 			request.getContent(),
 			request.getPrice(),
-			request.getStatus(),
+			ItemStatus.of(request.getStatus()),
 			request.getRegion(),
 			member,
 			LocalDateTime.now());

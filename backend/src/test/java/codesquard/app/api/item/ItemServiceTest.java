@@ -1,5 +1,6 @@
 package codesquard.app.api.item;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.nio.charset.StandardCharsets;
@@ -48,7 +49,7 @@ class ItemServiceTest {
 		Item item = em.find(Item.class, 1L);
 
 		// then
-		item.getTitle().equals(request.getTitle());
+		assertThat(item.getTitle()).isEqualTo(request.getTitle());
 	}
 
 	private List<MultipartFile> getMultipartFiles() {
