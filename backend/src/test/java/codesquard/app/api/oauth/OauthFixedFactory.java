@@ -12,6 +12,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
@@ -64,5 +65,9 @@ public class OauthFixedFactory {
 		String requestJson = objectMapper.writeValueAsString(request);
 		return new MockMultipartFile("signupData", "signupData", "application/json",
 			requestJson.getBytes(StandardCharsets.UTF_8));
+	}
+
+	public static OauthLoginRequest createFixedOauthLoginRequest() {
+		return new OauthLoginRequest("23Yong");
 	}
 }
