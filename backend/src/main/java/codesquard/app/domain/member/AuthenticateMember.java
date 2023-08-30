@@ -8,11 +8,8 @@ import lombok.ToString;
 public class AuthenticateMember {
 
 	private Long id;
-
 	private String email;
-
 	private String loginId;
-
 	private String profileUrl;
 
 	private AuthenticateMember() {
