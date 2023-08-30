@@ -5,8 +5,8 @@ import org.springframework.web.context.annotation.RequestScope;
 
 import lombok.Getter;
 
-@Component
 @Getter
+@Component
 @RequestScope
 public class AuthenticationContext {
 
