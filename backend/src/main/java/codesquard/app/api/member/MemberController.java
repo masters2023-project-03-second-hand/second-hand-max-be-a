@@ -24,6 +24,6 @@ public class MemberController {
 	public ResponseEntity<ApiResponse<Void>> modifyProfileImage(@RequestPart MultipartFile updateImageFile,
 		@PathVariable String loginId) {
 		memberService.modifyProfileImage(loginId, updateImageFile);
-		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.ok("수정되었습니다.", null));
+		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.ok("프로필 사진이 수정되었습니다.", null));
 	}
 }
