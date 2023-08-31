@@ -90,7 +90,7 @@ public class ImageFile {
 			log.info("ContentType : {}", contentType);
 
 			for (ImageContentType imageContentType : ImageContentType.values()) {
-				if (imageContentType.getContentType().equals(contentType)) {
+				if (imageContentType.getContentType().equals(contentType.toLowerCase())) {
 					return imageContentType.getContentType();
 				}
 			}
