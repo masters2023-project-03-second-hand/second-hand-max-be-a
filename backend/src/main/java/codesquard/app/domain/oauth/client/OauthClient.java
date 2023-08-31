@@ -17,7 +17,9 @@ import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
+import lombok.ToString;
 
+@ToString
 public abstract class OauthClient {
 
 	Logger log = LoggerFactory.getLogger(OauthClient.class);

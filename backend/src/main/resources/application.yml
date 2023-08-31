@@ -4,6 +4,7 @@ spring:
       local: local, secret, s3
       dev: dev, secret, s3
     default: local
+
 ---
 spring:
   config:
@@ -15,11 +16,14 @@ spring:
     username: ${db.local.datasource.username}
     password: ${db.local.datasource.password}
   jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: create
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
   redis:
     host: localhost
     port: 6379
@@ -40,11 +44,22 @@ spring:
     username: ${db.dev.datasource.username}
     password: ${db.dev.datasource.password}
   jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  redis:
+    host: redis
+    port: 6379
+
+
+logging:
+  level:
+    codesquard: info
 
 ---
 
