@@ -4,6 +4,7 @@ spring:
       local: local, secret, s3
       dev: dev, secret, s3
     default: local
+
 ---
 spring:
   config:
@@ -15,6 +16,8 @@ spring:
     username: ${db.local.datasource.username}
     password: ${db.local.datasource.password}
   jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: create
     properties:
@@ -56,7 +59,7 @@ spring:
 
 logging:
   level:
-    codesquard: debug
+    codesquard: info
 
 ---
 

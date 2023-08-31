@@ -77,6 +77,16 @@ jobs:
           port: 22
           source: "./nginx/nginx.conf"
           target: "/home/ec2-user/"
+      # .env 파일을 EC2에 업로드
+      - name: copy .env file
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ec2-user
+          key: ${{ secrets.PRIVATE_KEY }}
+          port: 22
+          source: "./backend/.env"
+          target: "/home/ec2-user/"
       # docker-compose-dev.yml 파일을 EC2에 업로드
       - name: copy docker-compose-dev file via ssh password
         uses: appleboy/scp-action@master
@@ -96,6 +106,7 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }} # pem 키
           port: 22
           script: |
+            cd ./backend
             sudo chmod 666 /var/run/docker.sock
             docker-compose -f docker-compose-dev.yml down -v
             docker-compose -f docker-compose-dev.yml pull
