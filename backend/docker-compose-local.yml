@@ -14,7 +14,13 @@ services:
       - redis
     networks:
       - backend_net
-
+  web:
+    container_name: second_hand_web
+    image: yhkim951107/second_hand_web
+    ports:
+      - 5173:5173
+    networks:
+      - backend_net
   db:
     container_name: second_hand_db
     image: mysql:latest
@@ -32,6 +38,18 @@ services:
     image: redis:latest
     ports:
       - 6379:6379
+    networks:
+      - backend_net
+  nginx:
+    image: nginx:latest
+    container_name: nginx_server
+    ports:
+      - 80:80
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
+      - web
     networks:
       - backend_net
 networks:
