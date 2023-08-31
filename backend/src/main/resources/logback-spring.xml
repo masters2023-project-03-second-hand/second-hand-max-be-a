@@ -75,7 +75,7 @@
     </root>
 
     <!-- 특정패키지 로깅레벨 설정 -->
-    <logger name="codesqaud" level="DEBUG" additivity="false">
+    <logger name="codesquard" level="DEBUG" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
         <appender-ref ref="Error"/>
