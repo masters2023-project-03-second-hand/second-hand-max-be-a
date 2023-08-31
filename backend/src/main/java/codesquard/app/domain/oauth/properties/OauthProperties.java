@@ -30,6 +30,7 @@ public class OauthProperties {
 	}
 
 	@Getter
+	@ToString
 	@RequiredArgsConstructor
 	public static class Naver {
 
