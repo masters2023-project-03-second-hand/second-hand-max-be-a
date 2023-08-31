@@ -26,6 +26,7 @@ public class CorsFilter implements Filter {
 	private final String allowedOrigins;
 
 	public CorsFilter(@Value("${spring.allowed.origins}") String allowedOrigins) {
+		log.info("allowedOrigins : {}", allowedOrigins);
 		this.allowedOrigins = allowedOrigins;
 	}
 
