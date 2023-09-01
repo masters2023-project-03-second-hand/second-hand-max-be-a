@@ -43,12 +43,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 		if (CorsUtils.isPreFlightRequest(request)) {
-			log.info("corsUtils.isPreflightRequest is true");
 			filterChain.doFilter(request, response);
 			return;
 		}
-		log.info("corsUtils.isPreflightRequest is false");
-
 		String token = extractJwt(request).orElseThrow(() -> new RestApiException(JwtTokenErrorCode.EMPTY_TOKEN));
 		jwtProvider.validateToken(token);
 		authenticationContext.setPrincipal(jwtProvider.extractPrincipal(token));
