@@ -36,4 +36,9 @@ public class ImageService {
 		}
 		return urls;
 	}
+
+	@Transactional
+	public void deleteImage(String fileName) {
+		imageUploader.deleteImage(fileName);
+	}
 }
