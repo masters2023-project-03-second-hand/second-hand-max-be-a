@@ -1,4 +1,4 @@
-package codesquard.app.api.item;
+package codesquard.app.api.item.unit;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.image.ImageUploader;
+import codesquard.app.api.item.ItemRegisterRequest;
+import codesquard.app.api.item.ItemService;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
 

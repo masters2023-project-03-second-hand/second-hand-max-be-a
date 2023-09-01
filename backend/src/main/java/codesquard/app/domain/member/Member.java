@@ -24,6 +24,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Member {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id; // 회원 등록번호
@@ -64,5 +65,9 @@ public class Member {
 		claims.put("email", email);
 		claims.put("loginId", loginId);
 		return claims;
+	}
+
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
 	}
 }

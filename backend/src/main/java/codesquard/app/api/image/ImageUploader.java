@@ -36,4 +36,8 @@ public class ImageUploader {
 	private String getObjectUri(String fileName) {
 		return URLDecoder.decode(amazonS3Client.getUrl(bucket, fileName).toString(), StandardCharsets.UTF_8);
 	}
+
+	public void deleteImage(String fileName) {
+		amazonS3Client.deleteObject(bucket, fileName);
+	}
 }
