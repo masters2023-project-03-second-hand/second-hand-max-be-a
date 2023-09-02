@@ -6,8 +6,6 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.SoftAssertions;
@@ -27,6 +25,7 @@ import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.image.ImageService;
 import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthLogoutRequest;
 import codesquard.app.api.oauth.request.OauthRefreshRequest;
@@ -45,8 +44,6 @@ import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
 import codesquard.app.domain.oauth.support.Principal;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 
 @Transactional
 class OauthServiceTest extends IntegrationTestSupport {
@@ -68,6 +65,9 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Autowired
 	private JwtProvider jwtProvider;
 
+	@MockBean
+	private ImageService imageService;
+
 	@DisplayName("로그인 아이디와 소셜 로그인을 하여 회원가입을 한다")
 	@Test
 	public void signUp() throws IOException {
@@ -85,6 +85,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.thenReturn(mockAccessTokenResponse);
 		when(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.thenReturn(mockUserProfileResponse);
+		when(imageService.uploadImage(any())).thenReturn("avatarUrlValue");
 
 		// when
 		OauthSignUpResponse response = oauthService.signUp(profile, request, provider, code);
@@ -95,17 +96,15 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
-				.extracting("email", "loginId")
-				.containsExactlyInAnyOrder("23Yong@gmail.com",
-					"23Yong");
+				.extracting("email", "loginId", "avatarUrl")
+				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertThat(findMember)
-				.extracting("email", "loginId")
-				.containsExactlyInAnyOrder("23Yong@gmail.com",
-					"23Yong");
+				.extracting("email", "loginId", "avatarUrl")
+				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertThat(findMember.getTowns())
 				.hasSize(1)
 				.extracting("name")
-				.containsExactlyInAnyOrder("가락 1동");
+				.contains("가락 1동");
 			softAssertions.assertAll();
 		});
 	}
@@ -255,15 +254,6 @@ class OauthServiceTest extends IntegrationTestSupport {
 			softAssertions.assertThat(redisTemplate.opsForValue().get(principal.getAccessToken())).isEqualTo("logout");
 			softAssertions.assertAll();
 		});
-	}
-
-	private String createToken(Map<String, Object> claims, Date expireDate) {
-		// claims를 비밀키로 이용하여 암호화
-		return Jwts.builder()
-			.setClaims(claims)
-			.setExpiration(expireDate)
-			.signWith(jwtProperties.getKey(), SignatureAlgorithm.HS256)
-			.compact();
 	}
 
 	@DisplayName("리프레쉬 토큰을 가지고 액세스 토큰을 갱신한다")

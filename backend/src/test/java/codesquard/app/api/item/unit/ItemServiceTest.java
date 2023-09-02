@@ -24,7 +24,6 @@ import codesquard.app.api.item.ItemRegisterRequest;
 import codesquard.app.api.item.ItemService;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.member.MemberRepository;
 
 @SpringBootTest
 class ItemServiceTest {
@@ -35,8 +34,6 @@ class ItemServiceTest {
 	private EntityManager em;
 	@MockBean
 	private ImageUploader imageUploader;
-	@Autowired
-	private MemberRepository memberRepository;
 
 	@Test
 	@DisplayName("새로운 상품 등록에 성공한다.")
