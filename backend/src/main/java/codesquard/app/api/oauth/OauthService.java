@@ -1,5 +1,8 @@
 package codesquard.app.api.oauth;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -9,17 +12,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageService;
 import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthLogoutRequest;
+import codesquard.app.api.oauth.request.OauthRefreshRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthLoginMemberResponse;
 import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthLogoutResponse;
+import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.jwt.Jwt;
@@ -93,7 +99,7 @@ public class OauthService {
 		}
 	}
 
-	public OauthLoginResponse login(OauthLoginRequest request, String provider, String code) {
+	public OauthLoginResponse login(OauthLoginRequest request, String provider, String code, LocalDateTime now) {
 		log.info("request : {}, provider : {}, code : {}", request, provider, code);
 
 		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, code);
@@ -103,7 +109,7 @@ public class OauthService {
 		log.debug("member : {}", member);
 
 		// JWT 객체 생성
-		Jwt jwt = jwtProvider.createJwtBasedOnMember(member);
+		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 		log.debug("jwt : {}", jwt);
 
 		// 리프레쉬 토큰 저장
@@ -136,5 +142,36 @@ public class OauthService {
 		long expiration = request.getPrincipal().getExpireDateAccessToken();
 		redisTemplate.opsForValue().set(principal.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
 		return OauthLogoutResponse.from(principal);
+	}
+
+	public OauthRefreshResponse refreshAccessToken(OauthRefreshRequest request, LocalDateTime now) {
+		String refreshToken = request.getRefreshToken();
+
+		// 토큰이 유효한지 검증합니다.
+		jwtProvider.validateToken(refreshToken);
+		log.debug("refreshToken is valid token : {}", refreshToken);
+
+		// 리프레쉬 토큰을 가지고 이메일 조회
+		String email = findEmailByRefreshToken(refreshToken);
+		Member member = memberRepository.findMemberByEmail(email)
+			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
+		log.debug("member : {}", member);
+
+		// jwt 객체 생성
+		Jwt jwt = jwtProvider.createJwtWithRefreshTokenBasedOnMember(member, refreshToken, now);
+
+		return OauthRefreshResponse.create(jwt);
+	}
+
+	private String findEmailByRefreshToken(String refreshToken) {
+		Set<String> keys = redisTemplate.keys("RT:*");
+		if (keys == null) {
+			throw new RestApiException(JwtTokenErrorCode.EMPTY_TOKEN);
+		}
+		return keys.stream()
+			.filter(key -> Objects.equals(redisTemplate.opsForValue().get(key), refreshToken))
+			.findAny()
+			.map(email -> email.replace("RT:", ""))
+			.orElseThrow(() -> new RestApiException(JwtTokenErrorCode.INVALID_TOKEN));
 	}
 }

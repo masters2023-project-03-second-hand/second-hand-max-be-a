@@ -2,6 +2,8 @@ package codesquard.app.api.oauth;
 
 import static org.springframework.http.HttpStatus.*;
 
+import java.time.LocalDateTime;
+
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -19,8 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthLogoutRequest;
+import codesquard.app.api.oauth.request.OauthRefreshRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthLoginResponse;
+import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.response.ApiResponse;
 import codesquard.app.domain.jwt.JwtProvider;
@@ -57,7 +61,7 @@ public class OauthRestController {
 		@PathVariable String provider,
 		@RequestParam String code,
 		@Valid @RequestBody OauthLoginRequest request) {
-		OauthLoginResponse response = oauthService.login(request, provider, code);
+		OauthLoginResponse response = oauthService.login(request, provider, code, LocalDateTime.now());
 		return ResponseEntity.status(OK)
 			.body(ApiResponse.of(OK, "로그인에 성공하였습니다.", response));
 	}
@@ -69,6 +73,17 @@ public class OauthRestController {
 		oauthService.logout(request);
 		return ResponseEntity.status(OK)
 			.body(ApiResponse.ok("로그아웃에 성공하였습니다.", null));
+	}
+
+	@PostMapping("/token")
+	public ResponseEntity<ApiResponse<OauthRefreshResponse>> refreshAccessToken(@AuthPrincipal Principal principal,
+		@RequestBody OauthRefreshRequest request) {
+		log.info("principal : {}, request : {}", principal, request);
+
+		OauthRefreshResponse response = oauthService.refreshAccessToken(request, LocalDateTime.now());
+		log.debug("response : {}", response);
+		return ResponseEntity.status(OK)
+			.body(ApiResponse.ok("액세스 토큰 갱신에 성공하였습니다.", response));
 	}
 
 }
