@@ -64,7 +64,7 @@ public class OauthService {
 		// 프로필 사진 업로드
 		String avatarUrl = null;
 		if (profile == null) {
-			avatarUrl = userProfileResponse.getProfile_image();
+			avatarUrl = userProfileResponse.getProfileImage();
 		} else {
 			avatarUrl = imageService.uploadImage(profile);
 		}
