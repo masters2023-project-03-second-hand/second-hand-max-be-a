@@ -27,7 +27,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 	private static final Logger log = LoggerFactory.getLogger(JwtAuthorizationFilter.class);
 	private static final String AUTHORIZATION = "Authorization";
-	private static final String BEARER = "bearer";
+	private static final String BEARER = "Bearer";
 	private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 	private static final List<String> excludeUrlPatterns = List.of("/api/auth/**/signup", "/api/auth/**/login");
 	private final JwtProvider jwtProvider;
@@ -56,7 +56,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	private Optional<String> extractJwt(HttpServletRequest request) {
 		String header = request.getHeader(AUTHORIZATION);
 
-		if (!StringUtils.hasText(header) || !header.toLowerCase().startsWith(BEARER)) {
+		if (!StringUtils.hasText(header) || !header.startsWith(BEARER)) {
 			return Optional.empty();
 		}
 
