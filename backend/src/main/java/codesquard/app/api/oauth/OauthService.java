@@ -63,10 +63,12 @@ public class OauthService {
 
 		// 프로필 사진 업로드
 		String avatarUrl = null;
-		if (profile != null) {
+		if (profile == null) {
+			avatarUrl = userProfileResponse.getProfile_image();
+		} else {
 			avatarUrl = imageService.uploadImage(profile);
-			log.debug("avatarUrl : {}", avatarUrl);
 		}
+		log.debug("avatarUrl : {}", avatarUrl);
 
 		Member member = request.toEntity(avatarUrl, userProfileResponse.getEmail());
 

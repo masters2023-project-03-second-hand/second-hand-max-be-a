@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.Key;
 import java.time.LocalDateTime;
 
 import org.springframework.core.io.ClassPathResource;
@@ -21,22 +20,15 @@ import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
-import io.jsonwebtoken.security.Keys;
 
 public class OauthFixedFactory {
 
 	private static final String LOGIN_ID = "23Yong";
 	private static final String ADDR_NAME = "가락 1동";
-
-	private static final String JWT_SECRET = "jwtSecretjwtSecretjwtSecretjwtSecret";
 	private static final String ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJsb2dpbklkIjoiMjNZb25nIiwiZW1haWwiOiIyM1lvbmdAZ21haWwuY29tIiwibWVtYmVySWQiOjEsImV4cCI6MTY3MjQ5OTEwMH0.7w2MKSLPVEr6wo7B-C6drNA3eETikpnYi2M1V8c9erY";
-
-	private static final String REFRESH_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NzI1MzQ4MDB9.3hKO0JAiiA3EwlDdCrCAF44KDSB4_sgZqnAjPT6w-gw";
 	private static final String SCOPE = "scopeValue";
 	private static final String TOKEN_TYPE = "Bearer";
-
 	private static final String EMAIL = "23Yong@gmail.com";
-
 	private static final String AVATAR_URL = "avatarUrlValue";
 
 	public static OauthSignUpRequest createFixedOauthSignUpRequest() {
@@ -52,7 +44,7 @@ public class OauthFixedFactory {
 	}
 
 	public static OauthUserProfileResponse createOauthUserProfileResponse() {
-		return OauthUserProfileResponse.create(EMAIL);
+		return OauthUserProfileResponse.create(EMAIL, null);
 	}
 
 	public static OauthSignUpResponse createdFixedOauthSignUpResponse() {
@@ -82,11 +74,6 @@ public class OauthFixedFactory {
 
 	public static LocalDateTime createNow() {
 		return LocalDateTime.now();
-	}
-
-	public static Key createFixedJwtSecretKey() {
-		byte[] secret = JWT_SECRET.getBytes();
-		return Keys.hmacShaKeyFor(secret);
 	}
 
 	public static Member createFixedMember() {
