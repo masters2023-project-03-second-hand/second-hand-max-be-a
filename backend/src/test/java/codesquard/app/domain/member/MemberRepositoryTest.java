@@ -96,4 +96,19 @@ class MemberRepositoryTest extends IntegrationTestSupport {
 		// then
 		Assertions.assertThat(findMember).isNull();
 	}
+
+	@DisplayName("이메일을 가지고 회원을 조회한다")
+	@Test
+	public void findMemberByEmail() {
+		// given
+		String email = "23Yong@gmail.com";
+		String loginId = "23Yong";
+		Member member = Member.create(null, email, loginId);
+		memberRepository.save(member);
+		// when
+		Member findMember = memberRepository.findMemberByEmail(email)
+			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
+		// thenR
+		Assertions.assertThat(findMember).isNotNull();
+	}
 }
