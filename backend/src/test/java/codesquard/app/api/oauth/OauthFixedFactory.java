@@ -25,7 +25,8 @@ public class OauthFixedFactory {
 
 	private static final String LOGIN_ID = "23Yong";
 	private static final String ADDR_NAME = "가락 1동";
-	private static final String ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJsb2dpbklkIjoiMjNZb25nIiwiZW1haWwiOiIyM1lvbmdAZ21haWwuY29tIiwibWVtYmVySWQiOjEsImV4cCI6MTY3MjQ5OTEwMH0.7w2MKSLPVEr6wo7B-C6drNA3eETikpnYi2M1V8c9erY";
+	private static final String ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJsb2dpbklkIjoiMjNZb25nIiwiZW1haWwiOiIyM1lvbm"
+		+ "dAZ21haWwuY29tIiwibWVtYmVySWQiOjEsImV4cCI6MTY3MjQ5OTEwMH0.7w2MKSLPVEr6wo7B-C6drNA3eETikpnYi2M1V8c9erY";
 	private static final String SCOPE = "scopeValue";
 	private static final String TOKEN_TYPE = "Bearer";
 	private static final String EMAIL = "23Yong@gmail.com";
