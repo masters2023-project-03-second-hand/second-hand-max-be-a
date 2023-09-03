@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +28,6 @@ import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.response.ApiResponse;
-import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
@@ -40,11 +40,11 @@ public class OauthRestController {
 	private static final Logger log = LoggerFactory.getLogger(OauthRestController.class);
 
 	private final OauthService oauthService;
-	private final JwtProvider jwtProvider;
 
+	@ResponseStatus(CREATED)
 	@PostMapping(value = "/{provider}/signup", consumes = {MediaType.APPLICATION_JSON_VALUE,
 		MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<ApiResponse<OauthSignUpResponse>> signUp(
+	public ApiResponse<OauthSignUpResponse> signUp(
 		@PathVariable String provider,
 		@RequestParam String code,
 		@RequestPart(value = "profile", required = false) MultipartFile profile,
@@ -52,38 +52,37 @@ public class OauthRestController {
 		log.info("provider : {}, code : {}, profile : {}, request : {}", provider, code, profile, request);
 
 		oauthService.signUp(profile, request, provider, code);
-		return ResponseEntity.status(CREATED)
-			.body(ApiResponse.created("회원가입에 성공하였습니다.", null));
+		return ApiResponse.created("회원가입에 성공하였습니다.", null);
 	}
 
+	@ResponseStatus(OK)
 	@PostMapping(value = "/{provider}/login")
-	public ResponseEntity<ApiResponse<OauthLoginResponse>> login(
+	public ApiResponse<OauthLoginResponse> login(
 		@PathVariable String provider,
 		@RequestParam String code,
 		@Valid @RequestBody OauthLoginRequest request) {
 		OauthLoginResponse response = oauthService.login(request, provider, code, LocalDateTime.now());
-		return ResponseEntity.status(OK)
-			.body(ApiResponse.of(OK, "로그인에 성공하였습니다.", response));
+		return ApiResponse.of(OK, "로그인에 성공하였습니다.", response);
 	}
 
+	@ResponseStatus(OK)
 	@PostMapping(value = "/logout")
-	public ResponseEntity<ApiResponse<Void>> logout(@AuthPrincipal Principal principal) {
+	public ApiResponse<Void> logout(@AuthPrincipal Principal principal) {
 		log.info("principal : {}", principal);
 		OauthLogoutRequest request = OauthLogoutRequest.create(principal);
 		oauthService.logout(request);
-		return ResponseEntity.status(OK)
-			.body(ApiResponse.ok("로그아웃에 성공하였습니다.", null));
+		return ApiResponse.ok("로그아웃에 성공하였습니다.", null);
 	}
 
+	@ResponseStatus(OK)
 	@PostMapping("/token")
-	public ResponseEntity<ApiResponse<OauthRefreshResponse>> refreshAccessToken(@AuthPrincipal Principal principal,
+	public ApiResponse<OauthRefreshResponse> refreshAccessToken(@AuthPrincipal Principal principal,
 		@RequestBody OauthRefreshRequest request) {
 		log.info("principal : {}, request : {}", principal, request);
 
 		OauthRefreshResponse response = oauthService.refreshAccessToken(request, LocalDateTime.now());
 		log.debug("response : {}", response);
-		return ResponseEntity.status(OK)
-			.body(ApiResponse.ok("액세스 토큰 갱신에 성공하였습니다.", response));
+		return ApiResponse.ok("액세스 토큰 갱신에 성공하였습니다.", response);
 	}
 
 }

@@ -39,7 +39,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 	@BeforeEach
 	public void setup() {
-		mockMvc = MockMvcBuilders.standaloneSetup(new OauthRestController(oauthService, jwtProvider))
+		mockMvc = MockMvcBuilders.standaloneSetup(new OauthRestController(oauthService))
 			.setControllerAdvice(new GlobalExceptionHandler())
 			.addFilter(new JwtAuthorizationFilter(jwtProvider, authenticationContext))
 			.alwaysDo(print())
