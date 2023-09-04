@@ -94,7 +94,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("message").value(Matchers.equalTo("유효하지 않은 입력형식입니다.")))
 			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("loginId")))
 			.andExpect(jsonPath("data[0].defaultMessage").value(
-				Matchers.contains("로그인 아이디는 필수 정보입니다.")));
+				Matchers.equalTo("로그인 아이디는 필수 정보입니다.")));
 	}
 
 	@DisplayName("비어 있는 주소를 전달하여 회원가입을 요청할 때 에러를 응답한다")

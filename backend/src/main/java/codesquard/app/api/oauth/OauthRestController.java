@@ -4,9 +4,8 @@ import static org.springframework.http.HttpStatus.*;
 
 import java.time.LocalDateTime;
 
-import javax.validation.Valid;
-
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +24,7 @@ import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.response.ApiResponse;
+import codesquard.app.config.ValidationSequence;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class OauthRestController {
 		@PathVariable String provider,
 		@RequestParam String code,
 		@RequestPart(value = "profile", required = false) MultipartFile profile,
-		@Valid @RequestPart(value = "signupData") OauthSignUpRequest request) {
+		@Validated(ValidationSequence.class) @RequestPart(value = "signupData") OauthSignUpRequest request) {
 		log.info("provider : {}, code : {}, profile : {}, {}", provider, code, profile, request);
 
 		oauthService.signUp(profile, request, provider, code);
@@ -57,7 +57,7 @@ public class OauthRestController {
 	public ApiResponse<OauthLoginResponse> login(
 		@PathVariable String provider,
 		@RequestParam String code,
-		@Valid @RequestBody OauthLoginRequest request) {
+		@Validated(ValidationSequence.class) @RequestBody OauthLoginRequest request) {
 		OauthLoginResponse response = oauthService.login(request, provider, code, LocalDateTime.now());
 		return ApiResponse.of(OK, "로그인에 성공하였습니다.", response);
 	}
