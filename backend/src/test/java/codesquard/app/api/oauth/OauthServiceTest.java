@@ -266,8 +266,10 @@ class OauthServiceTest extends IntegrationTestSupport {
 		memberRepository.save(member);
 
 		OauthRefreshRequest request = OauthRefreshRequest.create(jwt.getRefreshToken());
+
 		// when
 		OauthRefreshResponse response = oauthService.refreshAccessToken(request, now);
+
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
@@ -294,8 +296,10 @@ class OauthServiceTest extends IntegrationTestSupport {
 		memberRepository.save(member);
 
 		OauthRefreshRequest request = OauthRefreshRequest.create("invalidRefreshTokenValue");
+
 		// when
 		Throwable throwable = catchThrowable(() -> oauthService.refreshAccessToken(request, now));
+
 		// then
 		Assertions.assertThat(throwable)
 			.isInstanceOf(RestApiException.class)

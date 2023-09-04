@@ -17,7 +17,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -25,8 +27,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import codesquard.app.ControllerTestSupport;
 import codesquard.app.api.errors.handler.GlobalExceptionHandler;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
+import codesquard.app.api.oauth.response.OauthRefreshResponse;
+import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.member.AuthenticateMember;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
+import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.filter.JwtAuthorizationFilter;
 import io.jsonwebtoken.Claims;
 
@@ -37,11 +43,15 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@Mock
 	private ValueOperations<String, Object> valueOperations;
 
+	@MockBean
+	private AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
+
 	@BeforeEach
 	public void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(new OauthRestController(oauthService))
 			.setControllerAdvice(new GlobalExceptionHandler())
 			.addFilter(new JwtAuthorizationFilter(jwtProvider, authenticationContext))
+			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
 			.alwaysDo(print())
 			.build();
 	}
@@ -135,6 +145,29 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(200)))
 			.andExpect(jsonPath("message").value(Matchers.equalTo("로그아웃에 성공하였습니다.")))
 			.andExpect(jsonPath("data").value(Matchers.equalTo(null)));
+	}
+
+	@DisplayName("액세스 토큰 갱신을 요청한다")
+	@Test
+	public void refreshAccessToken() throws Exception {
+		// given
+		Principal principal = Principal.from(createFixedMember());
+		OauthRefreshResponse response = OauthRefreshResponse.create(
+			Jwt.create("accessTokenValue", "refreshTokenValue", null, null));
+		// mocking
+		when(authPrincipalArgumentResolver.supportsParameter(any())).thenReturn(true);
+		when(authPrincipalArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(principal);
+		when(oauthService.refreshAccessToken(any(), any())).thenReturn(response);
+		// when & then
+		mockMvc.perform(post("/api/auth/token")
+				.content(objectMapper.writeValueAsString("refreshTokenValue"))
+				.contentType(MediaType.APPLICATION_JSON)
+			)
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(200)))
+			.andExpect(jsonPath("message").value(Matchers.equalTo("액세스 토큰 갱신에 성공하였습니다.")))
+			.andExpect(jsonPath("data.jwt.accessToken").isNotEmpty())
+			.andExpect(jsonPath("data.jwt.refreshToken").isNotEmpty());
 	}
 
 	private static Stream<Arguments> provideInvalidLoginId() {
