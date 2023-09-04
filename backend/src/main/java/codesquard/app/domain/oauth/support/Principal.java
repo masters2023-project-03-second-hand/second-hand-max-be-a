@@ -6,10 +6,8 @@ import codesquard.app.domain.member.Member;
 import io.jsonwebtoken.Claims;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class Principal {
 
 	private Long memberId;
@@ -52,5 +50,11 @@ public class Principal {
 
 	public String createRedisKey() {
 		return "RT:" + email;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(id=%d, email=%s, loginId=%s)", "Principal", this.getClass().getSimpleName(),
+			memberId, email, loginId);
 	}
 }

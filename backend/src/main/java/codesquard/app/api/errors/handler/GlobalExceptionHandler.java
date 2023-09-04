@@ -3,8 +3,6 @@ package codesquard.app.api.errors.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,11 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.response.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	@ExceptionHandler(RestApiException.class)
 	public ResponseEntity<ApiResponse<Object>> handleRestApiException(RestApiException exception) {

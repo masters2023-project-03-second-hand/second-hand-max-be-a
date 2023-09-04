@@ -2,10 +2,8 @@ package codesquard.app.api.oauth.response;
 
 import codesquard.app.domain.jwt.Jwt;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class OauthRefreshResponse {
 	private Jwt jwt;
 
@@ -19,5 +17,11 @@ public class OauthRefreshResponse {
 
 	public static OauthRefreshResponse create(Jwt jwt) {
 		return new OauthRefreshResponse(jwt);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(accessToken=%s)", "액세스 토큰 갱신 응답", this.getClass().getSimpleName(),
+			jwt.getAccessToken());
 	}
 }

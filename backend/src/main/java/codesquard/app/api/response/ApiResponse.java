@@ -22,7 +22,6 @@ public class ApiResponse<T> {
 		return new ApiResponse<>(httpStatus, message, data);
 	}
 
-
 	public static <T> ApiResponse<T> ok(String message, T data) {
 		return new ApiResponse<>(HttpStatus.OK, message, data);
 	}
@@ -33,5 +32,12 @@ public class ApiResponse<T> {
 
 	public static <T> ApiResponse<T> error(ErrorCode errorCode) {
 		return new ApiResponse<>(errorCode.getHttpStatus(), errorCode.getMessage(), null);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(statusCode=%d, message=%s)", "API 공통 응답", this.getClass().getSimpleName(),
+			statusCode,
+			message);
 	}
 }

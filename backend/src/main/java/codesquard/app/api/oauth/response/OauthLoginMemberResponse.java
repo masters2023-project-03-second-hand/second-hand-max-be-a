@@ -20,4 +20,9 @@ public class OauthLoginMemberResponse {
 	public static OauthLoginMemberResponse from(Member member) {
 		return new OauthLoginMemberResponse(member.getLoginId(), member.getAvatarUrl());
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(loginId=%s)", "로그인 회원정보 응답", this.getClass().getSimpleName(), loginId);
+	}
 }

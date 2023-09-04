@@ -3,10 +3,8 @@ package codesquard.app.api.errors.errorcode;
 import org.springframework.http.HttpStatus;
 
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public enum ImageErrorCode implements ErrorCode {
 
 	INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 파일 확장자입니다."),
@@ -23,5 +21,11 @@ public enum ImageErrorCode implements ErrorCode {
 	@Override
 	public String getName() {
 		return name();
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(httpStatus=%s, message=%s)", "이미지 에러", this.getClass().getSimpleName(), httpStatus,
+			message);
 	}
 }

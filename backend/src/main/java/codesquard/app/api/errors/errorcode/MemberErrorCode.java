@@ -3,10 +3,8 @@ package codesquard.app.api.errors.errorcode;
 import org.springframework.http.HttpStatus;
 
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public enum MemberErrorCode implements ErrorCode {
 
 	ALREADY_EXIST_ID(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
@@ -23,5 +21,12 @@ public enum MemberErrorCode implements ErrorCode {
 	@Override
 	public String getName() {
 		return name();
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(httpStatus=%s, message=%s)", "회원 에러", this.getClass().getSimpleName(),
+			httpStatus,
+			message);
 	}
 }

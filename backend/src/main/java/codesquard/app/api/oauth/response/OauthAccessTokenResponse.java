@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-@ToString
 @NoArgsConstructor
 public class OauthAccessTokenResponse {
 	@Getter
@@ -25,5 +23,11 @@ public class OauthAccessTokenResponse {
 
 	public static OauthAccessTokenResponse create(String accessToken, String scope, String tokenType) {
 		return new OauthAccessTokenResponse(accessToken, scope, tokenType);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(scope=%s, tokenType=%s)", "액세스 토큰 발급 응답", this.getClass().getSimpleName(), scope,
+			tokenType);
 	}
 }

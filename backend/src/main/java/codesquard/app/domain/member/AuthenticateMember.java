@@ -1,10 +1,8 @@
 package codesquard.app.domain.member;
 
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class AuthenticateMember {
 
 	private Long id;
@@ -29,5 +27,10 @@ public class AuthenticateMember {
 
 	public String createRedisKey() {
 		return "RT:" + email;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(id=%d, loginId=%s)", "인증 회원", this.getClass().getSimpleName(), id, loginId);
 	}
 }

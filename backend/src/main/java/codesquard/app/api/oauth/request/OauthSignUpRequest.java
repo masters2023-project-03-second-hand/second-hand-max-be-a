@@ -6,10 +6,8 @@ import javax.validation.constraints.Pattern;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class OauthSignUpRequest {
 
 	@NotEmpty(message = "아이디는 띄어쓰기 없이 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.")
@@ -36,5 +34,11 @@ public class OauthSignUpRequest {
 		MemberTown town = MemberTown.create(addrName);
 		member.addMemberTown(town);
 		return member;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(loginId=%s, addressName=%s)", "회원가입 요청", this.getClass().getSimpleName(), loginId,
+			addrName);
 	}
 }
