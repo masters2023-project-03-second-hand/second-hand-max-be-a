@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -275,5 +276,30 @@ class OauthServiceTest extends IntegrationTestSupport {
 					createExpectedRefreshTokenBy(jwtProvider, member, now));
 			softAssertions.assertAll();
 		});
+	}
+
+	@DisplayName("유효하지 않은 토큰으로는 액세스 토큰을 갱신할 수 없다")
+	@Test
+	public void refreshAccessTokenWithInvalidRefreshToken() {
+		// given
+		Member member = createFixedMember();
+		LocalDateTime now = createNow();
+
+		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
+
+		redisTemplate.opsForValue().set(member.createRedisKey(),
+			jwt.getRefreshToken(),
+			jwt.getExpireDateRefreshTokenTime(),
+			TimeUnit.MILLISECONDS);
+		memberRepository.save(member);
+
+		OauthRefreshRequest request = OauthRefreshRequest.create("invalidRefreshTokenValue");
+		// when
+		Throwable throwable = catchThrowable(() -> oauthService.refreshAccessToken(request, now));
+		// then
+		Assertions.assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("유효하지 않은 토큰입니다.");
 	}
 }

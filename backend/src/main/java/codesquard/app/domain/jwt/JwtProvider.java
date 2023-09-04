@@ -95,8 +95,10 @@ public class JwtProvider {
 				.build()
 				.parseClaimsJws(token);
 		} catch (ExpiredJwtException e) {
+			log.error("토큰 만료 에러 : {}", e.getMessage());
 			throw new RestApiException(JwtTokenErrorCode.EXPIRE_TOKEN);
 		} catch (JwtException e) {
+			log.error("Jwt 에러 : {}", e.getMessage());
 			throw new RestApiException(JwtTokenErrorCode.INVALID_TOKEN);
 		}
 	}
