@@ -28,7 +28,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	private static final String AUTHORIZATION = "Authorization";
 	private static final String BEARER = "Bearer";
 	private static final AntPathMatcher pathMatcher = new AntPathMatcher();
-	private static final List<String> excludeUrlPatterns = List.of("/api/auth/**/signup", "/api/auth/**/login");
+	private static final List<String> excludeUrlPatterns = List.of("/api/auth/**/signup", "/api/auth/**/login",
+		"/api/auth/token");
 	private final JwtProvider jwtProvider;
 	private final AuthenticationContext authenticationContext;
 

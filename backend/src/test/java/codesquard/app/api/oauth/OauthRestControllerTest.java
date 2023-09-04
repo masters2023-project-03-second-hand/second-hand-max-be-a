@@ -84,7 +84,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("message").value(Matchers.equalTo("유효하지 않은 입력형식입니다.")))
 			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("loginId")))
 			.andExpect(jsonPath("data[0].defaultMessage").value(
-				Matchers.equalTo("아이디는 띄어쓰기 없이 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.")));
+				Matchers.equalTo("로그인 아이디는 필수 정보입니다.")));
 	}
 
 	@DisplayName("비어 있는 주소를 전달하여 회원가입을 요청할 때 에러를 응답한다")
@@ -103,9 +103,9 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(400)))
 			.andExpect(jsonPath("message").value(Matchers.equalTo("유효하지 않은 입력형식입니다.")))
-			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("addrName")))
+			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("addressName")))
 			.andExpect(jsonPath("data[0].defaultMessage").value(
-				Matchers.equalTo("동네는 필수 정보입니다.")));
+				Matchers.equalTo("동네 이름은 필수 정보입니다.")));
 	}
 
 	@DisplayName("로그아웃을 요청한다")
