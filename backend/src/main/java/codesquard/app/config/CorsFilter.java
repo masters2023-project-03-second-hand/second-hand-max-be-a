@@ -10,7 +10,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -22,18 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsFilter implements Filter {
 
-	private final String allowedOrigins;
-
-	public CorsFilter(@Value("${spring.allowed.origins}") String allowedOrigins) {
-		log.info("allowedOrigins : {}", allowedOrigins);
-		this.allowedOrigins = allowedOrigins;
-	}
-
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws
 		IOException,
 		ServletException, ServletException {
-		log.debug("allowedOrigins : {}", allowedOrigins);
 
 		HttpServletRequest request = (HttpServletRequest)req;
 		HttpServletResponse response = (HttpServletResponse)res;
