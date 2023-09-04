@@ -3,7 +3,9 @@ package codesquard.app;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import codesquard.app.api.category.CategoryQueryService;
 import codesquard.app.api.oauth.OauthService;
+import codesquard.app.domain.category.CategoryRepository;
 import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTownRepository;
 
@@ -18,4 +20,10 @@ public abstract class IntegrationTestSupport {
 
 	@Autowired
 	protected MemberTownRepository memberTownRepository;
+
+	@Autowired
+	protected CategoryQueryService categoryQueryService;
+
+	@Autowired
+	protected CategoryRepository categoryRepository;
 }
