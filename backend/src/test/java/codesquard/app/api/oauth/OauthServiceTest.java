@@ -12,8 +12,6 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -37,7 +35,6 @@ import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.jwt.Jwt;
-import codesquard.app.domain.jwt.JwtProperties;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
@@ -48,16 +45,11 @@ import codesquard.app.domain.oauth.support.Principal;
 @Transactional
 class OauthServiceTest extends IntegrationTestSupport {
 
-	private static final Logger log = LoggerFactory.getLogger(OauthServiceTest.class);
-
 	@MockBean
 	private OauthClientRepository oauthClientRepository;
 
 	@Mock
 	private OauthClient oauthClient;
-
-	@Autowired
-	private JwtProperties jwtProperties;
 
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
@@ -216,7 +208,6 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		// when
 		OauthLoginResponse response = oauthService.login(request, provider, code, now);
-		log.debug("response : {}", response);
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
@@ -244,7 +235,6 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		// when
 		OauthLogoutResponse response = oauthService.logout(request);
-		log.debug("response : {}", response);
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {

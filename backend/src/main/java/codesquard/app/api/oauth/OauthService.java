@@ -50,7 +50,7 @@ public class OauthService {
 
 	public OauthSignUpResponse signUp(MultipartFile profile, OauthSignUpRequest request, String provider,
 		String authorizationCode) {
-		log.info("OauthSignUpRequest : {}, provider : {}, authorizationCode : {}", request, provider,
+		log.info("{}, provider : {}, authorizationCode : {}", request, provider,
 			authorizationCode);
 
 		// 중복 로그인 아이디 검증
@@ -66,7 +66,7 @@ public class OauthService {
 		} else {
 			avatarUrl = imageService.uploadImage(profile);
 		}
-		log.debug("avatarUrl : {}", avatarUrl);
+		log.debug(avatarUrl);
 
 		Member member = request.toEntity(avatarUrl, userProfileResponse.getEmail());
 
@@ -79,17 +79,16 @@ public class OauthService {
 	private OauthUserProfileResponse getOauthUserProfileResponse(String provider, String authorizationCode) {
 		// provider(naver, github, google...)등에 따른 oauth 정보를 가져온다
 		OauthClient oauthClient = oauthClientRepository.findOneBy(provider);
-		log.debug("oauthProvider : {}", oauthClient);
 
 		// authorizationCode를 가지고 Oauth 서버에 요청하여 accessToken을 발급받는다
 		OauthAccessTokenResponse accessTokenResponse =
 			oauthClient.exchangeAccessTokenByAuthorizationCode(authorizationCode);
-		log.debug("OauthAccessTokenResponse : {}", accessTokenResponse);
+		log.debug("{}", accessTokenResponse);
 
 		// 발급받은 accessToken을 이용하여 유저 프로필 정보를 가져온다
 		OauthUserProfileResponse userProfileResponse =
 			oauthClient.getUserProfileByAccessToken(accessTokenResponse);
-		log.debug("userProfileResponse : {}", userProfileResponse);
+		log.debug("{}", userProfileResponse);
 		return userProfileResponse;
 	}
 
@@ -100,17 +99,17 @@ public class OauthService {
 	}
 
 	public OauthLoginResponse login(OauthLoginRequest request, String provider, String code, LocalDateTime now) {
-		log.info("request : {}, provider : {}, code : {}", request, provider, code);
+		log.info("{}, provider : {}, code : {}", request, provider, code);
 
 		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, code);
 
 		// 로그인 아이디와 이메일에 따른 회원 조회
 		Member member = getLoginMember(request, userProfileResponse);
-		log.debug("member : {}", member);
+		log.debug("{}", member);
 
 		// JWT 객체 생성
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
-		log.debug("jwt : {}", jwt);
+		log.debug("{}", jwt);
 
 		// 리프레쉬 토큰 저장
 		// key: "RT:" + email, value : 리프레쉬 토큰값
@@ -130,7 +129,7 @@ public class OauthService {
 	}
 
 	public OauthLogoutResponse logout(OauthLogoutRequest request) {
-		log.info("request : {}", request);
+		log.info("{}", request);
 		Principal principal = request.getPrincipal();
 
 		// Redis에 유저 email로 저장된 RefreshToken이 있는지 확인
@@ -155,7 +154,7 @@ public class OauthService {
 		String email = findEmailByRefreshToken(refreshToken);
 		Member member = memberRepository.findMemberByEmail(email)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
-		log.debug("member : {}", member);
+		log.debug("{}", member);
 
 		// jwt 객체 생성
 		Jwt jwt = jwtProvider.createJwtWithRefreshTokenBasedOnMember(member, refreshToken, now);

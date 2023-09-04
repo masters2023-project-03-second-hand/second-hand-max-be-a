@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import codesquard.app.IntegrationTestSupport;
@@ -14,8 +12,6 @@ import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.member.Member;
 
 class JwtProviderTest extends IntegrationTestSupport {
-
-	private static final Logger log = LoggerFactory.getLogger(JwtProviderTest.class);
 
 	@Autowired
 	private JwtProperties jwtProperties;

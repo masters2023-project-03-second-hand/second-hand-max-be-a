@@ -26,7 +26,7 @@ public class AuthPrincipalArgumentResolver implements HandlerMethodArgumentResol
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 		NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-		log.debug("authenticateContext : {}", authenticationContext);
+		log.debug("{}", authenticationContext);
 		return authenticationContext.getPrincipal();
 	}
 }

@@ -46,7 +46,7 @@ public class OauthRestController {
 		@RequestParam String code,
 		@RequestPart(value = "profile", required = false) MultipartFile profile,
 		@Valid @RequestPart(value = "signupData") OauthSignUpRequest request) {
-		log.info("provider : {}, code : {}, profile : {}, request : {}", provider, code, profile, request);
+		log.info("provider : {}, code : {}, profile : {}, {}", provider, code, profile, request);
 
 		oauthService.signUp(profile, request, provider, code);
 		return ApiResponse.created("회원가입에 성공하였습니다.", null);
@@ -65,7 +65,7 @@ public class OauthRestController {
 	@ResponseStatus(OK)
 	@PostMapping(value = "/logout")
 	public ApiResponse<Void> logout(@AuthPrincipal Principal principal) {
-		log.info("principal : {}", principal);
+		log.info("{}", principal);
 		OauthLogoutRequest request = OauthLogoutRequest.create(principal);
 		oauthService.logout(request);
 		return ApiResponse.ok("로그아웃에 성공하였습니다.", null);
@@ -75,10 +75,10 @@ public class OauthRestController {
 	@PostMapping("/token")
 	public ApiResponse<OauthRefreshResponse> refreshAccessToken(@AuthPrincipal Principal principal,
 		@RequestBody OauthRefreshRequest request) {
-		log.info("principal : {}, request : {}", principal, request);
+		log.info("{}, {}", principal, request);
 
 		OauthRefreshResponse response = oauthService.refreshAccessToken(request, LocalDateTime.now());
-		log.debug("response : {}", response);
+		log.debug("{}", response);
 		return ApiResponse.ok("액세스 토큰 갱신에 성공하였습니다.", response);
 	}
 
