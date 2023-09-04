@@ -6,10 +6,7 @@ import java.time.LocalDateTime;
 
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,13 +28,13 @@ import codesquard.app.api.response.ApiResponse;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 @RestController
 public class OauthRestController {
-
-	private static final Logger log = LoggerFactory.getLogger(OauthRestController.class);
 
 	private final OauthService oauthService;
 
