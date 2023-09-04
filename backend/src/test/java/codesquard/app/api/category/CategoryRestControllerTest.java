@@ -25,9 +25,6 @@ class CategoryRestControllerTest extends ControllerTestSupport {
 	@MockBean
 	private AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
 
-	@MockBean
-	private CategoryQueryService categoryQueryService;
-
 	@BeforeEach
 	public void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(new CategoryRestController(categoryQueryService))
