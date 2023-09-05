@@ -34,8 +34,9 @@ public class CategoryRestController {
 	@PostMapping
 	public ResponseEntity<Void> selectCategory(@Valid @RequestBody CategorySelectedRequest request) {
 		categoryQueryService.validateCategoryId(request);
+		String categoryId = String.valueOf(request.getSelectedCategoryId());
 		return ResponseEntity.status(HttpStatus.FOUND)
-			.header(HttpHeaders.LOCATION, String.valueOf(request.getSelectedCategoryId()))
+			.header(HttpHeaders.LOCATION, "/api/items?categoryId=" + categoryId)
 			.body(null);
 	}
 }
