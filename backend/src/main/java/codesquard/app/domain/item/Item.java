@@ -1,8 +1,10 @@
 package codesquard.app.domain.item;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -14,7 +16,9 @@ import javax.persistence.OneToMany;
 
 import codesquard.app.api.item.ItemRegisterRequest;
 import codesquard.app.domain.category.Category;
+import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.image.Image;
+import codesquard.app.domain.interest.Interest;
 import codesquard.app.domain.member.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,8 +39,9 @@ public class Item {
 	private ItemStatus status;
 	private String region;
 	private LocalDateTime createdAt;
-	@OneToMany
-	private List<Image> images;
+	private Long viewCount;
+	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+	private List<Image> images = new ArrayList<>();
 	private LocalDateTime modifiedAt;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
@@ -44,9 +49,17 @@ public class Item {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
+	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+	private List<Interest> interests = new ArrayList<>();
 
-	public Item(String title, String content, Long price, ItemStatus status, String region, Member member,
-		LocalDateTime createdAt) {
+	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+	private List<ChatRoom> chatRooms = new ArrayList<>();
+
+	public Item(String title, String content, Long price, ItemStatus status,
+		String region,
+		Member member,
+		LocalDateTime createdAt,
+		Long viewCount) {
 		this.title = title;
 		this.content = content;
 		this.price = price;
@@ -54,6 +67,39 @@ public class Item {
 		this.region = region;
 		this.member = member;
 		this.createdAt = createdAt;
+		this.viewCount = viewCount;
+	}
+
+	//== 연관관계 메소드 ==//
+	public void setMember(Member member) {
+		this.member = member;
+		if (!member.getItems().contains(this)) {
+			member.addItem(this);
+		}
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
+	public void addImage(Image image) {
+		if (!this.images.contains(image)) {
+			this.images.add(image);
+		}
+		image.setItem(this);
+	}
+
+	public void addInterest(Interest interest) {
+		if (!this.interests.contains(interest)) {
+			this.interests.add(interest);
+		}
+		interest.setItem(this);
+	}
+
+	public int getTotalChatLogCount() {
+		return chatRooms.stream()
+			.mapToInt(ChatRoom::getChatLogsSize)
+			.sum();
 	}
 
 	public static Item toEntity(ItemRegisterRequest request, Member member) {
@@ -64,6 +110,24 @@ public class Item {
 			ItemStatus.of(request.getStatus()),
 			request.getRegion(),
 			member,
-			LocalDateTime.now());
+			LocalDateTime.now(),
+			0L);
+	}
+
+	public static Item create(String title, String content, Long price, ItemStatus status, String region,
+		LocalDateTime createdAt, Member member, Category category, List<Image> images, List<Interest> interests,
+		Long viewCount) {
+		Item item = new Item(title, content, price, status, region, null, createdAt, viewCount);
+		item.setMember(member);
+		item.setCategory(category);
+		images.forEach(item::addImage);
+		interests.forEach(item::addInterest);
+		return item;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(id=%d, title=%s, price=%d, status=%s, region=%s, viewCount=%d)",
+			"상품", this.getClass().getSimpleName(), id, title, price, status, region, viewCount);
 	}
 }

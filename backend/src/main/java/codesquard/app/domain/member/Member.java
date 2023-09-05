@@ -13,6 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import codesquard.app.domain.interest.Interest;
+import codesquard.app.domain.item.Item;
 import codesquard.app.domain.membertown.MemberTown;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,6 +36,12 @@ public class Member {
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<MemberTown> towns = new ArrayList<>(); // 동네
 
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<Interest> interests = new ArrayList<>(); // 관심하트
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<Item> items = new ArrayList<>(); // 회원이 등록한 상품
+
 	public Member(Long id) {
 		this.id = id;
 	}
@@ -43,6 +51,21 @@ public class Member {
 		this.email = email;
 		this.loginId = loginId;
 		this.towns = new ArrayList<>();
+	}
+
+	//== 연관 관계 메소드==//
+	public void addInterest(Interest interest) {
+		if (interest.getMember() != this) {
+			interest.setMember(this);
+		}
+		interests.add(interest);
+	}
+
+	public void addItem(Item item) {
+		if (item.getMember() != this) {
+			item.setMember(this);
+		}
+		items.add(item);
 	}
 
 	public static Member create(String avatarUrl, String email, String loginId) {
