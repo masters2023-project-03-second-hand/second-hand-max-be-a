@@ -1,18 +1,18 @@
 package codesquard.app.api.category.response;
 
 import codesquard.app.domain.category.Category;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CategoryItemResponse {
+
 	private Long id;
 	private String imageUrl;
 	private String name;
 	private boolean selected;
-
-	private CategoryItemResponse() {
-
-	}
 
 	public CategoryItemResponse(Long id, String imageUrl, String name, boolean selected) {
 		this.id = id;

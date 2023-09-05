@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 public enum CategoryErrorCode implements ErrorCode {
+
 	NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다.");
 
 	private final HttpStatus httpStatus;

@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class CategoryQueryService {
+
 	private final CategoryRepository categoryRepository;
 
 	public CategoryListResponse findAll() {
