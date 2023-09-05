@@ -1,6 +1,8 @@
 package codesquard.app.domain.jwt;
 
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -28,11 +30,17 @@ public class JwtProperties {
 		this.refreshTokenExpirationMillisecond = refreshTokenExpirationMillisecond;
 	}
 
-	public Date getExpireDateAccessToken() {
-		return new Date(System.currentTimeMillis() + accessTokenExpirationMillisecond);
+	public Date createExpireAccessTokenDate(LocalDateTime now) {
+		long accessTokenExpireTime = toEpochMilli(now);
+		return new Date(accessTokenExpireTime + accessTokenExpirationMillisecond);
 	}
 
-	public Date getExpireDateRefreshToken() {
-		return new Date(System.currentTimeMillis() + refreshTokenExpirationMillisecond);
+	public Date getExpireDateRefreshToken(LocalDateTime now) {
+		long refreshTokenExpireTime = toEpochMilli(now);
+		return new Date(refreshTokenExpireTime + refreshTokenExpirationMillisecond);
+	}
+
+	private long toEpochMilli(LocalDateTime localDateTime) {
+		return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 	}
 }

@@ -15,4 +15,9 @@ public class AuthenticationContext {
 	public void setPrincipal(Principal principal) {
 		this.principal = principal;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(%s)", "인증 컨텍스트", this.getClass().getSimpleName(), principal);
+	}
 }

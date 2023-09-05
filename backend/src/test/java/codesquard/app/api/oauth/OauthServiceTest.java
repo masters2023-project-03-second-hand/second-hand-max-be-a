@@ -5,15 +5,14 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,28 +24,27 @@ import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.image.ImageService;
 import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthLogoutRequest;
+import codesquard.app.api.oauth.request.OauthRefreshRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthLogoutResponse;
+import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
-import codesquard.app.domain.jwt.JwtProperties;
+import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
 import codesquard.app.domain.oauth.support.Principal;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 
 @Transactional
 class OauthServiceTest extends IntegrationTestSupport {
-
-	private static final Logger log = LoggerFactory.getLogger(OauthServiceTest.class);
 
 	@MockBean
 	private OauthClientRepository oauthClientRepository;
@@ -55,13 +53,13 @@ class OauthServiceTest extends IntegrationTestSupport {
 	private OauthClient oauthClient;
 
 	@Autowired
-	private JwtProperties jwtProperties;
-
-	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
 
 	@Autowired
 	private JwtProvider jwtProvider;
+
+	@MockBean
+	private ImageService imageService;
 
 	@DisplayName("로그인 아이디와 소셜 로그인을 하여 회원가입을 한다")
 	@Test
@@ -80,6 +78,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.thenReturn(mockAccessTokenResponse);
 		when(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.thenReturn(mockUserProfileResponse);
+		when(imageService.uploadImage(any())).thenReturn("avatarUrlValue");
 
 		// when
 		OauthSignUpResponse response = oauthService.signUp(profile, request, provider, code);
@@ -90,17 +89,15 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
-				.extracting("email", "loginId")
-				.containsExactlyInAnyOrder("23Yong@gmail.com",
-					"23Yong");
+				.extracting("email", "loginId", "avatarUrl")
+				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertThat(findMember)
-				.extracting("email", "loginId")
-				.containsExactlyInAnyOrder("23Yong@gmail.com",
-					"23Yong");
+				.extracting("email", "loginId", "avatarUrl")
+				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertThat(findMember.getTowns())
 				.hasSize(1)
 				.extracting("name")
-				.containsExactlyInAnyOrder("가락 1동");
+				.contains("가락 1동");
 			softAssertions.assertAll();
 		});
 	}
@@ -193,18 +190,16 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void login() {
 		// given
-		String avatarUrl = "avatarUrlValue";
-		String loginId = "23Yong";
-		String email = "23Yong@gmail.com";
-		Member member = Member.create(avatarUrl, email, loginId);
+		Member member = createFixedMember();
 		memberRepository.save(member);
 
-		OauthLoginRequest request = OauthFixedFactory.createFixedOauthLoginRequest();
+		OauthLoginRequest request = createFixedOauthLoginRequest();
 		String provider = "naver";
 		String code = "1234";
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
 
+		LocalDateTime now = createNow();
 		// mocking
 		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
 		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
@@ -213,14 +208,17 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.thenReturn(mockUserProfileResponse);
 
 		// when
-		OauthLoginResponse response = oauthService.login(request, provider, code);
-		log.debug("response : {}", response);
+		OauthLoginResponse response = oauthService.login(request, provider, code, now);
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
-				.extracting("user.loginId", "user.profileUrl")
-				.contains("23Yong", "avatarUrlValue");
+				.extracting("jwt.accessToken", "jwt.refreshToken", "user.loginId", "user.profileUrl")
+				.contains(
+					createExpectedAccessTokenBy(jwtProvider, member, now),
+					createExpectedRefreshTokenBy(jwtProvider, member, now),
+					"23Yong",
+					"avatarUrlValue");
 			softAssertions.assertAll();
 		});
 	}
@@ -229,21 +227,15 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void logout() {
 		// given
-		String avatarUrl = "avatarUrlValue";
-		String loginId = "23Yong";
-		String email = "23Yong@gmail.com";
-		Member member = Member.create(avatarUrl, email, loginId);
+		Member member = OauthFixedFactory.createFixedMember();
 		Member saveMember = memberRepository.save(member);
-
-		Map<String, Object> claims = member.createClaims();
-		Date expireDateAccessToken = jwtProperties.getExpireDateAccessToken();
-		String accessToken = createToken(claims, expireDateAccessToken);
-		Principal principal = jwtProvider.extractPrincipal(accessToken);
+		LocalDateTime now = createNow();
+		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
+		Principal principal = jwtProvider.extractPrincipal(jwt.getAccessToken());
 		OauthLogoutRequest request = OauthLogoutRequest.create(principal);
 
 		// when
 		OauthLogoutResponse response = oauthService.logout(request);
-		log.debug("response : {}", response);
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
@@ -255,12 +247,63 @@ class OauthServiceTest extends IntegrationTestSupport {
 		});
 	}
 
-	private String createToken(Map<String, Object> claims, Date expireDate) {
-		// claims를 비밀키로 이용하여 암호화
-		return Jwts.builder()
-			.setClaims(claims)
-			.setExpiration(expireDate)
-			.signWith(jwtProperties.getKey(), SignatureAlgorithm.HS256)
-			.compact();
+	@DisplayName("리프레쉬 토큰을 가지고 액세스 토큰을 갱신한다")
+	@Test
+	public void refreshAccessToken() {
+		// given
+		String avatarUrl = "avatarUrlValue";
+		String loginId = "23Yong";
+		String email = "23Yong@gmail.com";
+		Member member = Member.create(avatarUrl, email, loginId);
+		LocalDateTime now = createNow();
+
+		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
+
+		redisTemplate.opsForValue().set(member.createRedisKey(),
+			jwt.getRefreshToken(),
+			jwt.getExpireDateRefreshTokenTime(),
+			TimeUnit.MILLISECONDS);
+		memberRepository.save(member);
+
+		OauthRefreshRequest request = OauthRefreshRequest.create(jwt.getRefreshToken());
+
+		// when
+		OauthRefreshResponse response = oauthService.refreshAccessToken(request, now);
+
+		// then
+		SoftAssertions.assertSoftly(softAssertions -> {
+			softAssertions.assertThat(response)
+				.extracting("jwt.accessToken", "jwt.refreshToken")
+				.contains(createExpectedAccessTokenBy(jwtProvider, member, now),
+					createExpectedRefreshTokenBy(jwtProvider, member, now));
+			softAssertions.assertAll();
+		});
+	}
+
+	@DisplayName("유효하지 않은 토큰으로는 액세스 토큰을 갱신할 수 없다")
+	@Test
+	public void refreshAccessTokenWithInvalidRefreshToken() {
+		// given
+		Member member = createFixedMember();
+		LocalDateTime now = createNow();
+
+		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
+
+		redisTemplate.opsForValue().set(member.createRedisKey(),
+			jwt.getRefreshToken(),
+			jwt.getExpireDateRefreshTokenTime(),
+			TimeUnit.MILLISECONDS);
+		memberRepository.save(member);
+
+		OauthRefreshRequest request = OauthRefreshRequest.create("invalidRefreshTokenValue");
+
+		// when
+		Throwable throwable = catchThrowable(() -> oauthService.refreshAccessToken(request, now));
+
+		// then
+		Assertions.assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("유효하지 않은 토큰입니다.");
 	}
 }

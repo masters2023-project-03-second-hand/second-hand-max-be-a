@@ -29,7 +29,7 @@ public class WebConfig implements WebMvcConfigurer {
 		resolvers.add(authPrincipalArgumentResolver);
 		WebMvcConfigurer.super.addArgumentResolvers(resolvers);
 	}
-	
+
 	@Bean
 	public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilter() {
 		FilterRegistrationBean<JwtAuthorizationFilter> filterFilterRegistrationBean = new FilterRegistrationBean<>();

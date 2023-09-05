@@ -23,4 +23,11 @@ public enum OauthErrorCode implements ErrorCode {
 	public String getName() {
 		return name();
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(httpStatus=%s, message=%s)", "Oauth 에러", this.getClass().getSimpleName(),
+			httpStatus,
+			message);
+	}
 }

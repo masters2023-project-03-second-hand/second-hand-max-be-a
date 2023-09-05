@@ -1,4 +1,4 @@
-package codesquard.app.domain.oauth.config;
+package codesquard.app.config;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

@@ -1,30 +1,29 @@
 package codesquard.app.api.oauth.request;
 
-import javax.validation.constraints.NotEmpty;
+import static codesquard.app.config.ValidationGroups.*;
+
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
 @Getter
-@ToString
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthSignUpRequest {
 
-	@NotEmpty(message = "아이디는 띄어쓰기 없이 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.")
-	@Pattern(regexp = "^[a-zA-Z0-9]{2,12}$", message = "아이디는 띄어쓰기 없이 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.")
+	@NotBlank(message = "로그인 아이디는 필수 정보입니다.", groups = NotBlankGroup.class)
+	@Pattern(regexp = "^[a-zA-Z0-9]{2,12}$", message = "아이디는 띄어쓰기 없이 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.", groups = PatternGroup.class)
 	private String loginId;
-	@NotEmpty(message = "동네는 필수 정보입니다.")
-	private String addrName;
+	@NotBlank(message = "동네 이름은 필수 정보입니다.", groups = NotBlankGroup.class)
+	private String addressName;
 
-	private OauthSignUpRequest() {
-
-	}
-
-	private OauthSignUpRequest(String loginId, String addrName) {
+	private OauthSignUpRequest(String loginId, String addressName) {
 		this.loginId = loginId;
-		this.addrName = addrName;
+		this.addressName = addressName;
 	}
 
 	public static OauthSignUpRequest create(String loginId, String addrName) {
@@ -33,8 +32,14 @@ public class OauthSignUpRequest {
 
 	public Member toEntity(String avatarUrl, String email) {
 		Member member = Member.create(avatarUrl, email, loginId);
-		MemberTown town = MemberTown.create(addrName);
+		MemberTown town = MemberTown.create(addressName);
 		member.addMemberTown(town);
 		return member;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(loginId=%s, addressName=%s)", "회원가입 요청", this.getClass().getSimpleName(), loginId,
+			addressName);
 	}
 }

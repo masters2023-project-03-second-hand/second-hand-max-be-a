@@ -1,5 +1,6 @@
 package codesquard.app.domain.jwt;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,10 +30,17 @@ public class JwtProvider {
 		this.jwtProperties = jwtProperties;
 	}
 
-	public Jwt createJwtBasedOnMember(Member member) {
+	public Jwt createJwtWithRefreshTokenBasedOnMember(Member member, String refreshToken, LocalDateTime now) {
 		Map<String, Object> claims = member.createClaims();
-		Date expireDateAccessToken = jwtProperties.getExpireDateAccessToken();
-		Date expireDateRefreshToken = jwtProperties.getExpireDateRefreshToken();
+		Date expireDateAccessToken = jwtProperties.createExpireAccessTokenDate(now);
+		Date expireDateRefreshToken = getClaims(refreshToken).getExpiration();
+		return createJwt(claims, expireDateAccessToken, expireDateRefreshToken);
+	}
+
+	public Jwt createJwtBasedOnMember(Member member, LocalDateTime now) {
+		Map<String, Object> claims = member.createClaims();
+		Date expireDateAccessToken = jwtProperties.createExpireAccessTokenDate(now);
+		Date expireDateRefreshToken = jwtProperties.getExpireDateRefreshToken(now);
 		return createJwt(claims, expireDateAccessToken, expireDateRefreshToken);
 	}
 
@@ -67,11 +75,17 @@ public class JwtProvider {
 	 */
 	public Claims getClaims(String token) {
 		// token을 비밀키로 복호화하여 Claims 추출
-		return Jwts.parserBuilder()
-			.setSigningKey(jwtProperties.getKey())
-			.build()
-			.parseClaimsJws(token)
-			.getBody();
+		try {
+			return Jwts.parserBuilder()
+				.setSigningKey(jwtProperties.getKey())
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
+		} catch (ExpiredJwtException e) {
+			throw new RestApiException(JwtTokenErrorCode.EXPIRE_TOKEN);
+		} catch (JwtException e) {
+			throw new RestApiException(JwtTokenErrorCode.INVALID_TOKEN);
+		}
 	}
 
 	public void validateToken(String token) {
@@ -81,8 +95,10 @@ public class JwtProvider {
 				.build()
 				.parseClaimsJws(token);
 		} catch (ExpiredJwtException e) {
+			log.error("토큰 만료 에러 : {}", e.getMessage());
 			throw new RestApiException(JwtTokenErrorCode.EXPIRE_TOKEN);
 		} catch (JwtException e) {
+			log.error("Jwt 에러 : {}", e.getMessage());
 			throw new RestApiException(JwtTokenErrorCode.INVALID_TOKEN);
 		}
 	}
@@ -98,4 +114,5 @@ public class JwtProvider {
 
 		return Principal.from(claims, token);
 	}
+
 }

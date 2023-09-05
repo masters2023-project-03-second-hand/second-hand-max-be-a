@@ -18,16 +18,11 @@ public class RedisRepositoryConfig {
 		this.redisProperties = redisProperties;
 	}
 
-	// lettuce
-	// RedisConnectionFactory 인터페이스를 통해 LettuceConnectionFactory 빈 객체 생성
-	// host : ip 주소
-	// port : 포트번호
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory() {
 		return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
 	}
 
-	// setKeySerializer, setValueSerializer 설정으로 redis-cli를 통한 데이터를 조회할 수 있습니다
 	@Bean
 	public RedisTemplate<String, Object> redisTemplate() {
 		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();

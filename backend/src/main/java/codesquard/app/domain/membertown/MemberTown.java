@@ -8,10 +8,8 @@ import javax.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter
-@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class MemberTown {
@@ -26,5 +24,10 @@ public class MemberTown {
 
 	public static MemberTown create(String name) {
 		return new MemberTown(name);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(id=%d, name=%s)", "회원동네", this.getClass().getSimpleName(), id, name);
 	}
 }

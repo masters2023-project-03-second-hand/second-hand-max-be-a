@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,12 +15,10 @@ import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
-import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
-@ToString
+@Slf4j
 public abstract class OauthClient {
-
-	Logger log = LoggerFactory.getLogger(OauthClient.class);
 
 	private final String clientId;
 	private final String clientSecret;

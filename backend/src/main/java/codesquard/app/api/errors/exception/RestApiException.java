@@ -10,4 +10,10 @@ public class RestApiException extends RuntimeException {
 	public RestApiException(ErrorCode errorCode) {
 		this.errorCode = errorCode;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(errorCode=%s)", "RestApi 에러", this.getClass().getSimpleName(),
+			errorCode.getName());
+	}
 }

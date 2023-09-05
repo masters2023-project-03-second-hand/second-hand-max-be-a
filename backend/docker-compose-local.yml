@@ -21,6 +21,8 @@ services:
       - 5173:5173
     networks:
       - backend_net
+    environment:
+      - NODE_ENV=prod
   db:
     container_name: second_hand_db
     image: mysql:latest

@@ -10,12 +10,11 @@ import codesquard.app.domain.oauth.client.NaverOauthClient;
 import codesquard.app.domain.oauth.client.OauthClient;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 @Getter
-@ToString
 @ConfigurationProperties(prefix = "oauth2")
 public class OauthProperties {
+
 	private final Naver naver;
 
 	@ConstructorBinding
@@ -30,7 +29,6 @@ public class OauthProperties {
 	}
 
 	@Getter
-	@ToString
 	@RequiredArgsConstructor
 	public static class Naver {
 

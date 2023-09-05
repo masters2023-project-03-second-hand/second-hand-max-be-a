@@ -1,7 +1,5 @@
 package codesquard.app.domain.oauth.support;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -10,12 +8,12 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class AuthPrincipalArgumentResolver implements HandlerMethodArgumentResolver {
-
-	private static final Logger log = LoggerFactory.getLogger(AuthPrincipalArgumentResolver.class);
 
 	private final AuthenticationContext authenticationContext;
 
@@ -28,7 +26,7 @@ public class AuthPrincipalArgumentResolver implements HandlerMethodArgumentResol
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 		NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-		log.debug("authenticateContext : {}", authenticationContext);
+		log.debug("{}", authenticationContext);
 		return authenticationContext.getPrincipal();
 	}
 }
