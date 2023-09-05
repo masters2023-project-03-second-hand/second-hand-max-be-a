@@ -3,7 +3,9 @@ package codesquard.app.api.response;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
 public class ItemListResponse {
 
 	private List<ItemResponse> contents;
@@ -15,6 +17,7 @@ public class ItemListResponse {
 	}
 
 	@AllArgsConstructor
+	@Getter
 	public static class Paging {
 
 		private Long nextCursor;

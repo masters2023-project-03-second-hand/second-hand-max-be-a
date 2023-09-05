@@ -1,5 +1,7 @@
 package codesquard.app.domain.item;
 
+import static codesquard.app.domain.item.QItem.*;
+
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;

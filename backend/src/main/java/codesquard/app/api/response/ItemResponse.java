@@ -13,7 +13,7 @@ public class ItemResponse {
 	private String title;
 	private String region;
 	private LocalDateTime createdAt;
-	private Integer price;
+	private Long price;
 	private ItemStatus status;
 	private Long chatCount;
 	private Long wishCount;

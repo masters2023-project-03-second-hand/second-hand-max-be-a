@@ -25,7 +25,7 @@ public class ItemController {
 
 	private final ItemService itemService;
 
-	@PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Void>> register(@RequestPart ItemRegisterRequest request,
 		@RequestPart List<MultipartFile> itemImage,
 		@AuthPrincipal Principal principal) {
@@ -38,6 +38,7 @@ public class ItemController {
 		@RequestParam(required = false, defaultValue = "10") int size, @RequestParam(required = false) Long cursor,
 		@RequestParam(required = false) Long categoryId) {
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(ApiResponse.ok("ddd", itemService.findAll(region, size, cursor, categoryId)));
+			.body(ApiResponse.ok("상품 목록 조회에 성공하였습니다.",
+				itemService.findAll(region, size, cursor, categoryId)));
 	}
 }
