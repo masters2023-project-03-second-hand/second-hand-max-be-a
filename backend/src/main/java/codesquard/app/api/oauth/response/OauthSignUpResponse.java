@@ -1,17 +1,21 @@
 package codesquard.app.api.oauth.response;
 
 import codesquard.app.domain.member.Member;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthSignUpResponse {
-	private final Long id;
 
-	private final String avatarUrl;
+	private Long id;
 
-	private final String email;
+	private String avatarUrl;
 
-	private final String loginId;
+	private String email;
+
+	private String loginId;
 
 	private OauthSignUpResponse(Long id, String avatarUrl, String email, String loginId) {
 		this.id = id;
