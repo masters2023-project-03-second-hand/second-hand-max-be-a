@@ -1,6 +1,7 @@
-package codesquard.app.api.item.unit;
+package codesquard.app.api.item;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.nio.charset.StandardCharsets;
@@ -20,10 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.image.ImageUploader;
-import codesquard.app.api.item.ItemRegisterRequest;
-import codesquard.app.api.item.ItemService;
+import codesquard.app.api.response.ItemListResponse;
+import codesquard.app.api.response.ItemResponse;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
+import codesquard.support.SupportRepository;
 
 @SpringBootTest
 class ItemServiceTest {
@@ -32,6 +34,8 @@ class ItemServiceTest {
 	private ItemService itemService;
 	@Autowired
 	private EntityManager em;
+	@Autowired
+	private SupportRepository supportRepository;
 	@MockBean
 	private ImageUploader imageUploader;
 
@@ -64,5 +68,33 @@ class ItemServiceTest {
 				"image-content".getBytes(StandardCharsets.UTF_8)));
 		}
 		return mockMultipartFiles;
+	}
+
+	@Test
+	@DisplayName("상품 목록 조회에 성공한다.")
+	void findAll() {
+		// given
+		ItemRegisterRequest request1 = new ItemRegisterRequest(
+			"선풍기", 12000L, null, "가양 1동", "판매중", 1L, null);
+		ItemRegisterRequest request2 = new ItemRegisterRequest(
+			"전기밥솥", null, null, "가양 1동", "판매중", 1L, null);
+		ItemRegisterRequest request3 = new ItemRegisterRequest(
+			"노트북", null, null, "가양 1동", "판매중", 1L, null);
+
+		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
+		supportRepository.save(Item.toEntity(request1, member, "thumbnail"));
+		supportRepository.save(Item.toEntity(request2, member, "thumbnail"));
+		supportRepository.save(Item.toEntity(request3, member, "thumbnail"));
+
+		// when
+		ItemListResponse all = itemService.findAll("가양 1동", 2, null, null);
+
+		// then
+		List<ItemResponse> contents = all.getContents();
+		assertAll(
+			() -> assertThat(contents.size()).isEqualTo(2),
+			() -> assertThat(contents.get(0).getTitle()).isEqualTo("노트북"),
+			() -> assertThat(all.getPaging().isHasNext()).isTrue(),
+			() -> assertThat(all.getPaging().getNextCursor()).isEqualTo(2L));
 	}
 }
