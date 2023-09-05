@@ -12,4 +12,12 @@ public class CategorySelectedRequest {
 	private CategorySelectedRequest() {
 
 	}
+
+	public CategorySelectedRequest(Long selectedCategoryId) {
+		this.selectedCategoryId = selectedCategoryId;
+	}
+
+	public static CategorySelectedRequest create(Long categoryId) {
+		return new CategorySelectedRequest(categoryId);
+	}
 }
