@@ -1,15 +1,14 @@
 package codesquard.app.api.oauth.response;
 
 import codesquard.app.domain.jwt.Jwt;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthRefreshResponse {
 	private Jwt jwt;
-
-	private OauthRefreshResponse() {
-
-	}
 
 	private OauthRefreshResponse(Jwt jwt) {
 		this.jwt = jwt;

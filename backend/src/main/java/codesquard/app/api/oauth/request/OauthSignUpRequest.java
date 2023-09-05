@@ -7,9 +7,12 @@ import javax.validation.constraints.Pattern;
 
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthSignUpRequest {
 
 	@NotBlank(message = "로그인 아이디는 필수 정보입니다.", groups = NotBlankGroup.class)
@@ -17,10 +20,6 @@ public class OauthSignUpRequest {
 	private String loginId;
 	@NotBlank(message = "동네 이름은 필수 정보입니다.", groups = NotBlankGroup.class)
 	private String addressName;
-
-	private OauthSignUpRequest() {
-
-	}
 
 	private OauthSignUpRequest(String loginId, String addressName) {
 		this.loginId = loginId;

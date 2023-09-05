@@ -1,6 +1,7 @@
 package codesquard.app.config;
 
 public class ValidationGroups {
+
 	public interface NotBlankGroup {
 	}
 

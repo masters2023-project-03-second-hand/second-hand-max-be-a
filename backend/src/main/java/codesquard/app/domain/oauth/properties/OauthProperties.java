@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @ConfigurationProperties(prefix = "oauth2")
 public class OauthProperties {
+
 	private final Naver naver;
 
 	@ConstructorBinding

@@ -1,12 +1,15 @@
 package codesquard.app.api.oauth.response;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthUserProfileResponse {
 
-	private final String email;
-	private final String profileImage;
+	private String email;
+	private String profileImage;
 
 	private OauthUserProfileResponse(String email, String profileImage) {
 		this.email = email;
