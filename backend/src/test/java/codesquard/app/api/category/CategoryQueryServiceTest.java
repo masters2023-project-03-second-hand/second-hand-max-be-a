@@ -27,7 +27,7 @@ class CategoryQueryServiceTest extends IntegrationTestSupport {
 		CategoryListResponse response = categoryQueryService.findAll();
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(response.getCategories()).hasSize(2);
+			softAssertions.assertThat(response.getCategories()).hasSize(3);
 			softAssertions.assertAll();
 		});
 	}
