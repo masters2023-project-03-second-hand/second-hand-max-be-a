@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.http.HttpHeaders;
@@ -82,7 +84,8 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	public void signupWhenInvalidLoginId(String loginId) throws Exception {
 		// given
 		MockMultipartFile mockProfile = createFixedProfile();
-		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest(loginId, "가락 1동"));
+		MockMultipartFile mockSignupData = createFixedSignUpData(
+			createFixedOauthSignUpRequest(loginId, List.of("가락 1동")));
 
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
@@ -102,8 +105,10 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@ParameterizedTest
 	public void signupWhenInvalidAddrName(String addrName) throws Exception {
 		// given
+		List<String> addressNames = new ArrayList<>();
+		addressNames.add(addrName);
 		MockMultipartFile mockProfile = createFixedProfile();
-		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest("23Yong", addrName));
+		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest("23Yong", addressNames));
 
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
@@ -113,9 +118,9 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(400)))
 			.andExpect(jsonPath("message").value(Matchers.equalTo("유효하지 않은 입력형식입니다.")))
-			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("addressName")))
+			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("addressNames[0]")))
 			.andExpect(jsonPath("data[0].defaultMessage").value(
-				Matchers.equalTo("동네 이름은 필수 정보입니다.")));
+				Matchers.equalTo("주소 이름은 공백이면 안됩니다.")));
 	}
 
 	@DisplayName("로그아웃을 요청한다")
