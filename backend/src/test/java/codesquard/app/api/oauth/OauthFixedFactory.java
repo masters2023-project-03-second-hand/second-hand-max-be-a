@@ -70,7 +70,7 @@ public class OauthFixedFactory {
 	}
 
 	public static OauthLoginRequest createFixedOauthLoginRequest() {
-		return new OauthLoginRequest("23Yong");
+		return OauthLoginRequest.create("23Yong");
 	}
 
 	public static LocalDateTime createNow() {
