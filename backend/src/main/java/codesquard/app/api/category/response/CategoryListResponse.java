@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CategoryListResponse {
 
-	List<CategoryItemResponse> categories;
+	private List<CategoryItemResponse> categories;
 
-	public CategoryListResponse(List<CategoryItemResponse> categories) {
+	private CategoryListResponse(List<CategoryItemResponse> categories) {
 		this.categories = new ArrayList<>(categories);
 	}
 

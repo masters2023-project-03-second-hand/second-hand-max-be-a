@@ -41,7 +41,7 @@ public class Item {
 	private ItemStatus status;
 	private String region;
 	private LocalDateTime createdAt;
-	private Long viewCount;
+	private String thumbnailUrl;
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
 	private List<Image> images = new ArrayList<>();
 	private LocalDateTime modifiedAt;
@@ -51,17 +51,17 @@ public class Item {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
+	private Long interestCount;
+	private Long chatCount;
+	private Long viewCount;
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
 	private List<Interest> interests = new ArrayList<>();
 
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
 	private List<ChatRoom> chatRooms = new ArrayList<>();
-
-	public Item(String title, String content, Long price, ItemStatus status,
-		String region,
-		Member member,
-		LocalDateTime createdAt,
-		Long viewCount) {
+	
+	public Item(String title, String content, Long price, ItemStatus status, String region, Member member,
+		LocalDateTime createdAt, String thumbnailUrl, Long viewCount) {
 		this.title = title;
 		this.content = content;
 		this.price = price;
@@ -70,6 +70,7 @@ public class Item {
 		this.member = member;
 		this.createdAt = createdAt;
 		this.viewCount = viewCount;
+		this.thumbnailUrl = thumbnailUrl;
 	}
 
 	//== 연관관계 메소드 ==//
@@ -118,7 +119,7 @@ public class Item {
 	}
 	//== 연관관계 메소드 종료 ==//
 
-	public static Item toEntity(ItemRegisterRequest request, Member member) {
+	public static Item toEntity(ItemRegisterRequest request, Member member, String thumbnailUrl) {
 		return new Item(
 			request.getTitle(),
 			request.getContent(),
@@ -126,6 +127,8 @@ public class Item {
 			ItemStatus.of(request.getStatus()),
 			request.getRegion(),
 			member,
+			LocalDateTime.now(),
+			thumbnailUrl,
 			LocalDateTime.now(),
 			0L);
 	}

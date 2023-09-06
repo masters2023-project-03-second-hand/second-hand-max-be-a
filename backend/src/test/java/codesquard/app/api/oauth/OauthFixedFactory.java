@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
@@ -25,7 +26,7 @@ import codesquard.app.domain.membertown.MemberTown;
 public class OauthFixedFactory {
 
 	private static final String LOGIN_ID = "23Yong";
-	private static final String ADDR_NAME = "가락 1동";
+	private static final List<String> ADDRESS_NAMES = List.of("가락 1동");
 	private static final String ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJsb2dpbklkIjoiMjNZb25nIiwiZW1haWwiOiIyM1lvbm"
 		+ "dAZ21haWwuY29tIiwibWVtYmVySWQiOjEsImV4cCI6MTY3MjQ5OTEwMH0.7w2MKSLPVEr6wo7B-C6drNA3eETikpnYi2M1V8c9erY";
 	private static final String SCOPE = "scopeValue";
@@ -34,11 +35,11 @@ public class OauthFixedFactory {
 	private static final String AVATAR_URL = "avatarUrlValue";
 
 	public static OauthSignUpRequest createFixedOauthSignUpRequest() {
-		return OauthSignUpRequest.create(LOGIN_ID, ADDR_NAME);
+		return OauthSignUpRequest.create(LOGIN_ID, ADDRESS_NAMES);
 	}
 
-	public static OauthSignUpRequest createFixedOauthSignUpRequest(String loginId, String addrName) {
-		return OauthSignUpRequest.create(loginId, addrName);
+	public static OauthSignUpRequest createFixedOauthSignUpRequest(String loginId, List<String> addressNames) {
+		return OauthSignUpRequest.create(loginId, addressNames);
 	}
 
 	public static OauthAccessTokenResponse createFixedOauthAccessTokenResponse() {
@@ -71,7 +72,7 @@ public class OauthFixedFactory {
 	}
 
 	public static OauthLoginRequest createFixedOauthLoginRequest() {
-		return new OauthLoginRequest("23Yong");
+		return OauthLoginRequest.create("23Yong");
 	}
 
 	public static LocalDateTime createNow() {

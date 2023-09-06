@@ -91,7 +91,7 @@ class CategoryRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(400)))
 			.andExpect(jsonPath("message").value(Matchers.equalTo("유효하지 않은 입력형식입니다.")))
 			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("selectedCategoryId")))
-			.andExpect(jsonPath("data[0].defaultMessage").value(Matchers.equalTo("카테고리 아이디는 양수어야 합니다.")));
+			.andExpect(jsonPath("data[0].defaultMessage").value(Matchers.equalTo("카테고리 아이디는 양수여야 합니다.")));
 	}
 
 	private static Stream<Arguments> invalidCategoryId() {

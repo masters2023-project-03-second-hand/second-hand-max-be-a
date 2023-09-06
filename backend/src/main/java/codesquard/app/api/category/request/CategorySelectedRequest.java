@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CategorySelectedRequest {
 
-	@Positive(message = "카테고리 아이디는 양수어야 합니다.")
+	@Positive(message = "카테고리 아이디는 양수여야 합니다.")
 	private Long selectedCategoryId;
 
-	public CategorySelectedRequest(Long selectedCategoryId) {
+	private CategorySelectedRequest(Long selectedCategoryId) {
 		this.selectedCategoryId = selectedCategoryId;
 	}
 
