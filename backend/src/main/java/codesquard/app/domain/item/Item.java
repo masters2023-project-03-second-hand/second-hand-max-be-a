@@ -1,7 +1,6 @@
 package codesquard.app.domain.item;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,11 +9,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import codesquard.app.api.item.ItemRegisterRequest;
 import codesquard.app.domain.category.Category;
-import codesquard.app.domain.image.Image;
 import codesquard.app.domain.member.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,8 +32,7 @@ public class Item {
 	private ItemStatus status;
 	private String region;
 	private LocalDateTime createdAt;
-	@OneToMany
-	private List<Image> images;
+	private String thumbnailUrl;
 	private LocalDateTime modifiedAt;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
@@ -44,9 +40,13 @@ public class Item {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
+	private Long interestCount;
+	private Long chatCount;
+	private Long viewCount;
 
 	public Item(String title, String content, Long price, ItemStatus status, String region, Member member,
-		LocalDateTime createdAt) {
+		LocalDateTime createdAt, String thumbnailUrl) {
+		this.thumbnailUrl = thumbnailUrl;
 		this.title = title;
 		this.content = content;
 		this.price = price;
@@ -56,7 +56,7 @@ public class Item {
 		this.createdAt = createdAt;
 	}
 
-	public static Item toEntity(ItemRegisterRequest request, Member member) {
+	public static Item toEntity(ItemRegisterRequest request, Member member, String thumbnailUrl) {
 		return new Item(
 			request.getTitle(),
 			request.getContent(),
@@ -64,6 +64,7 @@ public class Item {
 			ItemStatus.of(request.getStatus()),
 			request.getRegion(),
 			member,
-			LocalDateTime.now());
+			LocalDateTime.now(),
+			thumbnailUrl);
 	}
 }
