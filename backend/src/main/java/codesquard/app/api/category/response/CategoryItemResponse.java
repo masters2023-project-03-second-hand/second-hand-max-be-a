@@ -12,16 +12,14 @@ public class CategoryItemResponse {
 	private Long id;
 	private String imageUrl;
 	private String name;
-	private boolean selected;
 
-	private CategoryItemResponse(Long id, String imageUrl, String name, boolean selected) {
+	private CategoryItemResponse(Long id, String imageUrl, String name) {
 		this.id = id;
 		this.imageUrl = imageUrl;
 		this.name = name;
-		this.selected = selected;
 	}
 
 	public static CategoryItemResponse from(Category category) {
-		return new CategoryItemResponse(category.getId(), category.getImageUrl(), category.getName(), false);
+		return new CategoryItemResponse(category.getId(), category.getImageUrl(), category.getName());
 	}
 }
