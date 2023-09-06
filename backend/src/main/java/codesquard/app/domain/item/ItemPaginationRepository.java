@@ -39,7 +39,7 @@ public class ItemPaginationRepository {
 				equalTradingRegion(region)
 			)
 			.orderBy(item.createdAt.desc())
-			.limit(size + 1)    // 다음 요소가 있는지 확인하기 위해 +1개 만큼 더 가져온다.
+			.limit(size + 1)
 			.fetch();
 		return checkLastPage(size, itemResponses);
 	}
