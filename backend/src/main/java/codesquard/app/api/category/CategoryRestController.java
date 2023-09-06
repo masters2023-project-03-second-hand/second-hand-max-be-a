@@ -30,7 +30,6 @@ public class CategoryRestController {
 		return ApiResponse.of(HttpStatus.OK, "카테고리 조회에 성공하였습니다.", categoryQueryService.findAll());
 	}
 
-	@ResponseStatus(HttpStatus.FOUND)
 	@PostMapping
 	public ResponseEntity<Void> selectCategory(@Valid @RequestBody CategorySelectedRequest request) {
 		categoryQueryService.validateCategoryId(request);

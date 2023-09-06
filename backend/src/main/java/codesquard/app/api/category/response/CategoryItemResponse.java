@@ -14,7 +14,7 @@ public class CategoryItemResponse {
 	private String name;
 	private boolean selected;
 
-	public CategoryItemResponse(Long id, String imageUrl, String name, boolean selected) {
+	private CategoryItemResponse(Long id, String imageUrl, String name, boolean selected) {
 		this.id = id;
 		this.imageUrl = imageUrl;
 		this.name = name;
