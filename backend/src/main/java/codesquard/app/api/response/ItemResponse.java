@@ -11,7 +11,7 @@ public class ItemResponse {
 	private Long itemId;
 	private String thumbnailUrl;
 	private String title;
-	private String region;
+	private String tradingRegion;
 	private LocalDateTime createdAt;
 	private Long price;
 	private ItemStatus status;
