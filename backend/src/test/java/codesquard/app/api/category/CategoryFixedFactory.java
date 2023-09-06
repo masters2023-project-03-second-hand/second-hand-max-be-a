@@ -17,6 +17,10 @@ public class CategoryFixedFactory {
 		return List.of(category1, category2, category3);
 	}
 
+	public static Category createdFixedCategory() {
+		return Category.create("가구/인테리어", "https://i.ibb.co/cyYH5V8/furniture.png");
+	}
+
 	public static CategoryListResponse createFixedCategoryListResponse() {
 		List<CategoryItemResponse> categoryItemResponses = createFixedCategories().stream()
 			.map(CategoryItemResponse::from)

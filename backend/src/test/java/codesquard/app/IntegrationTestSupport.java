@@ -7,7 +7,10 @@ import codesquard.app.api.category.CategoryQueryService;
 import codesquard.app.api.item.ItemQueryService;
 import codesquard.app.api.oauth.OauthService;
 import codesquard.app.domain.category.CategoryRepository;
+import codesquard.app.domain.chat.ChatLogRepository;
+import codesquard.app.domain.chat.ChatRoomRepository;
 import codesquard.app.domain.image.ImageRepository;
+import codesquard.app.domain.interest.InterestRepository;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTownRepository;
@@ -38,4 +41,13 @@ public abstract class IntegrationTestSupport {
 
 	@Autowired
 	protected ImageRepository imageRepository;
+
+	@Autowired
+	protected InterestRepository interestRepository;
+
+	@Autowired
+	protected ChatLogRepository chatLogRepository;
+
+	@Autowired
+	protected ChatRoomRepository chatRoomRepository;
 }
