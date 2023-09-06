@@ -48,7 +48,7 @@ public class Interest {
 	public void setItem(Item item) {
 		this.item = item;
 		if (!item.getInterests().contains(this)) {
-			item.addInterest(this);
+			this.item.addInterest(this);
 		}
 	}
 

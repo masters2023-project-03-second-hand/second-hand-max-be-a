@@ -13,15 +13,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.interest.Interest;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.membertown.MemberTown;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id")
 @Entity
 public class Member {
 
@@ -42,6 +45,9 @@ public class Member {
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<Item> items = new ArrayList<>(); // 회원이 등록한 상품
 
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<ChatRoom> chatRooms = new ArrayList<>(); // 채팅방
+
 	public Member(Long id) {
 		this.id = id;
 	}
@@ -53,28 +59,42 @@ public class Member {
 		this.towns = new ArrayList<>();
 	}
 
-	//== 연관 관계 메소드==//
-	public void addInterest(Interest interest) {
-		if (interest.getMember() != this) {
-			interest.setMember(this);
-		}
-		interests.add(interest);
-	}
-
-	public void addItem(Item item) {
-		if (item.getMember() != this) {
-			item.setMember(this);
-		}
-		items.add(item);
-	}
-
 	public static Member create(String avatarUrl, String email, String loginId) {
 		return new Member(avatarUrl, email, loginId);
 	}
 
-	public void addMemberTown(MemberTown town) {
-		towns.add(town);
+	//== 연관 관계 메소드==//
+	public void addItem(Item item) {
+		if (item != null && item.getMember() != this) {
+			item.setMember(this);
+		}
+		if (item != null && !items.contains(item)) {
+			items.add(item);
+		}
 	}
+
+	public void addInterest(Interest interest) {
+		if (interest != null && interest.getMember() != this) {
+			interest.setMember(this);
+		}
+		if (interest != null && !interests.contains(interest)) {
+			interests.add(interest);
+		}
+	}
+
+	public void addMemberTown(MemberTown town) {
+		if (town != null && !towns.contains(town)) {
+			towns.add(town);
+		}
+	}
+
+	public void addChatRoom(ChatRoom chatRoom) {
+		if (chatRoom != null && !chatRooms.contains(chatRoom)) {
+			chatRooms.add(chatRoom);
+		}
+	}
+
+	//== 연관 관계 메소드 종료==//
 
 	public String createRedisKey() {
 		return "RT:" + email;

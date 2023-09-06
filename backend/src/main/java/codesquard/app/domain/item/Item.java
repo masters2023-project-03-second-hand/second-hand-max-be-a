@@ -21,10 +21,12 @@ import codesquard.app.domain.image.Image;
 import codesquard.app.domain.interest.Interest;
 import codesquard.app.domain.member.Member;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -73,8 +75,8 @@ public class Item {
 	//== 연관관계 메소드 ==//
 	public void setMember(Member member) {
 		this.member = member;
-		if (!member.getItems().contains(this)) {
-			member.addItem(this);
+		if (this.member != null && !this.member.getItems().contains(this)) {
+			this.member.addItem(this);
 		}
 	}
 
@@ -83,17 +85,30 @@ public class Item {
 	}
 
 	public void addImage(Image image) {
-		if (!this.images.contains(image)) {
+		if (image != null && !this.images.contains(image)) {
 			this.images.add(image);
 		}
-		image.setItem(this);
+		if (image != null) {
+			image.setItem(this);
+		}
 	}
 
 	public void addInterest(Interest interest) {
-		if (!this.interests.contains(interest)) {
+		if (interest != null && !this.interests.contains(interest)) {
 			this.interests.add(interest);
 		}
-		interest.setItem(this);
+		if (interest != null) {
+			interest.setItem(this);
+		}
+	}
+
+	public void addChatRoom(ChatRoom chatRoom) {
+		if (chatRoom != null && !chatRooms.contains(chatRoom)) {
+			chatRooms.add(chatRoom);
+		}
+		if (chatRoom != null) {
+			chatRoom.setItem(this);
+		}
 	}
 
 	public int getTotalChatLogCount() {
@@ -101,6 +116,7 @@ public class Item {
 			.mapToInt(ChatRoom::getChatLogsSize)
 			.sum();
 	}
+	//== 연관관계 메소드 종료 ==//
 
 	public static Item toEntity(ItemRegisterRequest request, Member member) {
 		return new Item(
@@ -117,7 +133,7 @@ public class Item {
 	public static Item create(String title, String content, Long price, ItemStatus status, String region,
 		LocalDateTime createdAt, Member member, Category category, List<Image> images, List<Interest> interests,
 		Long viewCount) {
-		Item item = new Item(title, content, price, status, region, null, createdAt, viewCount);
+		Item item = new Item(title, content, price, status, region, member, createdAt, viewCount);
 		item.setMember(member);
 		item.setCategory(category);
 		images.forEach(item::addImage);
@@ -130,4 +146,5 @@ public class Item {
 		return String.format("%s, %s(id=%d, title=%s, price=%d, status=%s, region=%s, viewCount=%d)",
 			"상품", this.getClass().getSimpleName(), id, title, price, status, region, viewCount);
 	}
+
 }

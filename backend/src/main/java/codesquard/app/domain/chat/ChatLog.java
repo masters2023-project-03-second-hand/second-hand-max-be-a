@@ -12,10 +12,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class ChatLog {
@@ -29,4 +31,25 @@ public class ChatLog {
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "chat_room_id")
 	private ChatRoom chatRoom;
+
+	public ChatLog(String message, String sender, String receiver, LocalDateTime createdAt) {
+		this.message = message;
+		this.sender = sender;
+		this.receiver = receiver;
+		this.createdAt = createdAt;
+	}
+
+	public static ChatLog create(String message, String sender, String receiver, LocalDateTime createdAt) {
+		return new ChatLog(message, sender, receiver, createdAt);
+	}
+
+	//== 연관 관계 메소드 ==//
+	public void setChatRoom(ChatRoom chatRoom) {
+		this.chatRoom = chatRoom;
+		if (chatRoom != null && !chatRoom.getChatLogs().contains(this)) {
+			chatRoom.addChatLog(this);
+		}
+	}
+
+	//== 연관 관계 메소드 종료 ==//
 }

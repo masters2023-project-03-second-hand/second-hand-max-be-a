@@ -18,14 +18,17 @@ import javax.persistence.Table;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id")
 @Table(name = "chat_room")
 @Entity
 public class ChatRoom {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -37,10 +40,41 @@ public class ChatRoom {
 	@JoinColumn(name = "item_id")
 	private Item item;
 
-	@OneToMany(mappedBy = "chatRoom")
+	@OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
 	private List<ChatLog> chatLogs = new ArrayList<>();
 
+	public ChatRoom(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public static ChatRoom create(LocalDateTime createdAt) {
+		return new ChatRoom(createdAt);
+	}
+
 	//== 연관관계 메소드 ==//
+	public void setMember(Member member) {
+		this.member = member;
+		if (member != null && !member.getChatRooms().contains(this)) {
+			member.addChatRoom(this);
+		}
+	}
+
+	public void setItem(Item item) {
+		this.item = item;
+		if (item != null && !item.getChatRooms().contains(this)) {
+			item.addChatRoom(this);
+		}
+	}
+
+	public void addChatLog(ChatLog chatLog) {
+		if (chatLog != null && !chatLogs.contains(chatLog)) {
+			chatLogs.add(chatLog);
+		}
+		if (chatLog != null) {
+			chatLog.setChatRoom(this);
+		}
+	}
+
 	public int getChatLogsSize() {
 		return chatLogs.size();
 	}
