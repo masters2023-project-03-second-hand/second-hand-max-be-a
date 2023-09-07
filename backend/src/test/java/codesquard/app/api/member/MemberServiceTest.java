@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
+import codesquard.support.DatabaseInitializer;
 import codesquard.support.SupportRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
@@ -30,8 +32,15 @@ class MemberServiceTest {
 	private JwtProvider jwtProvider;
 	@Autowired
 	private SupportRepository repository;
+	@Autowired
+	private DatabaseInitializer databaseInitializer;
 	@MockBean
 	private ImageUploader imageUploader;
+
+	@AfterEach
+	public void tearDown() {
+		databaseInitializer.truncateTables();
+	}
 
 	@Test
 	@DisplayName("사용자의 프로필 사진 변경에 성공한다.")

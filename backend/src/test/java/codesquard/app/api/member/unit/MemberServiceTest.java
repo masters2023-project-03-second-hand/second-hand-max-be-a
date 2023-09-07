@@ -5,6 +5,9 @@ import static org.mockito.BDDMockito.*;
 
 import java.nio.charset.StandardCharsets;
 
+import javax.persistence.EntityManager;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,24 +22,23 @@ import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.member.MemberService;
 import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.member.Member;
+import codesquard.support.DatabaseInitializer;
 
-class MemberServiceTest extends IntegrationTestSupport {
+@SpringBootTest
+class MemberServiceTest {
 
 	@Autowired
 	private MemberService memberService;
+	@Autowired
+	private EntityManager em;
+	@Autowired
+	private DatabaseInitializer databaseInitializer;
 	@MockBean
 	private ImageUploader imageUploader;
 
-	@BeforeEach
-	void cleanup() {
-		chatLogRepository.deleteAllInBatch();
-		chatRoomRepository.deleteAllInBatch();
-		interestRepository.deleteAllInBatch();
-		imageRepository.deleteAllInBatch();
-		itemRepository.deleteAllInBatch();
-		categoryRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
-		memberTownRepository.deleteAllInBatch();
+	@AfterEach
+	public void tearDown() {
+		databaseInitializer.truncateTables();
 	}
 
 	@Test
@@ -46,7 +48,7 @@ class MemberServiceTest extends IntegrationTestSupport {
 
 		// given
 		given(imageUploader.uploadImageToS3(any(), anyString())).willReturn("test-image.png");
-		Member saveMember = memberRepository.save(OauthFixedFactory.createFixedMemberWithMemberTown());
+		em.persist(Member.create("123123", "123@123", "pieeeee"));
 		MockMultipartFile mockMultipartFile = new MockMultipartFile(
 			"test-image",
 			"test-image.png",
@@ -54,8 +56,8 @@ class MemberServiceTest extends IntegrationTestSupport {
 			"image-content".getBytes(StandardCharsets.UTF_8));
 
 		// when
-		memberService.modifyProfileImage("23Yong", mockMultipartFile);
-		Member member = memberRepository.findById(saveMember.getId()).orElseThrow();
+		memberService.modifyProfileImage("pieeeee", mockMultipartFile);
+		Member member = em.find(Member.class, 1L);
 
 		// then
 		assertThat(member.getAvatarUrl()).isEqualTo(mockMultipartFile.getOriginalFilename());

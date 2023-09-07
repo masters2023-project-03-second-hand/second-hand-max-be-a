@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,9 +27,11 @@ import codesquard.app.api.response.ItemListResponse;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
+import codesquard.support.DatabaseInitializer;
 import codesquard.support.SupportRepository;
 
-class ItemServiceTest extends IntegrationTestSupport {
+@SpringBootTest
+class ItemServiceTest {
 
 	@Autowired
 	private ItemService itemService;
@@ -36,19 +39,14 @@ class ItemServiceTest extends IntegrationTestSupport {
 	private EntityManager em;
 	@Autowired
 	private SupportRepository supportRepository;
+	@Autowired
+	private DatabaseInitializer databaseInitializer;
 	@MockBean
 	private ImageUploader imageUploader;
 
-	@BeforeEach
-	void cleanup() {
-		chatLogRepository.deleteAllInBatch();
-		chatRoomRepository.deleteAllInBatch();
-		interestRepository.deleteAllInBatch();
-		imageRepository.deleteAllInBatch();
-		itemRepository.deleteAllInBatch();
-		categoryRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
-		memberTownRepository.deleteAllInBatch();
+	@AfterEach
+	public void tearDown() {
+		databaseInitializer.truncateTables();
 	}
 
 	@Test
@@ -57,14 +55,14 @@ class ItemServiceTest extends IntegrationTestSupport {
 	void registerTest() {
 		// given
 		given(imageUploader.uploadImageToS3(any(), anyString())).willReturn("url");
-		Member saveMember = memberRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
+		em.persist(Member.create("avatar", "pie@pie", "pieeeeeee"));
 		List<MultipartFile> multipartFiles = getMultipartFiles();
 		ItemRegisterRequest request = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", "판매중", 1L, null);
 
 		// when
-		itemService.register(request, multipartFiles, saveMember.getId());
-		Item item = itemRepository.findAll().stream().findAny().orElseThrow();
+		itemService.register(request, multipartFiles, 1L);
+		Item item = em.find(Item.class, 1L);
 
 		// then
 		assertThat(item.getTitle()).isEqualTo(request.getTitle());

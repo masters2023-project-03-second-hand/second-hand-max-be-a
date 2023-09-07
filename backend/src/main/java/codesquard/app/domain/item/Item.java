@@ -45,12 +45,8 @@ public class Item {
 	private ItemStatus status;
 	private String region;
 	private LocalDateTime createdAt;
-	private LocalDateTime modifiedAt;
 	private String thumbnailUrl;
-	private Long wishCount;
-	private Long chatCount;
-	private Long viewCount;
-
+	private LocalDateTime modifiedAt;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
@@ -58,6 +54,9 @@ public class Item {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
+	private Long wishCount = 0L;
+	private Long chatCount = 0L;
+	private Long viewCount = 0L;
 
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
 	private List<Interest> interests = new ArrayList<>();
@@ -130,6 +129,10 @@ public class Item {
 	}
 	//== 연관관계 메소드 종료 ==//
 
+	public Item(Long id) {
+		this.id = id;
+	}
+
 	public static Item toEntity(ItemRegisterRequest request, Member member, String thumbnailUrl) {
 		Item item = Item.builder()
 			.title(request.getTitle())
@@ -158,6 +161,14 @@ public class Item {
 			.createdAt(createdAt)
 			.viewCount(viewCount)
 			.build();
+	}
+
+	public void wishRegister() {
+		this.wishCount++;
+	}
+
+	public void wishCancel() {
+		this.wishCount--;
 	}
 
 	@Override
