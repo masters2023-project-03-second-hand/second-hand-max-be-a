@@ -36,7 +36,6 @@ public class Image {
 		this.imageUrl = imageUrl;
 	}
 
-	//== 연관관계 메소드==//
 	public void setItem(Item item) {
 		this.item = item;
 		if (!item.getImages().contains(this)) {

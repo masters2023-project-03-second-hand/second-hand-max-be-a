@@ -60,7 +60,6 @@ public class Member {
 		return new Member(avatarUrl, email, loginId);
 	}
 
-	//== 연관 관계 메소드==//
 	public void addItem(Item item) {
 		if (item != null && item.getMember() != this) {
 			item.setMember(this);
@@ -81,9 +80,7 @@ public class Member {
 			chatRooms.add(chatRoom);
 		}
 	}
-
-	//== 연관 관계 메소드 종료==//
-
+	
 	public String createRedisKey() {
 		return "RT:" + email;
 	}
