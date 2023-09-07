@@ -13,7 +13,7 @@ public class CategoryItemResponse {
 	private String imageUrl;
 	private String name;
 
-	public CategoryItemResponse(Long id, String imageUrl, String name) {
+	private CategoryItemResponse(Long id, String imageUrl, String name) {
 		this.id = id;
 		this.imageUrl = imageUrl;
 		this.name = name;
