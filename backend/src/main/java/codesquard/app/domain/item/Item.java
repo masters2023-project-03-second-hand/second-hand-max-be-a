@@ -17,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import codesquard.app.api.item.ItemRegisterRequest;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.image.Image;
@@ -88,24 +87,7 @@ public class Item {
 		this.chatCount = chatCount;
 		this.viewCount = viewCount;
 	}
-
-	public static Item toEntity(ItemRegisterRequest request, Member member, String thumbnailUrl) {
-		Item item = Item.builder()
-			.title(request.getTitle())
-			.content(request.getContent())
-			.price(request.getPrice())
-			.status(ItemStatus.of(request.getStatus()))
-			.region(request.getRegion())
-			.createdAt(LocalDateTime.now())
-			.thumbnailUrl(thumbnailUrl)
-			.wishCount(0L)
-			.chatCount(0L)
-			.viewCount(0L)
-			.build();
-		item.setMember(member);
-		return item;
-	}
-
+	
 	public static Item create(String title, String content, Long price, ItemStatus status, String region,
 		LocalDateTime createdAt, Long viewCount) {
 		return Item.builder()

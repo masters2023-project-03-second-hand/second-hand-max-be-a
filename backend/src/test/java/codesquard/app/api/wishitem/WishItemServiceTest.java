@@ -33,7 +33,7 @@ class WishItemServiceTest {
 			"선풍기", 12000L, null, "가양 1동", "판매중", 1L, null);
 
 		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
-		Item item1 = supportRepository.save(Item.toEntity(request, member, "thumbnail"));
+		Item item1 = supportRepository.save(request.toEntity(member, "thumbnail"));
 
 		// when
 		wishItemService.register(item1.getId(), member.getId());
@@ -51,7 +51,7 @@ class WishItemServiceTest {
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", "판매중", 1L, null);
 		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "piepie"));
-		Item saveItem = supportRepository.save(Item.toEntity(request1, member, "thumbnail"));
+		Item saveItem = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		wishItemService.register(saveItem.getId(), member.getId());
 
 		// when

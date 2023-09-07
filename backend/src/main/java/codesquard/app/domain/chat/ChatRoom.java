@@ -43,7 +43,7 @@ public class ChatRoom {
 	@OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
 	private List<ChatLog> chatLogs = new ArrayList<>();
 
-	public ChatRoom(LocalDateTime createdAt) {
+	private ChatRoom(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 

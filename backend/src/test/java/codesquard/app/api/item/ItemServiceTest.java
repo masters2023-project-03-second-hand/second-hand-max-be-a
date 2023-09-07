@@ -82,9 +82,9 @@ class ItemServiceTest {
 			"노트북", null, null, "가양 1동", "판매중", 1L, null);
 
 		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
-		supportRepository.save(Item.toEntity(request1, member, "thumbnail"));
-		supportRepository.save(Item.toEntity(request2, member, "thumbnail"));
-		supportRepository.save(Item.toEntity(request3, member, "thumbnail"));
+		supportRepository.save(request1.toEntity(member, "thumbnail"));
+		supportRepository.save(request2.toEntity(member, "thumbnail"));
+		supportRepository.save(request3.toEntity(member, "thumbnail"));
 
 		// when
 		ItemListResponse all = itemService.findAll("가양 1동", 2, null, null);
