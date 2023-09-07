@@ -87,7 +87,7 @@ public class Item {
 		this.chatCount = chatCount;
 		this.viewCount = viewCount;
 	}
-	
+
 	public static Item create(String title, String content, Long price, ItemStatus status, String region,
 		LocalDateTime createdAt, Long viewCount) {
 		return Item.builder()
@@ -101,7 +101,6 @@ public class Item {
 			.build();
 	}
 
-	//== 연관관계 메소드 ==//
 	public void setMember(Member member) {
 		this.member = member;
 		if (this.member != null && !this.member.getItems().contains(this)) {
@@ -145,7 +144,6 @@ public class Item {
 			.mapToInt(ChatRoom::getChatLogsSize)
 			.sum();
 	}
-	//== 연관관계 메소드 종료 ==//
 
 	public void wishRegister() {
 		this.wishCount++;

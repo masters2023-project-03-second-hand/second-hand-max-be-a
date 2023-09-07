@@ -45,7 +45,6 @@ public class ChatLog {
 		return new ChatLog(message, sender, receiver, createdAt);
 	}
 
-	//== 연관 관계 메소드 ==//
 	public void setChatRoom(ChatRoom chatRoom) {
 		this.chatRoom = chatRoom;
 		if (chatRoom != null && !chatRoom.getChatLogs().contains(this)) {
@@ -53,5 +52,4 @@ public class ChatLog {
 		}
 	}
 
-	//== 연관 관계 메소드 종료 ==//
 }
