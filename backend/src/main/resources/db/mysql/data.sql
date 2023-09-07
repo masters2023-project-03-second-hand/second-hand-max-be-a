@@ -42,3 +42,22 @@ INSERT INTO category(name, image_url)
 VALUES ('기타 중고물품', 'https://i.ibb.co/tCyMPf5/etc.png');
 INSERT INTO category(name, image_url)
 VALUES ('삽니다', 'https://i.ibb.co/g7Gc1w0/buy.png');
+
+INSERT INTO member(email, login_id)
+VALUES ('dragonbead95@naver.com', 'bruni');
+
+INSERT INTO item(title, content, price, status, region,
+                 created_at, thumbnail_url, wish_count,
+                 chat_count, view_count, category_id, member_id)
+VALUES ('빈티지 롤러 스케이트',
+        '어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.',
+        169000,
+        'ON_SALE',
+        '가락 1동',
+        NOW(),
+        'https://second-hand-team03-a.s3.ap-northeast-2.amazonaws.com/public/%E1%84%85%E1%85%A9%E1%86%AF%E1%84%85%E1%85%A5%E1%84%87%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%83%E1%85%B3.webp',
+        0, 0, 0, 1, 1);
+
+INSERT INTO image(image_url, item_id)
+VALUES ('https://second-hand-team03-a.s3.ap-northeast-2.amazonaws.com/public/%E1%84%85%E1%85%A9%E1%86%AF%E1%84%85%E1%85%A5%E1%84%87%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%83%E1%85%B3.webp',
+        1);
