@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class ChatLog {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -28,11 +29,12 @@ public class ChatLog {
 	private String sender;
 	private String receiver;
 	private LocalDateTime createdAt;
+
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "chat_room_id")
 	private ChatRoom chatRoom;
 
-	public ChatLog(String message, String sender, String receiver, LocalDateTime createdAt) {
+	private ChatLog(String message, String sender, String receiver, LocalDateTime createdAt) {
 		this.message = message;
 		this.sender = sender;
 		this.receiver = receiver;
