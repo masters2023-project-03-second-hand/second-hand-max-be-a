@@ -19,8 +19,14 @@ class JwtProviderTest extends IntegrationTestSupport {
 
 	@BeforeEach
 	void cleanup() {
-		memberTownRepository.deleteAllInBatch();
+		chatLogRepository.deleteAllInBatch();
+		chatRoomRepository.deleteAllInBatch();
+		interestRepository.deleteAllInBatch();
+		imageRepository.deleteAllInBatch();
+		itemRepository.deleteAllInBatch();
+		categoryRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
+		memberTownRepository.deleteAllInBatch();
 	}
 
 	@DisplayName("해시맵을 기반으로 JWT 객체를 생성한다")

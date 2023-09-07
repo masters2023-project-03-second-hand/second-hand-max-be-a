@@ -15,7 +15,14 @@ class CategoryQueryServiceTest extends IntegrationTestSupport {
 
 	@BeforeEach
 	void cleanup() {
+		chatLogRepository.deleteAllInBatch();
+		chatRoomRepository.deleteAllInBatch();
+		interestRepository.deleteAllInBatch();
+		imageRepository.deleteAllInBatch();
+		itemRepository.deleteAllInBatch();
 		categoryRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
+		memberTownRepository.deleteAllInBatch();
 	}
 
 	@DisplayName("모든 카테고리 목록을 조회한다")

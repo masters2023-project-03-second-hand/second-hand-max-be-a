@@ -21,7 +21,11 @@ public class ItemFixedFactory {
 
 	public static Item createFixedItem(Member member, Category category, List<Image> images, List<Interest> interests,
 		Long viewCount) {
-		return Item.create(TITLE, CONTENT, PRICE, STATUS, REGION, CREATED_AT, member, category, images, interests,
-			viewCount);
+		Item item = Item.create(TITLE, CONTENT, PRICE, STATUS, REGION, CREATED_AT, viewCount);
+		item.setMember(member);
+		item.setCategory(category);
+		images.forEach(item::addImage);
+		interests.forEach(item::addInterest);
+		return item;
 	}
 }

@@ -23,10 +23,14 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 
 	@BeforeEach
 	void cleanup() {
-		categoryRepository.deleteAllInBatch();
+		chatLogRepository.deleteAllInBatch();
+		chatRoomRepository.deleteAllInBatch();
+		interestRepository.deleteAllInBatch();
 		imageRepository.deleteAllInBatch();
 		itemRepository.deleteAllInBatch();
+		categoryRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
+		memberTownRepository.deleteAllInBatch();
 	}
 
 	@DisplayName("한 상품의 상세한 정보를 조회한다")

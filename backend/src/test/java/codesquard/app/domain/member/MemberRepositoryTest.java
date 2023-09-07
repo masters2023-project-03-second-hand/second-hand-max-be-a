@@ -15,8 +15,14 @@ class MemberRepositoryTest extends IntegrationTestSupport {
 
 	@BeforeEach
 	void cleanup() {
-		memberTownRepository.deleteAllInBatch();
+		chatLogRepository.deleteAllInBatch();
+		chatRoomRepository.deleteAllInBatch();
+		interestRepository.deleteAllInBatch();
+		imageRepository.deleteAllInBatch();
+		itemRepository.deleteAllInBatch();
+		categoryRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
+		memberTownRepository.deleteAllInBatch();
 	}
 
 	@DisplayName("로그인 아이디를 가지고 회원을 조회할 수 있다")
