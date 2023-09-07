@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.validation.constraints.NotBlank;
 
+import codesquard.app.domain.category.Category;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
@@ -39,6 +40,7 @@ public class ItemRegisterRequest {
 			.viewCount(0L)
 			.build();
 		item.setMember(member);
+		item.setCategory(new Category(categoryId));
 		return item;
 	}
 
