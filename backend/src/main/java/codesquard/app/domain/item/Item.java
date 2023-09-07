@@ -40,9 +40,9 @@ public class Item {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
-	private Long interestCount;
-	private Long chatCount;
-	private Long viewCount;
+	private Long wishCount = 0L;
+	private Long chatCount = 0L;
+	private Long viewCount = 0L;
 
 	public Item(String title, String content, Long price, ItemStatus status, String region, Member member,
 		LocalDateTime createdAt, String thumbnailUrl) {
@@ -56,6 +56,10 @@ public class Item {
 		this.createdAt = createdAt;
 	}
 
+	public Item(Long id) {
+		this.id = id;
+	}
+
 	public static Item toEntity(ItemRegisterRequest request, Member member, String thumbnailUrl) {
 		return new Item(
 			request.getTitle(),
@@ -66,5 +70,13 @@ public class Item {
 			member,
 			LocalDateTime.now(),
 			thumbnailUrl);
+	}
+
+	public void wishRegister() {
+		this.wishCount++;
+	}
+
+	public void wishCancel() {
+		this.wishCount--;
 	}
 }
