@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,6 +23,7 @@ import codesquard.app.domain.image.Image;
 import codesquard.app.domain.interest.Interest;
 import codesquard.app.domain.member.Member;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,39 +41,47 @@ public class Item {
 	private String title;
 	private String content;
 	private Long price;
+	@Enumerated(value = EnumType.STRING)
 	private ItemStatus status;
 	private String region;
 	private LocalDateTime createdAt;
-	private String thumbnailUrl;
-	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-	private List<Image> images = new ArrayList<>();
 	private LocalDateTime modifiedAt;
+	private String thumbnailUrl;
+	private Long wishCount;
+	private Long chatCount;
+	private Long viewCount;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
-	private Long interestCount;
-	private Long chatCount;
-	private Long viewCount;
+
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
 	private List<Interest> interests = new ArrayList<>();
 
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
 	private List<ChatRoom> chatRooms = new ArrayList<>();
-	
-	public Item(String title, String content, Long price, ItemStatus status, String region, Member member,
-		LocalDateTime createdAt, String thumbnailUrl, Long viewCount) {
+
+	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+	private List<Image> images = new ArrayList<>();
+
+	@Builder
+	public Item(String title, String content, Long price, ItemStatus status, String region, LocalDateTime createdAt,
+		String thumbnailUrl, LocalDateTime modifiedAt, Long wishCount, Long chatCount, Long viewCount) {
 		this.title = title;
 		this.content = content;
 		this.price = price;
 		this.status = status;
 		this.region = region;
-		this.member = member;
 		this.createdAt = createdAt;
-		this.viewCount = viewCount;
 		this.thumbnailUrl = thumbnailUrl;
+		this.modifiedAt = modifiedAt;
+		this.wishCount = wishCount;
+		this.chatCount = chatCount;
+		this.viewCount = viewCount;
 	}
 
 	//== 연관관계 메소드 ==//
@@ -120,28 +131,33 @@ public class Item {
 	//== 연관관계 메소드 종료 ==//
 
 	public static Item toEntity(ItemRegisterRequest request, Member member, String thumbnailUrl) {
-		return new Item(
-			request.getTitle(),
-			request.getContent(),
-			request.getPrice(),
-			ItemStatus.of(request.getStatus()),
-			request.getRegion(),
-			member,
-			LocalDateTime.now(),
-			thumbnailUrl,
-			LocalDateTime.now(),
-			0L);
+		Item item = Item.builder()
+			.title(request.getTitle())
+			.content(request.getContent())
+			.price(request.getPrice())
+			.status(ItemStatus.of(request.getStatus()))
+			.region(request.getRegion())
+			.createdAt(LocalDateTime.now())
+			.thumbnailUrl(thumbnailUrl)
+			.wishCount(0L)
+			.chatCount(0L)
+			.viewCount(0L)
+			.build();
+		item.setMember(member);
+		return item;
 	}
 
 	public static Item create(String title, String content, Long price, ItemStatus status, String region,
-		LocalDateTime createdAt, Member member, Category category, List<Image> images, List<Interest> interests,
-		Long viewCount) {
-		Item item = new Item(title, content, price, status, region, member, createdAt, viewCount);
-		item.setMember(member);
-		item.setCategory(category);
-		images.forEach(item::addImage);
-		interests.forEach(item::addInterest);
-		return item;
+		LocalDateTime createdAt, Long viewCount) {
+		return Item.builder()
+			.title(title)
+			.content(content)
+			.price(price)
+			.status(status)
+			.region(region)
+			.createdAt(createdAt)
+			.viewCount(viewCount)
+			.build();
 	}
 
 	@Override
