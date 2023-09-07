@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.api.response.ApiResponse;
-import codesquard.app.api.response.ItemListResponse;
+import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class ItemController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResponse<ItemListResponse> findAll(@RequestParam String region,
+	public ApiResponse<ItemResponses> findAll(@RequestParam String region,
 		@RequestParam(required = false, defaultValue = "10") int size, @RequestParam(required = false) Long cursor,
 		@RequestParam(required = false) Long categoryId) {
 		return ApiResponse.ok("상품 목록 조회에 성공하였습니다.",
