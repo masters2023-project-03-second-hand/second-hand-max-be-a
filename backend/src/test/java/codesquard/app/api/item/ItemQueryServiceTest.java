@@ -2,6 +2,7 @@ package codesquard.app.api.item;
 
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,9 +34,9 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 		memberTownRepository.deleteAllInBatch();
 	}
 
-	@DisplayName("한 상품의 상세한 정보를 조회한다")
+	@DisplayName("판매자가 한 상품의 상세한 정보를 조회한다")
 	@Test
-	public void findDetailItem() {
+	public void findDetailItemBySeller() {
 		// given
 		List<Category> categories = CategoryFixedFactory.createFixedCategories();
 		categoryRepository.saveAll(categories);
@@ -56,7 +57,7 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 		Item item = ItemFixedFactory.createFixedItem(member, findCategory, images, interests, viewCount);
 		Item saveItem = itemRepository.save(item);
 		// when
-		ItemDetailResponse response = itemQueryService.findDetailItemWithSeller(saveItem.getId());
+		ItemDetailResponse response = itemQueryService.findDetailItemBy(saveItem.getId(), member.getId());
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
@@ -68,5 +69,21 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 				.hasSize(2);
 			softAssertions.assertAll();
 		});
+	}
+
+	@DisplayName("존재하지 않는 상품 등록번호로 상품을 조회할 수 없다")
+	@Test
+	public void findDetailItemWithNotExistItem() {
+		// given
+		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Long itemId = 9999L;
+		// when
+		Throwable throwable = Assertions.catchThrowable(
+			() -> itemQueryService.findDetailItemBy(itemId, member.getId()));
+		// then
+		Assertions.assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("존재하지 않는 상품입니다.");
 	}
 }
