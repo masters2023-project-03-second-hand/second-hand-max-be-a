@@ -2,7 +2,6 @@ package codesquard.app.api.category;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,18 +11,6 @@ import codesquard.app.api.category.response.CategoryListResponse;
 import codesquard.app.api.errors.exception.RestApiException;
 
 class CategoryQueryServiceTest extends IntegrationTestSupport {
-
-	@BeforeEach
-	void cleanup() {
-		chatLogRepository.deleteAllInBatch();
-		chatRoomRepository.deleteAllInBatch();
-		wishRepository.deleteAllInBatch();
-		imageRepository.deleteAllInBatch();
-		itemRepository.deleteAllInBatch();
-		categoryRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
-		memberTownRepository.deleteAllInBatch();
-	}
 
 	@DisplayName("모든 카테고리 목록을 조회한다")
 	@Test
