@@ -3,6 +3,7 @@ package codesquard.app.domain.item;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -170,6 +171,12 @@ public class Item {
 
 	public void wishCancel() {
 		this.wishCount--;
+	}
+
+	public List<String> getImageUrls() {
+		return images.stream()
+			.map(Image::getImageUrl)
+			.collect(Collectors.toUnmodifiableList());
 	}
 
 	@Override

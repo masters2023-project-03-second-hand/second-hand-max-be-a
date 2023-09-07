@@ -2,11 +2,9 @@ package codesquard.app.api.item.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import codesquard.app.domain.image.Image;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
 import lombok.AccessLevel;
@@ -33,10 +31,9 @@ public class ItemDetailResponse {
 	private int price;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	public ItemDetailResponse(boolean isSeller, List<String> imageUrls, String seller,
-		String status,
-		String title, String categoryName, LocalDateTime createdAt, String content,
-		int chatCount, int wishCount, int viewCount, int price) {
+	private ItemDetailResponse(boolean isSeller, List<String> imageUrls, String seller, String status, String title,
+		String categoryName, LocalDateTime createdAt, String content, int chatCount, int wishCount, int viewCount,
+		int price) {
 		this.isSeller = isSeller;
 		this.imageUrls = imageUrls;
 		this.seller = seller;
@@ -60,9 +57,7 @@ public class ItemDetailResponse {
 	}
 
 	private static ItemDetailResponse create(Item item, Member seller, boolean isSeller) {
-		List<String> imageUrls = item.getImages().stream()
-			.map(Image::getImageUrl)
-			.collect(Collectors.toUnmodifiableList());
+		List<String> imageUrls = item.getImageUrls();
 
 		return ItemDetailResponse.builder()
 			.isSeller(isSeller)
