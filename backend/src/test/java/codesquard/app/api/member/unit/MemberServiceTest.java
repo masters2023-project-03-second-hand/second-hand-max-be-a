@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 
 import javax.persistence.EntityManager;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.member.MemberService;
 import codesquard.app.domain.member.Member;
+import codesquard.support.DatabaseInitializer;
 
 @SpringBootTest
 class MemberServiceTest {
@@ -27,8 +29,15 @@ class MemberServiceTest {
 	private MemberService memberService;
 	@Autowired
 	private EntityManager em;
+	@Autowired
+	private DatabaseInitializer databaseInitializer;
 	@MockBean
 	private ImageUploader imageUploader;
+
+	@AfterEach
+	public void tearDown() {
+		databaseInitializer.truncateTables();
+	}
 
 	@Test
 	@DisplayName("프로필 사진 변경에 성공한다.")

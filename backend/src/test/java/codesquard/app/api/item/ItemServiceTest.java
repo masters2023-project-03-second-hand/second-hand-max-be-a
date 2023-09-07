@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import codesquard.app.api.response.ItemListResponse;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
+import codesquard.support.DatabaseInitializer;
 import codesquard.support.SupportRepository;
 
 @SpringBootTest
@@ -36,8 +38,15 @@ class ItemServiceTest {
 	private EntityManager em;
 	@Autowired
 	private SupportRepository supportRepository;
+	@Autowired
+	private DatabaseInitializer databaseInitializer;
 	@MockBean
 	private ImageUploader imageUploader;
+
+	@AfterEach
+	public void tearDown() {
+		databaseInitializer.truncateTables();
+	}
 
 	@Test
 	@DisplayName("새로운 상품 등록에 성공한다.")
