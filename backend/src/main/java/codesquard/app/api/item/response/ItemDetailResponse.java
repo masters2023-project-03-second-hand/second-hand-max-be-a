@@ -52,12 +52,20 @@ public class ItemDetailResponse {
 	}
 
 	public static ItemDetailResponse createWithSellerResponse(Item item, Member seller) {
+		return create(item, seller, true);
+	}
+
+	public static ItemDetailResponse createWithBuyerResponse(Item item, Member seller) {
+		return create(item, seller, false);
+	}
+
+	private static ItemDetailResponse create(Item item, Member seller, boolean isSeller) {
 		List<String> imageUrls = item.getImages().stream()
 			.map(Image::getImageUrl)
 			.collect(Collectors.toUnmodifiableList());
 
 		return ItemDetailResponse.builder()
-			.isSeller(true)
+			.isSeller(isSeller)
 			.imageUrls(imageUrls)
 			.seller(seller.getLoginId())
 			.status(item.getStatus().getStatus())
