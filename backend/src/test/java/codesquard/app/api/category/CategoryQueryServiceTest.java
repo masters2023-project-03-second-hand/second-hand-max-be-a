@@ -15,7 +15,14 @@ class CategoryQueryServiceTest extends IntegrationTestSupport {
 
 	@BeforeEach
 	void cleanup() {
+		chatLogRepository.deleteAllInBatch();
+		chatRoomRepository.deleteAllInBatch();
+		wishRepository.deleteAllInBatch();
+		imageRepository.deleteAllInBatch();
+		itemRepository.deleteAllInBatch();
 		categoryRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
+		memberTownRepository.deleteAllInBatch();
 	}
 
 	@DisplayName("모든 카테고리 목록을 조회한다")
@@ -27,7 +34,7 @@ class CategoryQueryServiceTest extends IntegrationTestSupport {
 		CategoryListResponse response = categoryQueryService.findAll();
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(response.getCategories()).hasSize(2);
+			softAssertions.assertThat(response.getCategories()).hasSize(3);
 			softAssertions.assertAll();
 		});
 	}

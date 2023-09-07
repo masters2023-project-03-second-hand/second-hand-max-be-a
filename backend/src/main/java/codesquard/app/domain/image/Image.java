@@ -10,23 +10,40 @@ import javax.persistence.ManyToOne;
 
 import codesquard.app.domain.item.Item;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class Image {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_id")
-	@ManyToOne(fetch = FetchType.LAZY) // 이미지를 불러올 때 item 은 불러오지 않는다.
 	private Item item;
 	private String imageUrl;
+
+	public Image(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 
 	public Image(Item item, String imageUrl) {
 		this.item = item;
 		this.imageUrl = imageUrl;
+	}
+
+	public void setItem(Item item) {
+		this.item = item;
+		if (!item.getImages().contains(this)) {
+			item.addImage(this);
+		}
+	}
+
+	public static Image create(String imageUrl) {
+		return new Image(imageUrl);
 	}
 }

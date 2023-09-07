@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import codesquard.app.api.response.ItemListResponse;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
-import codesquard.support.DatabaseInitializer;
 import codesquard.support.SupportRepository;
 
 @SpringBootTest
@@ -38,15 +36,8 @@ class ItemServiceTest {
 	private EntityManager em;
 	@Autowired
 	private SupportRepository supportRepository;
-	@Autowired
-	private DatabaseInitializer databaseInitializer;
 	@MockBean
 	private ImageUploader imageUploader;
-
-	@AfterEach
-	public void tearDown() {
-		databaseInitializer.truncateTables();
-	}
 
 	@Test
 	@DisplayName("새로운 상품 등록에 성공한다.")
@@ -91,9 +82,9 @@ class ItemServiceTest {
 			"노트북", null, null, "가양 1동", "판매중", 1L, null);
 
 		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
-		supportRepository.save(Item.toEntity(request1, member, "thumbnail"));
-		supportRepository.save(Item.toEntity(request2, member, "thumbnail"));
-		supportRepository.save(Item.toEntity(request3, member, "thumbnail"));
+		supportRepository.save(request1.toEntity(member, "thumbnail"));
+		supportRepository.save(request2.toEntity(member, "thumbnail"));
+		supportRepository.save(request3.toEntity(member, "thumbnail"));
 
 		// when
 		ItemListResponse all = itemService.findAll("가양 1동", 2, null, null);

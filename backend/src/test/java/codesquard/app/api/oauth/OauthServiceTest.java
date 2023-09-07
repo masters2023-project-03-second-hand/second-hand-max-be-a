@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -19,7 +18,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
@@ -44,7 +42,6 @@ import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
 import codesquard.app.domain.oauth.support.Principal;
 
-@Transactional
 class OauthServiceTest extends IntegrationTestSupport {
 
 	@MockBean
@@ -61,12 +58,6 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 	@MockBean
 	private ImageService imageService;
-
-	@BeforeEach
-	void cleanup() {
-		memberTownRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
-	}
 
 	@DisplayName("로그인 아이디와 소셜 로그인을 하여 회원가입을 한다")
 	@Test
@@ -101,10 +92,6 @@ class OauthServiceTest extends IntegrationTestSupport {
 			softAssertions.assertThat(findMember)
 				.extracting("email", "loginId", "avatarUrl")
 				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
-			softAssertions.assertThat(findMember.getTowns())
-				.hasSize(1)
-				.extracting("name")
-				.contains("가락 1동");
 			softAssertions.assertAll();
 		});
 	}

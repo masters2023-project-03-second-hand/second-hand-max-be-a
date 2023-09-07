@@ -33,7 +33,7 @@ public class ItemService {
 		List<String> serverFileUrls = imageService.uploadImages(itemImage);
 		List<Image> images = new ArrayList<>();
 
-		Item item = itemRepository.save(Item.toEntity(request, new Member(memberId), serverFileUrls.get(0)));
+		Item item = itemRepository.save(request.toEntity(new Member(memberId), serverFileUrls.get(0)));
 
 		for (String serverFileUrl : serverFileUrls) {
 			images.add(new Image(item, serverFileUrl));

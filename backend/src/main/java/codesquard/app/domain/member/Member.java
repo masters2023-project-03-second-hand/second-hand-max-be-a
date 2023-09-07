@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,13 +14,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import codesquard.app.domain.chat.ChatRoom;
+import codesquard.app.domain.item.Item;
 import codesquard.app.domain.membertown.MemberTown;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id")
 @Entity
 public class Member {
 
@@ -33,6 +38,12 @@ public class Member {
 
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<MemberTown> towns = new ArrayList<>(); // 동네
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<Item> items = new ArrayList<>(); // 회원이 등록한 상품
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<ChatRoom> chatRooms = new ArrayList<>(); // 채팅방
 
 	public Member(Long id) {
 		this.id = id;
@@ -49,10 +60,27 @@ public class Member {
 		return new Member(avatarUrl, email, loginId);
 	}
 
-	public void addMemberTown(MemberTown town) {
-		towns.add(town);
+	public void addItem(Item item) {
+		if (item != null && item.getMember() != this) {
+			item.setMember(this);
+		}
+		if (item != null && !items.contains(item)) {
+			items.add(item);
+		}
 	}
 
+	public void addMemberTown(MemberTown town) {
+		if (town != null && !towns.contains(town)) {
+			towns.add(town);
+		}
+	}
+
+	public void addChatRoom(ChatRoom chatRoom) {
+		if (chatRoom != null && !chatRooms.contains(chatRoom)) {
+			chatRooms.add(chatRoom);
+		}
+	}
+	
 	public String createRedisKey() {
 		return "RT:" + email;
 	}
@@ -67,6 +95,10 @@ public class Member {
 
 	public void setAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
+	}
+
+	public boolean equalId(Long memberId) {
+		return Objects.equals(id, memberId);
 	}
 
 	@Override

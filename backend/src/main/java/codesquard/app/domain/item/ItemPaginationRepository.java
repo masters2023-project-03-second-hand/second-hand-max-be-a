@@ -31,7 +31,7 @@ public class ItemPaginationRepository {
 				item.createdAt,
 				item.price,
 				item.status,
-				item.interestCount,
+				item.wishCount,
 				item.chatCount))
 			.from(item)
 			.where(lessThanItemId(itemId),
