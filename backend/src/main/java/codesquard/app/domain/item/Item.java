@@ -20,8 +20,8 @@ import codesquard.app.api.item.ItemRegisterRequest;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.image.Image;
-import codesquard.app.domain.interest.Interest;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.wish.Wish;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -47,6 +47,10 @@ public class Item {
 	private LocalDateTime createdAt;
 	private String thumbnailUrl;
 	private LocalDateTime modifiedAt;
+	private Long wishCount = 0L;
+	private Long chatCount = 0L;
+	private Long viewCount = 0L;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
@@ -54,18 +58,19 @@ public class Item {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
-	private Long wishCount = 0L;
-	private Long chatCount = 0L;
-	private Long viewCount = 0L;
 
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-	private List<Interest> interests = new ArrayList<>();
+	private List<Wish> wishes = new ArrayList<>();
 
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
 	private List<ChatRoom> chatRooms = new ArrayList<>();
 
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
 	private List<Image> images = new ArrayList<>();
+
+	public Item(Long id) {
+		this.id = id;
+	}
 
 	@Builder
 	public Item(String title, String content, Long price, ItemStatus status, String region, LocalDateTime createdAt,
@@ -81,56 +86,6 @@ public class Item {
 		this.wishCount = wishCount;
 		this.chatCount = chatCount;
 		this.viewCount = viewCount;
-	}
-
-	//== 연관관계 메소드 ==//
-	public void setMember(Member member) {
-		this.member = member;
-		if (this.member != null && !this.member.getItems().contains(this)) {
-			this.member.addItem(this);
-		}
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-
-	public void addImage(Image image) {
-		if (image != null && !this.images.contains(image)) {
-			this.images.add(image);
-		}
-		if (image != null) {
-			image.setItem(this);
-		}
-	}
-
-	public void addInterest(Interest interest) {
-		if (interest != null && !this.interests.contains(interest)) {
-			this.interests.add(interest);
-		}
-		if (interest != null) {
-			interest.setItem(this);
-		}
-	}
-
-	public void addChatRoom(ChatRoom chatRoom) {
-		if (chatRoom != null && !chatRooms.contains(chatRoom)) {
-			chatRooms.add(chatRoom);
-		}
-		if (chatRoom != null) {
-			chatRoom.setItem(this);
-		}
-	}
-
-	public int getTotalChatLogCount() {
-		return chatRooms.stream()
-			.mapToInt(ChatRoom::getChatLogsSize)
-			.sum();
-	}
-	//== 연관관계 메소드 종료 ==//
-
-	public Item(Long id) {
-		this.id = id;
 	}
 
 	public static Item toEntity(ItemRegisterRequest request, Member member, String thumbnailUrl) {
@@ -162,6 +117,52 @@ public class Item {
 			.viewCount(viewCount)
 			.build();
 	}
+
+	//== 연관관계 메소드 ==//
+	public void setMember(Member member) {
+		this.member = member;
+		if (this.member != null && !this.member.getItems().contains(this)) {
+			this.member.addItem(this);
+		}
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
+	public void addImage(Image image) {
+		if (image != null && !this.images.contains(image)) {
+			this.images.add(image);
+		}
+		if (image != null) {
+			image.setItem(this);
+		}
+	}
+
+	public void addWish(Wish wish) {
+		if (wish != null && !this.wishes.contains(wish)) {
+			this.wishes.add(wish);
+		}
+		if (wish != null) {
+			wish.setItem(this);
+		}
+	}
+
+	public void addChatRoom(ChatRoom chatRoom) {
+		if (chatRoom != null && !chatRooms.contains(chatRoom)) {
+			chatRooms.add(chatRoom);
+		}
+		if (chatRoom != null) {
+			chatRoom.setItem(this);
+		}
+	}
+
+	public int getTotalChatLogCount() {
+		return chatRooms.stream()
+			.mapToInt(ChatRoom::getChatLogsSize)
+			.sum();
+	}
+	//== 연관관계 메소드 종료 ==//
 
 	public void wishRegister() {
 		this.wishCount++;

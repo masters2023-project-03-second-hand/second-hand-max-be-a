@@ -74,7 +74,7 @@ public class ItemDetailResponse {
 			.createdAt(item.getCreatedAt())
 			.content(item.getContent())
 			.chatCount(item.getTotalChatLogCount())
-			.wishCount(item.getInterests().size())
+			.wishCount(item.getWishes().size())
 			.viewCount(item.getViewCount().intValue())
 			.price(item.getPrice().intValue())
 			.build();

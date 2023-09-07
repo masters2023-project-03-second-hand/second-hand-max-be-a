@@ -2,6 +2,7 @@ package codesquard.app.domain.wish;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -24,10 +25,10 @@ public class Wish {
 	@Id
 	@GeneratedValue
 	private Long id;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "member_id")
 	private Member member;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "item_id")
 	private Item item;
 	private LocalDateTime createdAt;
@@ -36,5 +37,21 @@ public class Wish {
 		this.member = new Member(memberId);
 		this.item = new Item(itemId);
 		this.createdAt = LocalDateTime.now();
+	}
+
+	//== 연관관계 메소드==//
+	public void setMember(Member member) {
+		this.member = member;
+	}
+
+	public void setItem(Item item) {
+		this.item = item;
+		if (!item.getWishes().contains(this)) {
+			this.item.addWish(this);
+		}
+	}
+
+	public static Wish create(LocalDateTime createdAt) {
+		return new Wish(null, null, null, createdAt);
 	}
 }

@@ -28,7 +28,7 @@ public class ItemQueryService {
 	public ItemDetailResponse findDetailItemBy(Long itemId, Long loginMemberId) {
 		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
 		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.NOT_FOUND_ITEM));
+			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		Member seller = item.getMember();
 		return createItemDetailResponse(item, seller, loginMemberId);
 	}
