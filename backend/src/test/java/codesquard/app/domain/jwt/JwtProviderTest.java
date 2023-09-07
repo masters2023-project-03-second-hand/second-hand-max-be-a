@@ -3,7 +3,6 @@ package codesquard.app.domain.jwt;
 import java.time.LocalDateTime;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,18 +15,6 @@ class JwtProviderTest extends IntegrationTestSupport {
 
 	@Autowired
 	private JwtProperties jwtProperties;
-
-	@BeforeEach
-	void cleanup() {
-		chatLogRepository.deleteAllInBatch();
-		chatRoomRepository.deleteAllInBatch();
-		interestRepository.deleteAllInBatch();
-		imageRepository.deleteAllInBatch();
-		itemRepository.deleteAllInBatch();
-		categoryRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
-		memberTownRepository.deleteAllInBatch();
-	}
 
 	@DisplayName("해시맵을 기반으로 JWT 객체를 생성한다")
 	@Test

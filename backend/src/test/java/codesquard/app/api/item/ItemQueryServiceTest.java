@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,23 +15,11 @@ import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.image.Image;
-import codesquard.app.domain.interest.Interest;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.wish.Wish;
 
 class ItemQueryServiceTest extends IntegrationTestSupport {
-
-	@BeforeEach
-	void cleanup() {
-		chatLogRepository.deleteAllInBatch();
-		chatRoomRepository.deleteAllInBatch();
-		interestRepository.deleteAllInBatch();
-		imageRepository.deleteAllInBatch();
-		itemRepository.deleteAllInBatch();
-		categoryRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
-		memberTownRepository.deleteAllInBatch();
-	}
 
 	@DisplayName("판매자가 한 상품의 상세한 정보를 조회한다")
 	@Test
@@ -46,15 +33,15 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 
 		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
-		List<Interest> interests = List.of(
-			InterestFixedFactory.createInterest(member),
-			InterestFixedFactory.createInterest(member),
-			InterestFixedFactory.createInterest(member)
+		List<Wish> wishes = List.of(
+			WishFixedFactory.createWish(member),
+			WishFixedFactory.createWish(member),
+			WishFixedFactory.createWish(member)
 		);
 		List<Image> images = ImageFixedFactory.createFixedImages();
 		long viewCount = 4L;
 
-		Item item = ItemFixedFactory.createFixedItem(member, findCategory, images, interests, viewCount);
+		Item item = ItemFixedFactory.createFixedItem(member, findCategory, images, wishes, viewCount);
 		Item saveItem = itemRepository.save(item);
 		// when
 		ItemDetailResponse response = itemQueryService.findDetailItemBy(saveItem.getId(), member.getId());
@@ -84,6 +71,6 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 		Assertions.assertThat(throwable)
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
-			.isEqualTo("존재하지 않는 상품입니다.");
+			.isEqualTo("상품을 찾을 수 없습니다.");
 	}
 }

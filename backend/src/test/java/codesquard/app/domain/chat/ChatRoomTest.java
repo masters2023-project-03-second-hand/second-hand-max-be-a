@@ -3,7 +3,6 @@ package codesquard.app.domain.chat;
 import java.util.ArrayList;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,18 +15,6 @@ import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
 
 class ChatRoomTest extends IntegrationTestSupport {
-
-	@BeforeEach
-	void cleanup() {
-		chatLogRepository.deleteAllInBatch();
-		chatRoomRepository.deleteAllInBatch();
-		interestRepository.deleteAllInBatch();
-		imageRepository.deleteAllInBatch();
-		itemRepository.deleteAllInBatch();
-		categoryRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
-		memberTownRepository.deleteAllInBatch();
-	}
 
 	@DisplayName("채팅방에 회원을 설정한다")
 	@Test

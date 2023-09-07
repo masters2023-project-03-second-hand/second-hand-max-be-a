@@ -118,12 +118,12 @@ class ItemControllerTest extends ControllerTestSupport {
 		// given
 		long itemId = 9999L;
 		Mockito.when(itemQueryService.findDetailItemBy(any(), any()))
-			.thenThrow(new RestApiException(ItemErrorCode.NOT_FOUND_ITEM));
+			.thenThrow(new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("statusCode").value(equalTo(404)))
-			.andExpect(jsonPath("message").value(equalTo("존재하지 않는 상품입니다.")))
+			.andExpect(jsonPath("message").value(equalTo("상품을 찾을 수 없습니다.")))
 			.andExpect(jsonPath("data").value(equalTo(null)));
 	}
 }

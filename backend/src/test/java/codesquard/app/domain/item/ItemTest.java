@@ -14,12 +14,12 @@ import org.junit.jupiter.api.Test;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.ImageFixedFactory;
-import codesquard.app.api.item.InterestFixedFactory;
 import codesquard.app.api.item.ItemFixedFactory;
+import codesquard.app.api.item.WishFixedFactory;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.image.Image;
-import codesquard.app.domain.interest.Interest;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.wish.Wish;
 
 class ItemTest extends IntegrationTestSupport {
 
@@ -27,7 +27,7 @@ class ItemTest extends IntegrationTestSupport {
 	void cleanup() {
 		chatLogRepository.deleteAllInBatch();
 		chatRoomRepository.deleteAllInBatch();
-		interestRepository.deleteAllInBatch();
+		wishRepository.deleteAllInBatch();
 		imageRepository.deleteAllInBatch();
 		itemRepository.deleteAllInBatch();
 		categoryRepository.deleteAllInBatch();
@@ -116,16 +116,16 @@ class ItemTest extends IntegrationTestSupport {
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(),
 			0L);
 
-		Interest interest = InterestFixedFactory.createInterest(member);
+		Wish wish = WishFixedFactory.createWish(member);
 
 		// when
-		item.addInterest(interest);
+		item.addWish(wish);
 
 		// then
 		Item saveItem = itemRepository.save(item);
 		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(saveItem.getInterests()).hasSize(1).contains(interest);
-			softAssertions.assertThat(interest.getItem()).isEqualTo(saveItem);
+			softAssertions.assertThat(saveItem.getWishes()).hasSize(1).contains(wish);
+			softAssertions.assertThat(wish.getItem()).isEqualTo(saveItem);
 			softAssertions.assertAll();
 		});
 	}

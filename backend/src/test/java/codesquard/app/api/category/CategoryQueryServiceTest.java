@@ -17,7 +17,7 @@ class CategoryQueryServiceTest extends IntegrationTestSupport {
 	void cleanup() {
 		chatLogRepository.deleteAllInBatch();
 		chatRoomRepository.deleteAllInBatch();
-		interestRepository.deleteAllInBatch();
+		wishRepository.deleteAllInBatch();
 		imageRepository.deleteAllInBatch();
 		itemRepository.deleteAllInBatch();
 		categoryRepository.deleteAllInBatch();
