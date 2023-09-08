@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.image.ImageService;
-import codesquard.app.api.response.ItemListResponse;
 import codesquard.app.api.response.ItemResponse;
+import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.image.Image;
 import codesquard.app.domain.image.ImageRepository;
 import codesquard.app.domain.item.Item;
@@ -43,7 +43,7 @@ public class ItemService {
 	}
 
 	@Transactional
-	public ItemListResponse findAll(String region, int size, Long cursor, Long categoryId) {
+	public ItemResponses findAll(String region, int size, Long cursor, Long categoryId) {
 		Slice<ItemResponse> itemResponses = itemPaginationRepository.findByIdAndRegion(cursor, region, size,
 			categoryId);
 
@@ -53,6 +53,6 @@ public class ItemService {
 		if (hasNext) {
 			nextCursor = contents.get(contents.size() - 1).getItemId();
 		}
-		return new ItemListResponse(contents, hasNext, nextCursor);
+		return new ItemResponses(contents, hasNext, nextCursor);
 	}
 }

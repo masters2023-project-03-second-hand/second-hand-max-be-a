@@ -1,5 +1,7 @@
 package codesquard.support;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,5 +20,13 @@ public class SupportRepository {
 		em.flush();
 		em.clear();
 		return entity;
+	}
+
+	public <T> T findById(Long id, Class<T> entityClass) {
+		return em.find(entityClass, id);
+	}
+
+	public <T> List<T> findAll(Class<T> entityClass) {
+		return em.createQuery("select entity from " + entityClass.getSimpleName() + " entity").getResultList();
 	}
 }

@@ -5,8 +5,6 @@ import static org.mockito.BDDMockito.*;
 
 import java.nio.charset.StandardCharsets;
 
-import javax.persistence.EntityManager;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,30 +12,30 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.transaction.annotation.Transactional;
 
+import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.member.MemberService;
 import codesquard.app.domain.member.Member;
+import codesquard.support.SupportRepository;
 
 @SpringBootTest
-class MemberServiceTest {
+class MemberServiceTest extends IntegrationTestSupport {
 
 	@Autowired
 	private MemberService memberService;
 	@Autowired
-	private EntityManager em;
+	private SupportRepository supportRepository;
 	@MockBean
 	private ImageUploader imageUploader;
 
 	@Test
 	@DisplayName("프로필 사진 변경에 성공한다.")
-	@Transactional
 	void modifyProfileUrl() {
 
 		// given
 		given(imageUploader.uploadImageToS3(any(), anyString())).willReturn("test-image.png");
-		em.persist(Member.create("123123", "123@123", "pieeeee"));
+		Member member = supportRepository.save(Member.create("123123", "123@123", "pieeeee"));
 		MockMultipartFile mockMultipartFile = new MockMultipartFile(
 			"test-image",
 			"test-image.png",
@@ -46,9 +44,8 @@ class MemberServiceTest {
 
 		// when
 		memberService.modifyProfileImage("pieeeee", mockMultipartFile);
-		Member member = em.find(Member.class, 1L);
-
+		Member updateMember = supportRepository.findById(member.getId(), Member.class);
 		// then
-		assertThat(member.getAvatarUrl()).isEqualTo(mockMultipartFile.getOriginalFilename());
+		assertThat(updateMember.getAvatarUrl()).isEqualTo(mockMultipartFile.getOriginalFilename());
 	}
 }

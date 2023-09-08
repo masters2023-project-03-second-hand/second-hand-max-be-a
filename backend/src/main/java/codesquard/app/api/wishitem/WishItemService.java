@@ -1,5 +1,8 @@
 package codesquard.app.api.wishitem;
 
+import java.util.List;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,5 +35,15 @@ public class WishItemService {
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		item.wishCancel();
 		wishRepository.deleteByItemId(itemId);
+	}
+
+	@Transactional
+	public List<Wish> findAll(Long categoryId, int size, Long cursor) {
+		cursor = cursor == null ? Long.MAX_VALUE : cursor;
+		if (categoryId == null) {
+			return wishRepository.findAll(cursor, Pageable.ofSize(size));
+		} else {
+			return wishRepository.findAllByCategoryId(categoryId, cursor, Pageable.ofSize(size));
+		}
 	}
 }

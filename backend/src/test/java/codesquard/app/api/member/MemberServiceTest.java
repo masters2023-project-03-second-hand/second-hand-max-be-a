@@ -18,13 +18,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
 import codesquard.support.SupportRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-class MemberServiceTest {
+class MemberServiceTest extends IntegrationTestSupport {
 
 	@Autowired
 	private JwtProvider jwtProvider;
