@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
@@ -88,10 +89,10 @@ class OauthServiceTest extends IntegrationTestSupport {
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
 				.extracting("email", "loginId", "avatarUrl")
-				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
+				.contains("dragonbead95@naver.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertThat(findMember)
 				.extracting("email", "loginId", "avatarUrl")
-				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
+				.contains("dragonbead95@naver.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertAll();
 		});
 	}
@@ -235,7 +236,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
 				.extracting("id", "email")
-				.contains(saveMember.getId(), "23Yong@gmail.com");
+				.contains(saveMember.getId(), "dragonbead95@naver.com");
 			softAssertions.assertThat(redisTemplate.opsForValue().get(principal.getAccessToken())).isEqualTo("logout");
 			softAssertions.assertAll();
 		});
@@ -245,10 +246,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void refreshAccessToken() {
 		// given
-		String avatarUrl = "avatarUrlValue";
-		String loginId = "23Yong";
-		String email = "23Yong@gmail.com";
-		Member member = Member.create(avatarUrl, email, loginId);
+		Member member = createFixedMember();
 		LocalDateTime now = createNow();
 
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
@@ -298,5 +296,37 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("유효하지 않은 토큰입니다.");
+	}
+
+	@DisplayName("한명의 소셜 사용자가 여러 로그인 아이디로 가입되어 있는 상태에서 로그인 후 액세스 토큰 갱신을 할 수 있다")
+	@Test
+	public void refreshAccessTokenWithMultipleLoginId() {
+		// mocking
+		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
+		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
+		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
+		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
+			.thenReturn(mockAccessTokenResponse);
+		when(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
+			.thenReturn(mockUserProfileResponse);
+
+		// given
+		Member bruni = Member.create(null, "dragonbead95@naver.com", "bruni");
+		Member yong23 = Member.create(null, "dragonbead95@naver.com", "23Yong");
+		memberRepository.saveAll(List.of(bruni, yong23));
+
+		OauthLoginRequest loginRequest = OauthLoginRequest.create("bruni");
+		OauthLoginResponse response = oauthService.login(loginRequest, "naver", "code", createNow());
+
+		String refreshToken = response.getJwt().getRefreshToken();
+		LocalDateTime now = createNow();
+		OauthRefreshRequest request = OauthRefreshRequest.create(refreshToken);
+		// when
+		OauthRefreshResponse refreshResponse = oauthService.refreshAccessToken(request, now);
+		// then
+		SoftAssertions.assertSoftly(softAssertions -> {
+			softAssertions.assertThat(refreshResponse.getJwt().getAccessToken()).isNotNull();
+			softAssertions.assertAll();
+		});
 	}
 }

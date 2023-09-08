@@ -80,9 +80,9 @@ public class Member {
 			chatRooms.add(chatRoom);
 		}
 	}
-	
+
 	public String createRedisKey() {
-		return "RT:" + email;
+		return String.format("%s%s-%s", "RT:", email, loginId);
 	}
 
 	public Map<String, Object> createClaims() {

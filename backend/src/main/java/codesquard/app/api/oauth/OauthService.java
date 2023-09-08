@@ -138,8 +138,10 @@ public class OauthService {
 		jwtProvider.validateToken(refreshToken);
 		log.debug("refreshToken is valid token : {}", refreshToken);
 
-		String email = findEmailByRefreshToken(refreshToken);
-		Member member = memberRepository.findMemberByEmail(email)
+		String emailAndLoginId = findEmailByRefreshToken(refreshToken);
+		String email = emailAndLoginId.split("-")[0];
+		String loginId = emailAndLoginId.split("-")[1];
+		Member member = memberRepository.findMemberByLoginIdAndEmail(loginId, email)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
 		log.debug("{}", member);
 
@@ -156,7 +158,7 @@ public class OauthService {
 		return keys.stream()
 			.filter(key -> Objects.equals(redisTemplate.opsForValue().get(key), refreshToken))
 			.findAny()
-			.map(email -> email.replace("RT:", ""))
+			.map(key -> key.replace("RT:", ""))
 			.orElseThrow(() -> new RestApiException(JwtTokenErrorCode.INVALID_TOKEN));
 	}
 }
