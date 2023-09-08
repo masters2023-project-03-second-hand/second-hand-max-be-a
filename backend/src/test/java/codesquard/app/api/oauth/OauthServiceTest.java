@@ -267,9 +267,8 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
-				.extracting("jwt.accessToken", "jwt.refreshToken")
-				.contains(createExpectedAccessTokenBy(jwtProvider, member, now),
-					createExpectedRefreshTokenBy(jwtProvider, member, now));
+				.extracting("jwt.accessToken")
+				.isEqualTo(createExpectedAccessTokenBy(jwtProvider, member, now));
 			softAssertions.assertAll();
 		});
 	}

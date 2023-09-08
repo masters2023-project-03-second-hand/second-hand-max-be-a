@@ -13,7 +13,9 @@ public class Jwt {
 
 	private String accessToken;
 	private String refreshToken;
+	@JsonIgnore
 	private Date expireDateAccessToken;
+	@JsonIgnore
 	private Date expireDateRefreshToken;
 
 	private Jwt() {
