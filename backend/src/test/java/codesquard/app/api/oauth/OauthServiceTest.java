@@ -255,7 +255,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		redisTemplate.opsForValue().set(member.createRedisKey(),
 			jwt.getRefreshToken(),
-			jwt.getExpireDateRefreshTokenTime(),
+			jwt.convertExpireDateRefreshTokenTimeWithLong(),
 			TimeUnit.MILLISECONDS);
 		memberRepository.save(member);
 
@@ -284,7 +284,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		redisTemplate.opsForValue().set(member.createRedisKey(),
 			jwt.getRefreshToken(),
-			jwt.getExpireDateRefreshTokenTime(),
+			jwt.convertExpireDateRefreshTokenTimeWithLong(),
 			TimeUnit.MILLISECONDS);
 		memberRepository.save(member);
 

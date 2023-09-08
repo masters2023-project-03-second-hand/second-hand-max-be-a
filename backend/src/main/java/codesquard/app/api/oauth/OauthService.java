@@ -105,7 +105,7 @@ public class OauthService {
 		// key: "RT:" + email, value : 리프레쉬 토큰값
 		redisTemplate.opsForValue().set(member.createRedisKey(),
 			jwt.getRefreshToken(),
-			jwt.getExpireDateRefreshTokenTime(),
+			jwt.convertExpireDateRefreshTokenTimeWithLong(),
 			TimeUnit.MILLISECONDS);
 
 		return OauthLoginResponse.create(jwt, OauthLoginMemberResponse.from(member));
