@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.category.CategoryFixedFactory;
@@ -35,6 +36,7 @@ class ChatRoomTest extends IntegrationTestSupport {
 		});
 	}
 
+	@Transactional
 	@DisplayName("채팅방에 상품을 설정한다")
 	@Test
 	public void setItem() {

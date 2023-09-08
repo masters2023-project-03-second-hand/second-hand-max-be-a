@@ -27,6 +27,10 @@ public class Category {
 		this.imageUrl = imageUrl;
 	}
 
+	public Category(Long id) {
+		this.id = id;
+	}
+
 	public static Category create(String name, String imageUrl) {
 		return new Category(name, imageUrl);
 	}

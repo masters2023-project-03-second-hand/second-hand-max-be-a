@@ -7,8 +7,8 @@ import codesquard.app.domain.wish.Wish;
 
 public class WishFixedFactory {
 	public static Wish createWish(Member member) {
-		Wish interest = Wish.create(LocalDateTime.now());
-		interest.setMember(member);
-		return interest;
+		Wish wish = Wish.create(LocalDateTime.now());
+		wish.setMember(member);
+		return wish;
 	}
 }

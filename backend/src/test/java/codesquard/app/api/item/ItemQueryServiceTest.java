@@ -33,18 +33,21 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 
 		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
+		memberRepository.save(member);
+
+		List<Image> images = ImageFixedFactory.createFixedImages();
+		long viewCount = 4L;
 		List<Wish> wishes = List.of(
 			WishFixedFactory.createWish(member),
 			WishFixedFactory.createWish(member),
 			WishFixedFactory.createWish(member)
 		);
-		List<Image> images = ImageFixedFactory.createFixedImages();
-		long viewCount = 4L;
-
 		Item item = ItemFixedFactory.createFixedItem(member, findCategory, images, wishes, viewCount);
-		Item saveItem = itemRepository.save(item);
+		itemRepository.save(item);
+		wishRepository.saveAll(wishes);
+		imageRepository.saveAll(images);
 		// when
-		ItemDetailResponse response = itemQueryService.findDetailItemBy(saveItem.getId(), member.getId());
+		ItemDetailResponse response = itemQueryService.findDetailItemBy(item.getId(), member.getId());
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)

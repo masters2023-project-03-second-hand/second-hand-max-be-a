@@ -11,6 +11,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.ImageFixedFactory;
@@ -105,12 +106,12 @@ class ItemTest extends IntegrationTestSupport {
 		});
 	}
 
+	@Transactional
 	@DisplayName("상품에 관심 상품을 추가한다")
 	@Test
 	public void addInterest() {
 		// given
 		Category category = createdFixedCategory();
-		categoryRepository.save(category);
 		Member member = createFixedMemberWithMemberTown();
 
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(),
@@ -122,7 +123,11 @@ class ItemTest extends IntegrationTestSupport {
 		item.addWish(wish);
 
 		// then
+		categoryRepository.save(category);
+		memberRepository.save(member);
 		Item saveItem = itemRepository.save(item);
+		itemRepository.findById(saveItem.getId()).orElseThrow();
+
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(saveItem.getWishes()).hasSize(1).contains(wish);
 			softAssertions.assertThat(wish.getItem()).isEqualTo(saveItem);
