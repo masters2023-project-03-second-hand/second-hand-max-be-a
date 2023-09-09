@@ -41,7 +41,7 @@ INSERT INTO image(image_url, item_id)
 VALUES ('https://second-hand-team03-a.s3.ap-northeast-2.amazonaws.com/public/%E1%84%85%E1%85%A9%E1%86%AF%E1%84%85%E1%85%A5%E1%84%87%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%83%E1%85%B3.webp',
         1);
 
-LOAD DATA LOCAL INFILE 'backend/src/main/resources/regions.csv'
+LOAD DATA LOCAL INFILE 'src/main/resources/regions.csv'
     INTO TABLE region
     FIELDS TERMINATED BY ','
     IGNORE 1 ROWS

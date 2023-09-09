@@ -53,7 +53,7 @@ public class ChatRoom {
 
 	public void setMember(Member member) {
 		this.member = member;
-		if (member != null && !member.getChatRooms().contains(this)) {
+		if (member != null) {
 			member.addChatRoom(this);
 		}
 	}

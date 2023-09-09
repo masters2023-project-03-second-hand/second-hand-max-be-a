@@ -38,7 +38,7 @@ public class Image {
 
 	public void setItem(Item item) {
 		this.item = item;
-		if (!item.getImages().contains(this)) {
+		if (item != null && !item.getImages().contains(this)) {
 			item.addImage(this);
 		}
 	}

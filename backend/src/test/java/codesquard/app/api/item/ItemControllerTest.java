@@ -13,7 +13,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -61,8 +60,8 @@ class ItemControllerTest extends ControllerTestSupport {
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		List<Image> images = ImageFixedFactory.createFixedImages();
 		Item item = ItemFixedFactory.createFixedItem(seller, category, images, new ArrayList<>(), 0L);
-		ItemDetailResponse response = ItemDetailResponse.createWithSellerResponse(item, seller);
-		Mockito.when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
+		ItemDetailResponse response = ItemDetailResponse.create(item, seller, seller.getId());
+		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))
 			.andExpect(status().isOk())
@@ -91,8 +90,8 @@ class ItemControllerTest extends ControllerTestSupport {
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		List<Image> images = ImageFixedFactory.createFixedImages();
 		Item item = ItemFixedFactory.createFixedItem(seller, category, images, new ArrayList<>(), 0L);
-		ItemDetailResponse response = ItemDetailResponse.createWithBuyerResponse(item, seller);
-		Mockito.when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
+		ItemDetailResponse response = ItemDetailResponse.create(item, seller, 9999L);
+		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))
 			.andExpect(status().isOk())
@@ -117,7 +116,7 @@ class ItemControllerTest extends ControllerTestSupport {
 	public void findDetailItemWithNotExistItem() throws Exception {
 		// given
 		long itemId = 9999L;
-		Mockito.when(itemQueryService.findDetailItemBy(any(), any()))
+		when(itemQueryService.findDetailItemBy(any(), any()))
 			.thenThrow(new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))

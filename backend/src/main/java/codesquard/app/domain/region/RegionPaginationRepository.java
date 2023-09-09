@@ -24,7 +24,7 @@ public class RegionPaginationRepository {
 		List<Region> regions = queryFactory.selectFrom(region)
 			.where(
 				// no-offset 페이징 처리
-				lessThanRegionId(lastRegionId),
+				ltRegionId(lastRegionId),
 				// 동네 이름이 포함된 지역 검색
 				likeRegionName(regionName)
 			)
@@ -35,7 +35,7 @@ public class RegionPaginationRepository {
 		return checkLastPage(pageable, regions);
 	}
 
-	private BooleanExpression lessThanRegionId(Long regionId) {
+	private BooleanExpression ltRegionId(Long regionId) {
 		if (regionId == null) {
 			return null;
 		}
