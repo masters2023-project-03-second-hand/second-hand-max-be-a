@@ -56,7 +56,14 @@ public class Wish {
 
 	public void setItem(Item item) {
 		this.item = item;
-		if (item != null && !item.getWishes().contains(this)) {
+		addWishBy(item);
+	}
+
+	private void addWishBy(Item item) {
+		if (item == null) {
+			return;
+		}
+		if (!item.containsWish(this)) {
 			this.item.addWish(this);
 		}
 	}

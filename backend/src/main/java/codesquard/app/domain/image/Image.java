@@ -38,7 +38,14 @@ public class Image {
 
 	public void setItem(Item item) {
 		this.item = item;
-		if (item != null && !item.getImages().contains(this)) {
+		addImageBy(item);
+	}
+
+	private void addImageBy(Item item) {
+		if (item == null) {
+			return;
+		}
+		if (!item.containsImage(this)) {
 			item.addImage(this);
 		}
 	}

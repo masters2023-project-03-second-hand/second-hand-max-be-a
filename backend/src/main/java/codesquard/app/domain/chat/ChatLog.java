@@ -46,7 +46,14 @@ public class ChatLog {
 
 	public void setChatRoom(ChatRoom chatRoom) {
 		this.chatRoom = chatRoom;
-		if (chatRoom != null && !chatRoom.getChatLogs().contains(this)) {
+		addChatLogBy(chatRoom);
+	}
+
+	private void addChatLogBy(ChatRoom chatRoom) {
+		if (chatRoom == null) {
+			return;
+		}
+		if (!chatRoom.containsChatLog(this)) {
 			chatRoom.addChatLog(this);
 		}
 	}

@@ -53,28 +53,47 @@ public class ChatRoom {
 
 	public void setMember(Member member) {
 		this.member = member;
-		if (member != null) {
+		addChatRoomBy(member);
+	}
+
+	private void addChatRoomBy(Member member) {
+		if (member == null) {
+			return;
+		}
+		if (!member.containsChatRoom(this)) {
 			member.addChatRoom(this);
 		}
 	}
 
 	public void setItem(Item item) {
 		this.item = item;
-		if (item != null && !item.getChatRooms().contains(this)) {
+		addChatRoomBy(item);
+	}
+
+	private void addChatRoomBy(Item item) {
+		if (item == null) {
+			return;
+		}
+		if (!item.containsChatRoom(this)) {
 			item.addChatRoom(this);
 		}
 	}
 
 	public void addChatLog(ChatLog chatLog) {
-		if (chatLog != null && !chatLogs.contains(chatLog)) {
+		if (chatLog == null) {
+			return;
+		}
+		if (!containsChatLog(chatLog)) {
 			chatLogs.add(chatLog);
 		}
-		if (chatLog != null) {
-			chatLog.setChatRoom(this);
-		}
+		chatLog.setChatRoom(this);
 	}
 
 	public int getChatLogsSize() {
 		return chatLogs.size();
+	}
+
+	public boolean containsChatLog(ChatLog chatLog) {
+		return chatLogs.contains(chatLog);
 	}
 }
