@@ -17,6 +17,7 @@ import codesquard.app.domain.member.Member;
 
 class ChatRoomTest extends IntegrationTestSupport {
 
+	@Transactional
 	@DisplayName("채팅방에 회원을 설정한다")
 	@Test
 	public void setMember() {
