@@ -1,6 +1,5 @@
 package codesquard.app.domain.category;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,7 +18,6 @@ public class Category {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
-	@Column(name = "image_url")
 	private String imageUrl;
 
 	public Category(String name, String imageUrl) {
