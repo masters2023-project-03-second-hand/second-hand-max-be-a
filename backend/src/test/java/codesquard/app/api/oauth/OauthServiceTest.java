@@ -2,7 +2,7 @@ package codesquard.app.api.oauth;
 
 import static codesquard.app.api.oauth.OauthFixedFactory.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -95,6 +95,57 @@ class OauthServiceTest extends IntegrationTestSupport {
 				.contains("dragonbead95@naver.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertAll();
 		});
+	}
+
+	@DisplayName("중복됝 로그인 아이디로 회원가입을 할 수 없다")
+	@Test
+	public void signupWithDuplicateLoginId() throws IOException {
+		// given
+		memberRepository.save(createFixedMember());
+
+		String provider = "naver";
+		String code = "1234";
+		MockMultipartFile profile = createFixedProfile();
+		OauthSignUpRequest request = createFixedOauthSignUpRequest();
+
+		// when
+		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
+		// then
+
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("이미 존재하는 아이디입니다.");
+	}
+
+	@DisplayName("한 명의 소셜 사용자가 서로 다른 로그인 아이디로 이중 회원가입을 할 수 없다")
+	@Test
+	public void signupWithMultipleLoginId() throws IOException {
+		// given
+		memberRepository.save(createFixedMember());
+
+		String provider = "naver";
+		String code = "1234";
+		MockMultipartFile profile = createFixedProfile();
+		OauthSignUpRequest request = createOauthSignUpRequest("bruni", List.of("가락 1동"));
+		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
+		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
+
+		given(oauthClientRepository.findOneBy(anyString())).willReturn(oauthClient);
+		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
+			.willReturn(mockAccessTokenResponse);
+		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
+			.willReturn(mockUserProfileResponse);
+
+		// when
+		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
+
+		// then
+
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("이미 회원가입된 상태입니다.");
 	}
 
 	@DisplayName("제공되지 않은 provider로 소셜 로그인하여 회원가입을 할 수 없다")
@@ -296,37 +347,5 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("유효하지 않은 토큰입니다.");
-	}
-
-	@DisplayName("한명의 소셜 사용자가 여러 로그인 아이디로 가입되어 있는 상태에서 로그인 후 액세스 토큰 갱신을 할 수 있다")
-	@Test
-	public void refreshAccessTokenWithMultipleLoginId() {
-		// mocking
-		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
-		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
-		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
-		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
-			.thenReturn(mockAccessTokenResponse);
-		when(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
-			.thenReturn(mockUserProfileResponse);
-
-		// given
-		Member bruni = Member.create(null, "dragonbead95@naver.com", "bruni");
-		Member yong23 = Member.create(null, "dragonbead95@naver.com", "23Yong");
-		memberRepository.saveAll(List.of(bruni, yong23));
-
-		OauthLoginRequest loginRequest = OauthLoginRequest.create("bruni");
-		OauthLoginResponse response = oauthService.login(loginRequest, "naver", "code", createNow());
-
-		String refreshToken = response.getJwt().getRefreshToken();
-		LocalDateTime now = createNow();
-		OauthRefreshRequest request = OauthRefreshRequest.create(refreshToken);
-		// when
-		OauthRefreshResponse refreshResponse = oauthService.refreshAccessToken(request, now);
-		// then
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(refreshResponse.getJwt().getAccessToken()).isNotNull();
-			softAssertions.assertAll();
-		});
 	}
 }

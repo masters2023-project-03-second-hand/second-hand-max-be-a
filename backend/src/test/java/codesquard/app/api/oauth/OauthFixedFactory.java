@@ -38,6 +38,10 @@ public class OauthFixedFactory {
 		return OauthSignUpRequest.create(LOGIN_ID, ADDRESS_NAMES);
 	}
 
+	public static OauthSignUpRequest createOauthSignUpRequest(String loginId, List<String> addressNames) {
+		return OauthSignUpRequest.create(loginId, addressNames);
+	}
+
 	public static OauthSignUpRequest createFixedOauthSignUpRequest(String loginId, List<String> addressNames) {
 		return OauthSignUpRequest.create(loginId, addressNames);
 	}
