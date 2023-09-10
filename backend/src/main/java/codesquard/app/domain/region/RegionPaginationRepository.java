@@ -26,7 +26,7 @@ public class RegionPaginationRepository {
 				// no-offset 페이징 처리
 				ltRegionId(lastRegionId),
 				// 동네 이름이 포함된 지역 검색
-				likeRegionName(regionName)
+				likeName(regionName)
 			)
 			.orderBy(region.id.desc())
 			.limit(pageable.getPageSize() + 1)
@@ -42,7 +42,7 @@ public class RegionPaginationRepository {
 		return region.id.lt(regionId);
 	}
 
-	private BooleanExpression likeRegionName(String name) {
+	private BooleanExpression likeName(String name) {
 		if (name == null) {
 			return null;
 		}
@@ -52,10 +52,10 @@ public class RegionPaginationRepository {
 	private Slice<Region> checkLastPage(Pageable pageable, List<Region> regions) {
 		boolean hasNext = false;
 
-		// 조회된 동네의 개수가 요청한 페이지의 개수보다 크면 뒤에 더 있다는 것을 의미합니다.
+		// 뒷 페이지가 더 있는지 확인
 		if (regions.size() > pageable.getPageSize()) {
 			hasNext = true;
-			// 조회된 동네의 개수는 요청한 페이지의 개수보다 1개더 많이 조회하였기 때문에 마지막 동네 데이터를 제거합니다.
+			// LIMIT로 인해 한개 더 조회한 데이터를 제거
 			regions.remove(pageable.getPageSize());
 		}
 		return new SliceImpl<>(regions, pageable, hasNext);
