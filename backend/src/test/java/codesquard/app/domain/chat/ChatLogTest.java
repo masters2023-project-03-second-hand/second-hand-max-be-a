@@ -15,7 +15,7 @@ class ChatLogTest extends IntegrationTestSupport {
 		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
 		ChatLog chatLog = ChatLogFixedFactory.createFixedChatLog(null);
 		// when
-		chatLog.setChatRoom(chatRoom);
+		chatLog.changeChatRoom(chatRoom);
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(chatLog.getChatRoom()).isEqualTo(chatRoom);

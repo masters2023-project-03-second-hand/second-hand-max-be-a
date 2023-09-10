@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class ChatLogFixedFactory {
 	public static ChatLog createFixedChatLog(ChatRoom chatRoom) {
 		ChatLog chatLog = ChatLog.create("hello", "sam", "23Yong", LocalDateTime.now());
-		chatLog.setChatRoom(chatRoom);
+		chatLog.changeChatRoom(chatRoom);
 		return chatLog;
 	}
 }

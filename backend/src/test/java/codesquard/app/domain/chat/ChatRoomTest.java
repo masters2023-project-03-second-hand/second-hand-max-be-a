@@ -25,7 +25,7 @@ class ChatRoomTest extends IntegrationTestSupport {
 		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
 		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
 		// when
-		chatRoom.setMember(member);
+		chatRoom.changeMember(member);
 		// then
 		Member saveMember = memberRepository.save(member);
 		ChatRoom saveChatRoom = chatRoomRepository.save(chatRoom);
@@ -44,11 +44,11 @@ class ChatRoomTest extends IntegrationTestSupport {
 		// given
 		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
 		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
-		chatRoom.setMember(member);
+		chatRoom.changeMember(member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(), 0L);
 		// when
-		chatRoom.setItem(item);
+		chatRoom.changeItem(item);
 		// then
 		categoryRepository.save(category);
 		memberRepository.save(member);
@@ -68,10 +68,10 @@ class ChatRoomTest extends IntegrationTestSupport {
 		// given
 		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
 		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
-		chatRoom.setMember(member);
+		chatRoom.changeMember(member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(), 0L);
-		chatRoom.setItem(item);
+		chatRoom.changeItem(item);
 		ChatLog chatLog = ChatLogFixedFactory.createFixedChatLog(null);
 		// when
 		chatRoom.addChatLog(chatLog);

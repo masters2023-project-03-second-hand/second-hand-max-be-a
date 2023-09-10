@@ -36,7 +36,7 @@ class ItemTest extends IntegrationTestSupport {
 		Item item = ItemFixedFactory.createFixedItem(null, category, new ArrayList<>(), new ArrayList<>(), 0L);
 
 		// when
-		item.setMember(member);
+		item.changeMember(member);
 
 		// then
 		Item saveItem = itemRepository.save(item);
@@ -60,7 +60,7 @@ class ItemTest extends IntegrationTestSupport {
 		Item item = ItemFixedFactory.createFixedItem(member, null, new ArrayList<>(), new ArrayList<>(), 0L);
 
 		// when
-		item.setCategory(category);
+		item.changeCategory(category);
 
 		// then
 		Item saveItem = itemRepository.save(item);
@@ -137,7 +137,7 @@ class ItemTest extends IntegrationTestSupport {
 		Item saveItem = itemRepository.save(item);
 
 		// when
-		int sum = saveItem.getTotalChatLogCount();
+		int sum = saveItem.countTotalChatLog();
 
 		// then
 		Assertions.assertThat(sum).isZero();
