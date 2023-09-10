@@ -34,9 +34,9 @@ public class ItemPaginationRepository {
 				item.wishCount,
 				item.chatCount))
 			.from(item)
-			.where(ltItemId(itemId),
-				eqCategoryId(categoryId),
-				eqTradingRegion(region)
+			.where(lessThanItemId(itemId),
+				equalCategoryId(categoryId),
+				equalTradingRegion(region)
 			)
 			.orderBy(item.createdAt.desc())
 			.limit(size + 1)
@@ -44,7 +44,7 @@ public class ItemPaginationRepository {
 		return checkLastPage(size, itemResponses);
 	}
 
-	private BooleanExpression ltItemId(Long itemId) {
+	private BooleanExpression lessThanItemId(Long itemId) {
 		if (itemId == null) {
 			return null;
 		}
@@ -52,7 +52,7 @@ public class ItemPaginationRepository {
 		return item.id.lt(itemId);
 	}
 
-	private BooleanExpression eqCategoryId(Long categoryId) {
+	private BooleanExpression equalCategoryId(Long categoryId) {
 		if (categoryId == null) {
 			return null;
 		}
@@ -60,7 +60,7 @@ public class ItemPaginationRepository {
 		return item.category.id.eq(categoryId);
 	}
 
-	private BooleanExpression eqTradingRegion(String region) {
+	private BooleanExpression equalTradingRegion(String region) {
 		if (region == null) {
 			return null;
 		}
