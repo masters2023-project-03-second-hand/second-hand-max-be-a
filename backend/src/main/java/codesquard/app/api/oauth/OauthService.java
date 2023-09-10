@@ -57,6 +57,8 @@ public class OauthService {
 
 		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, authorizationCode);
 
+		validateMultipleSignUp(userProfileResponse.getEmail());
+
 		String avatarUrl = null;
 		if (profile == null) {
 			avatarUrl = userProfileResponse.getProfileImage();
@@ -72,6 +74,18 @@ public class OauthService {
 		return OauthSignUpResponse.from(saveMember);
 	}
 
+	private void validateDuplicateLoginId(String loginId) {
+		if (memberRepository.existsMemberByLoginId(loginId)) {
+			throw new RestApiException(MemberErrorCode.ALREADY_EXIST_ID);
+		}
+	}
+
+	private void validateMultipleSignUp(String email) {
+		if (memberRepository.existsMemberByEmail(email)) {
+			throw new RestApiException(OauthErrorCode.ALREADY_SIGNUP);
+		}
+	}
+
 	private OauthUserProfileResponse getOauthUserProfileResponse(String provider, String authorizationCode) {
 		OauthClient oauthClient = oauthClientRepository.findOneBy(provider);
 
@@ -83,12 +97,6 @@ public class OauthService {
 			oauthClient.getUserProfileByAccessToken(accessTokenResponse);
 		log.debug("{}", userProfileResponse);
 		return userProfileResponse;
-	}
-
-	private void validateDuplicateLoginId(String loginId) {
-		if (memberRepository.existsMemberByLoginId(loginId)) {
-			throw new RestApiException(MemberErrorCode.ALREADY_EXIST_ID);
-		}
 	}
 
 	public OauthLoginResponse login(OauthLoginRequest request, String provider, String code, LocalDateTime now) {
@@ -138,10 +146,8 @@ public class OauthService {
 		jwtProvider.validateToken(refreshToken);
 		log.debug("refreshToken is valid token : {}", refreshToken);
 
-		String emailAndLoginId = findEmailByRefreshToken(refreshToken);
-		String email = emailAndLoginId.split("-")[0];
-		String loginId = emailAndLoginId.split("-")[1];
-		Member member = memberRepository.findMemberByLoginIdAndEmail(loginId, email)
+		String email = findEmailByRefreshToken(refreshToken);
+		Member member = memberRepository.findMemberByEmail(email)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
 		log.debug("{}", member);
 
