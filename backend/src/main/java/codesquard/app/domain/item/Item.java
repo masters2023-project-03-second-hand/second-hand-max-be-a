@@ -101,7 +101,7 @@ public class Item {
 			.build();
 	}
 
-	public void setMember(Member member) {
+	public void changeMember(Member member) {
 		this.member = member;
 		addItemBy(member);
 	}
@@ -116,7 +116,7 @@ public class Item {
 		}
 	}
 
-	public void setCategory(Category category) {
+	public void changeCategory(Category category) {
 		this.category = category;
 	}
 
@@ -127,7 +127,7 @@ public class Item {
 		if (!containsImage(image)) {
 			this.images.add(image);
 		}
-		image.setItem(this);
+		image.changeItem(this);
 	}
 
 	public void addWish(Wish wish) {
@@ -137,7 +137,7 @@ public class Item {
 		if (!containsWish(wish)) {
 			this.wishes.add(wish);
 		}
-		wish.setItem(this);
+		wish.changeItem(this);
 	}
 
 	public void addChatRoom(ChatRoom chatRoom) {
@@ -147,12 +147,12 @@ public class Item {
 		if (!containsChatRoom(chatRoom)) {
 			chatRooms.add(chatRoom);
 		}
-		chatRoom.setItem(this);
+		chatRoom.changeItem(this);
 	}
 
-	public int getTotalChatLogCount() {
+	public int countTotalChatLog() {
 		return chatRooms.stream()
-			.mapToInt(ChatRoom::getChatLogsSize)
+			.mapToInt(ChatRoom::sizeChatLogs)
 			.sum();
 	}
 

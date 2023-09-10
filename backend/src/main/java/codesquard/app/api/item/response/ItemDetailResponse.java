@@ -61,7 +61,7 @@ public class ItemDetailResponse {
 			.categoryName(item.getCategory().getName())
 			.createdAt(item.getCreatedAt())
 			.content(item.getContent())
-			.chatCount(item.getTotalChatLogCount())
+			.chatCount(item.countTotalChatLog())
 			.wishCount(item.getWishes().size())
 			.viewCount(item.getViewCount())
 			.price(item.getPrice())

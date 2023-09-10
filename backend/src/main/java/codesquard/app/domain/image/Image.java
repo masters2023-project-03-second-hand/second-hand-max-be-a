@@ -36,7 +36,11 @@ public class Image {
 		this.imageUrl = imageUrl;
 	}
 
-	public void setItem(Item item) {
+	public static Image create(String imageUrl) {
+		return new Image(imageUrl);
+	}
+
+	public void changeItem(Item item) {
 		this.item = item;
 		addImageBy(item);
 	}
@@ -48,9 +52,5 @@ public class Image {
 		if (!item.containsImage(this)) {
 			item.addImage(this);
 		}
-	}
-
-	public static Image create(String imageUrl) {
-		return new Image(imageUrl);
 	}
 }

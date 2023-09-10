@@ -23,6 +23,6 @@ public class MemberService {
 		Member member = memberRepository.findMemberByLoginId(loginId)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
 		imageService.deleteImage(member.getAvatarUrl());
-		member.setAvatarUrl(imageService.uploadImage(updateImageFile));
+		member.changeAvatarUrl(imageService.uploadImage(updateImageFile));
 	}
 }

@@ -53,7 +53,6 @@ public class Member {
 		this.avatarUrl = avatarUrl;
 		this.email = email;
 		this.loginId = loginId;
-		this.towns = new ArrayList<>();
 	}
 
 	public static Member create(String avatarUrl, String email, String loginId) {
@@ -67,7 +66,7 @@ public class Member {
 		if (!containsItem(item)) {
 			items.add(item);
 		}
-		item.setMember(this);
+		item.changeMember(this);
 	}
 
 	public void addMemberTown(MemberTown town) {
@@ -86,10 +85,10 @@ public class Member {
 		if (!containsChatRoom(chatRoom)) {
 			chatRooms.add(chatRoom);
 		}
-		chatRoom.setMember(this);
+		chatRoom.changeMember(this);
 	}
 
-	public void setAvatarUrl(String avatarUrl) {
+	public void changeAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
 	}
 

@@ -51,7 +51,7 @@ public class ChatRoom {
 		return new ChatRoom(createdAt);
 	}
 
-	public void setMember(Member member) {
+	public void changeMember(Member member) {
 		this.member = member;
 		addChatRoomBy(member);
 	}
@@ -65,7 +65,7 @@ public class ChatRoom {
 		}
 	}
 
-	public void setItem(Item item) {
+	public void changeItem(Item item) {
 		this.item = item;
 		addChatRoomBy(item);
 	}
@@ -86,10 +86,10 @@ public class ChatRoom {
 		if (!containsChatLog(chatLog)) {
 			chatLogs.add(chatLog);
 		}
-		chatLog.setChatRoom(this);
+		chatLog.changeChatRoom(this);
 	}
 
-	public int getChatLogsSize() {
+	public int sizeChatLogs() {
 		return chatLogs.size();
 	}
 

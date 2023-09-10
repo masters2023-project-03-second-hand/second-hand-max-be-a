@@ -50,11 +50,11 @@ public class Wish {
 		return new Wish(memberId, itemId);
 	}
 
-	public void setMember(Member member) {
+	public void changeMember(Member member) {
 		this.member = member;
 	}
 
-	public void setItem(Item item) {
+	public void changeItem(Item item) {
 		this.item = item;
 		addWishBy(item);
 	}

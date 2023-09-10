@@ -44,7 +44,7 @@ public class ChatLog {
 		return new ChatLog(message, sender, receiver, createdAt);
 	}
 
-	public void setChatRoom(ChatRoom chatRoom) {
+	public void changeChatRoom(ChatRoom chatRoom) {
 		this.chatRoom = chatRoom;
 		addChatLogBy(chatRoom);
 	}
