@@ -14,13 +14,16 @@ import codesquard.app.api.item.ItemQueryService;
 import codesquard.app.api.item.ItemService;
 import codesquard.app.api.oauth.OauthRestController;
 import codesquard.app.api.oauth.OauthService;
+import codesquard.app.api.region.RegionQueryService;
+import codesquard.app.api.region.RegionRestController;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.oauth.support.AuthenticationContext;
 
 @WebMvcTest(controllers = {
 	OauthRestController.class,
 	CategoryRestController.class,
-	ItemController.class
+	ItemController.class,
+	RegionRestController.class
 })
 public abstract class ControllerTestSupport {
 
@@ -47,4 +50,7 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected ItemService itemService;
+
+	@MockBean
+	protected RegionQueryService regionQueryService;
 }
