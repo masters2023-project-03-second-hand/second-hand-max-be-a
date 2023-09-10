@@ -82,7 +82,7 @@ public class Member {
 	}
 
 	public String createRedisKey() {
-		return String.format("%s%s-%s", "RT:", email, loginId);
+		return "RT:" + email;
 	}
 
 	public Map<String, Object> createClaims() {
