@@ -24,7 +24,8 @@ public enum CategoryErrorCode implements ErrorCode {
 
 	@Override
 	public String toString() {
-		return String.format("%s, %s(httpStatus=%s, message=%s)", "Oauth 에러", this.getClass().getSimpleName(),
+		return String.format("%s, %s(name=%s, httpStatus=%s, message=%s)", "Oauth 에러", this.getClass().getSimpleName(),
+			name(),
 			httpStatus,
 			message);
 	}
