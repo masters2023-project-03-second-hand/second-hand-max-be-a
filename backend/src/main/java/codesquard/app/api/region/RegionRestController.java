@@ -19,9 +19,9 @@ public class RegionRestController {
 
 	@GetMapping
 	public ApiResponse<RegionListResponse> findAll(
-		@RequestParam("size") int size,
-		@RequestParam("cursor") Long cursor,
-		@RequestParam("region") String region) {
+		@RequestParam(value = "size", defaultValue = "10", required = false) int size,
+		@RequestParam(value = "cursor", required = false) Long cursor,
+		@RequestParam(value = "region", required = false) String region) {
 		RegionListRequest request = RegionListRequest.create(cursor, size, region);
 		return ApiResponse.ok("주소 목록 조회에 성공하였습니다.", regionQueryService.searchBySlice(request));
 	}
