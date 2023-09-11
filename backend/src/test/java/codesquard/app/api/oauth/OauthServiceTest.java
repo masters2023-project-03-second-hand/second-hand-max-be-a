@@ -125,7 +125,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createOauthSignUpRequest("bruni", List.of("가락 1동"));
+		OauthSignUpRequest request = createOauthSignUpRequest("bruni2", List.of("가락 1동"));
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
 
@@ -316,7 +316,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		redisTemplate.opsForValue()
 			.set(member.createRedisKey(), jwt.getRefreshToken(),
-				jwt.getExpireDateRefreshTokenTime(), TimeUnit.MILLISECONDS);
+				jwt.getExpireDateRefreshToken().getTime(), TimeUnit.MILLISECONDS);
 		// when
 		oauthService.logout(request);
 

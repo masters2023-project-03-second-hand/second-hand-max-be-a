@@ -6,6 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import codesquard.app.api.category.CategoryQueryService;
 import codesquard.app.api.item.ItemQueryService;
+import codesquard.app.api.member.MemberService;
+import codesquard.app.api.membertown.MemberTownService;
 import codesquard.app.api.oauth.OauthService;
 import codesquard.app.api.region.RegionQueryService;
 import codesquard.app.domain.category.CategoryRepository;
@@ -64,6 +66,12 @@ public abstract class IntegrationTestSupport {
 	@Autowired
 	protected RegionQueryService regionQueryService;
 
+	@Autowired
+	protected MemberService memberService;
+
+	@Autowired
+	protected MemberTownService memberTownService;
+
 	@AfterEach
 	void cleanup() {
 		chatLogRepository.deleteAllInBatch();
@@ -74,6 +82,5 @@ public abstract class IntegrationTestSupport {
 		categoryRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
 		memberTownRepository.deleteAllInBatch();
-		regionRepository.deleteAllInBatch();
 	}
 }
