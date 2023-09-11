@@ -80,7 +80,7 @@ public class Member {
 			chatRooms.add(chatRoom);
 		}
 	}
-	
+
 	public String createRedisKey() {
 		return "RT:" + email;
 	}
