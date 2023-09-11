@@ -59,14 +59,28 @@ public class OauthService {
 
 		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, authorizationCode);
 
+    validateMultipleSignUp(userProfileResponse.getEmail());
+    
 		String avatarUrl = optionalProfile.map(imageService::uploadImage)
 			.orElse(userProfileResponse.getProfileImage());
 		log.debug("회원 가입 서비스에서 생성한 아바타 주소 : {}", avatarUrl);
-
+		
 		Member member = request.toEntity(avatarUrl, userProfileResponse.getEmail());
 		Member saveMember = memberRepository.save(member);
 
 		return OauthSignUpResponse.from(saveMember);
+	}
+
+	private void validateDuplicateLoginId(String loginId) {
+		if (memberRepository.existsMemberByLoginId(loginId)) {
+			throw new RestApiException(MemberErrorCode.ALREADY_EXIST_ID);
+		}
+	}
+
+	private void validateMultipleSignUp(String email) {
+		if (memberRepository.existsMemberByEmail(email)) {
+			throw new RestApiException(OauthErrorCode.ALREADY_SIGNUP);
+		}
 	}
 
 	private OauthUserProfileResponse getOauthUserProfileResponse(String provider, String authorizationCode) {
@@ -80,12 +94,6 @@ public class OauthService {
 			oauthClient.getUserProfileByAccessToken(accessTokenResponse);
 		log.debug("{}", userProfileResponse);
 		return userProfileResponse;
-	}
-
-	private void validateDuplicateLoginId(String loginId) {
-		if (memberRepository.existsMemberByLoginId(loginId)) {
-			throw new RestApiException(MemberErrorCode.ALREADY_EXIST_ID);
-		}
 	}
 
 	public OauthLoginResponse login(OauthLoginRequest request, String provider, String code, LocalDateTime now) {
@@ -102,7 +110,7 @@ public class OauthService {
 		// key: "RT:" + email, value : 리프레쉬 토큰값
 		redisTemplate.opsForValue().set(member.createRedisKey(),
 			jwt.getRefreshToken(),
-			jwt.getExpireDateRefreshTokenTime(),
+			jwt.convertExpireDateRefreshTokenTimeWithLong(),
 			TimeUnit.MILLISECONDS);
 
 		return OauthLoginResponse.create(jwt, OauthLoginMemberResponse.from(member));
@@ -153,7 +161,7 @@ public class OauthService {
 		return keys.stream()
 			.filter(key -> Objects.equals(redisTemplate.opsForValue().get(key), refreshToken))
 			.findAny()
-			.map(email -> email.replace("RT:", ""))
+			.map(key -> key.replace("RT:", ""))
 			.orElseThrow(() -> new RestApiException(JwtTokenErrorCode.INVALID_TOKEN));
 	}
 }

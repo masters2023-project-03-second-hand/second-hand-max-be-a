@@ -30,11 +30,15 @@ public class OauthFixedFactory {
 		+ "dAZ21haWwuY29tIiwibWVtYmVySWQiOjEsImV4cCI6MTY3MjQ5OTEwMH0.7w2MKSLPVEr6wo7B-C6drNA3eETikpnYi2M1V8c9erY";
 	private static final String SCOPE = "scopeValue";
 	private static final String TOKEN_TYPE = "Bearer";
-	private static final String EMAIL = "23Yong@gmail.com";
+	private static final String EMAIL = "dragonbead95@naver.com";
 	private static final String AVATAR_URL = "avatarUrlValue";
 
 	public static OauthSignUpRequest createFixedOauthSignUpRequest() {
 		return OauthSignUpRequest.create(LOGIN_ID, ADDRESS_NAMES);
+	}
+
+	public static OauthSignUpRequest createOauthSignUpRequest(String loginId, List<String> addressNames) {
+		return OauthSignUpRequest.create(loginId, addressNames);
 	}
 
 	public static OauthSignUpRequest createFixedOauthSignUpRequest(String loginId, List<String> addressNames) {
