@@ -2,8 +2,6 @@ package codesquard.app.api.wishitem;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.List;
-
 import javax.persistence.EntityManager;
 
 import org.junit.jupiter.api.DisplayName;
@@ -13,10 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.ItemRegisterRequest;
+import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.wish.Wish;
 import codesquard.support.SupportRepository;
 
 @SpringBootTest
@@ -42,7 +40,7 @@ class WishItemServiceTest extends IntegrationTestSupport {
 		Item item1 = supportRepository.save(request.toEntity(member, "thumbnail"));
 
 		// when
-		wishItemService.register(item1.getId(), member.getId());
+		wishItemService.register(item1.getId(), member.getId(), "yes");
 
 		// then
 		Item item = em.find(Item.class, item1.getId());
@@ -59,7 +57,7 @@ class WishItemServiceTest extends IntegrationTestSupport {
 			"선풍기", 12000L, null, "가양 1동", "판매중", category.getId(), null);
 		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "piepie"));
 		Item saveItem = supportRepository.save(request1.toEntity(member, "thumbnail"));
-		wishItemService.register(saveItem.getId(), member.getId());
+		wishItemService.register(saveItem.getId(), member.getId(), "yes");
 
 		// when
 		wishItemService.cancel(saveItem.getId());
@@ -86,15 +84,15 @@ class WishItemServiceTest extends IntegrationTestSupport {
 		Item item1 = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		Item item2 = supportRepository.save(request2.toEntity(member, "thumb"));
 		Item item3 = supportRepository.save(request3.toEntity(member, "nail"));
-		wishItemService.register(item1.getId(), member.getId());
-		wishItemService.register(item2.getId(), member.getId());
-		wishItemService.register(item3.getId(), member.getId());
+		wishItemService.register(item1.getId(), member.getId(), "yes");
+		wishItemService.register(item2.getId(), member.getId(), "yes");
+		wishItemService.register(item3.getId(), member.getId(), "yes");
 
 		// when
-		List<Wish> all = wishItemService.findAll(null, 10, null);
+		ItemResponses responses = wishItemService.findAll(null, 10, null);
 
 		// then
-		assertThat(all.size()).isEqualTo(3);
+		assertThat(responses.getContents().size()).isEqualTo(3);
 
 	}
 
@@ -116,15 +114,15 @@ class WishItemServiceTest extends IntegrationTestSupport {
 		Item item1 = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		Item item2 = supportRepository.save(request2.toEntity(member, "thumb"));
 		Item item3 = supportRepository.save(request3.toEntity(member, "nail"));
-		wishItemService.register(item1.getId(), member.getId());
-		wishItemService.register(item2.getId(), member.getId());
-		wishItemService.register(item3.getId(), member.getId());
+		wishItemService.register(item1.getId(), member.getId(), "yes");
+		wishItemService.register(item2.getId(), member.getId(), "yes");
+		wishItemService.register(item3.getId(), member.getId(), "yes");
 
 		// when
-		List<Wish> wishList = wishItemService.findAll(category1.getId(), 10, null);
+		ItemResponses responses = wishItemService.findAll(category1.getId(), 10, null);
 
 		// then
-		assertThat(wishList.size()).isEqualTo(2);
+		assertThat(responses.getContents().size()).isEqualTo(2);
 
 	}
 }
