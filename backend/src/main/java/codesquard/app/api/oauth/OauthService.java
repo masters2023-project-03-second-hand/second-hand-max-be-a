@@ -57,12 +57,12 @@ public class OauthService {
 
 		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, authorizationCode);
 
-    validateMultipleSignUp(userProfileResponse.getEmail());
-    
+		validateMultipleSignUp(userProfileResponse.getEmail());
+
 		String avatarUrl = optionalProfile.map(imageService::uploadImage)
 			.orElse(userProfileResponse.getProfileImage());
 		log.debug("회원 가입 서비스에서 생성한 아바타 주소 : {}", avatarUrl);
-		
+
 		Member member = request.toEntity(avatarUrl, userProfileResponse.getEmail());
 		Member saveMember = memberRepository.save(member);
 
