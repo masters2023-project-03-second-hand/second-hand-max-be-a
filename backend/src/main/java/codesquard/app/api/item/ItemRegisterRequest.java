@@ -39,8 +39,8 @@ public class ItemRegisterRequest {
 			.chatCount(0L)
 			.viewCount(0L)
 			.build();
-		item.setMember(member);
-		item.setCategory(new Category(categoryId));
+		item.changeMember(member);
+		item.changeCategory(new Category(categoryId));
 		return item;
 	}
 

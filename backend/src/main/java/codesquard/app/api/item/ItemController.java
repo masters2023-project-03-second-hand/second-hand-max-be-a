@@ -39,7 +39,6 @@ public class ItemController {
 	}
 
 	@GetMapping
-	@ResponseStatus(HttpStatus.OK)
 	public ApiResponse<ItemResponses> findAll(@RequestParam String region,
 		@RequestParam(required = false, defaultValue = "10") int size, @RequestParam(required = false) Long cursor,
 		@RequestParam(required = false) Long categoryId) {

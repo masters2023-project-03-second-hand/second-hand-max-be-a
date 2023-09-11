@@ -24,7 +24,6 @@ import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 
 public class OauthFixedFactory {
-
 	private static final String LOGIN_ID = "23Yong";
 	private static final List<String> ADDRESS_NAMES = List.of("가락 1동");
 	private static final String ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJsb2dpbklkIjoiMjNZb25nIiwiZW1haWwiOiIyM1lvbm"

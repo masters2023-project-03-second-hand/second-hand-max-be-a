@@ -27,13 +27,13 @@ public class ItemDetailResponse {
 	private String content;
 	private int chatCount;
 	private int wishCount;
-	private int viewCount;
-	private int price;
+	private Long viewCount;
+	private Long price;
 
 	@Builder(access = AccessLevel.PRIVATE)
 	private ItemDetailResponse(boolean isSeller, List<String> imageUrls, String seller, String status, String title,
-		String categoryName, LocalDateTime createdAt, String content, int chatCount, int wishCount, int viewCount,
-		int price) {
+		String categoryName, LocalDateTime createdAt, String content, int chatCount, int wishCount, Long viewCount,
+		Long price) {
 		this.isSeller = isSeller;
 		this.imageUrls = imageUrls;
 		this.seller = seller;
@@ -48,15 +48,8 @@ public class ItemDetailResponse {
 		this.price = price;
 	}
 
-	public static ItemDetailResponse createWithSellerResponse(Item item, Member seller) {
-		return create(item, seller, true);
-	}
-
-	public static ItemDetailResponse createWithBuyerResponse(Item item, Member seller) {
-		return create(item, seller, false);
-	}
-
-	private static ItemDetailResponse create(Item item, Member seller, boolean isSeller) {
+	public static ItemDetailResponse create(Item item, Member seller, Long loginMemberId) {
+		boolean isSeller = seller.equalId(loginMemberId);
 		List<String> imageUrls = item.getImageUrls();
 
 		return ItemDetailResponse.builder()
@@ -68,10 +61,10 @@ public class ItemDetailResponse {
 			.categoryName(item.getCategory().getName())
 			.createdAt(item.getCreatedAt())
 			.content(item.getContent())
-			.chatCount(item.getTotalChatLogCount())
+			.chatCount(item.countTotalChatLog())
 			.wishCount(item.getWishes().size())
-			.viewCount(item.getViewCount().intValue())
-			.price(item.getPrice().intValue())
+			.viewCount(item.getViewCount())
+			.price(item.getPrice())
 			.build();
 	}
 }

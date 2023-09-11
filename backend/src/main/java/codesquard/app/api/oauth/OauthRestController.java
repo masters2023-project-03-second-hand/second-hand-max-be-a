@@ -4,6 +4,8 @@ import static org.springframework.http.HttpStatus.*;
 
 import java.time.LocalDateTime;
 
+import javax.validation.Valid;
+
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,14 +47,13 @@ public class OauthRestController {
 		@PathVariable String provider,
 		@RequestParam String code,
 		@RequestPart(value = "profile", required = false) MultipartFile profile,
-		@Validated(ValidationSequence.class) @RequestPart(value = "signupData") OauthSignUpRequest request) {
+		@Valid @RequestPart(value = "signupData") OauthSignUpRequest request) {
 		log.info("provider : {}, code : {}, profile : {}, {}", provider, code, profile, request);
 
 		oauthService.signUp(profile, request, provider, code);
 		return ApiResponse.created("회원가입에 성공하였습니다.", null);
 	}
 
-	@ResponseStatus(OK)
 	@PostMapping(value = "/{provider}/login")
 	public ApiResponse<OauthLoginResponse> login(
 		@PathVariable String provider,
@@ -62,7 +63,6 @@ public class OauthRestController {
 		return ApiResponse.of(OK, "로그인에 성공하였습니다.", response);
 	}
 
-	@ResponseStatus(OK)
 	@PostMapping(value = "/logout")
 	public ApiResponse<Void> logout(@AuthPrincipal Principal principal) {
 		log.info("{}", principal);

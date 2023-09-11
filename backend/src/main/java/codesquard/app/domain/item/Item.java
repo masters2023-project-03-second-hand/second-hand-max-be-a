@@ -101,48 +101,71 @@ public class Item {
 			.build();
 	}
 
-	public void setMember(Member member) {
+	public void changeMember(Member member) {
 		this.member = member;
-		if (this.member != null && !this.member.getItems().contains(this)) {
-			this.member.addItem(this);
+		addItemBy(member);
+	}
+
+	private void addItemBy(Member member) {
+		if (member == null) {
+			return;
+		}
+
+		if (!member.containsItem(this)) {
+			member.addItem(this);
 		}
 	}
 
-	public void setCategory(Category category) {
+	public void changeCategory(Category category) {
 		this.category = category;
 	}
 
 	public void addImage(Image image) {
-		if (image != null && !this.images.contains(image)) {
+		if (image == null) {
+			return;
+		}
+		if (!containsImage(image)) {
 			this.images.add(image);
 		}
-		if (image != null) {
-			image.setItem(this);
-		}
+		image.changeItem(this);
 	}
 
 	public void addWish(Wish wish) {
-		if (wish != null && !this.wishes.contains(wish)) {
+		if (wish == null) {
+			return;
+		}
+		if (!containsWish(wish)) {
 			this.wishes.add(wish);
 		}
-		if (wish != null) {
-			wish.setItem(this);
-		}
+		wish.changeItem(this);
 	}
 
 	public void addChatRoom(ChatRoom chatRoom) {
-		if (chatRoom != null && !chatRooms.contains(chatRoom)) {
+		if (chatRoom == null) {
+			return;
+		}
+		if (!containsChatRoom(chatRoom)) {
 			chatRooms.add(chatRoom);
 		}
-		if (chatRoom != null) {
-			chatRoom.setItem(this);
-		}
+		chatRoom.changeItem(this);
 	}
 
-	public int getTotalChatLogCount() {
+	public int countTotalChatLog() {
 		return chatRooms.stream()
-			.mapToInt(ChatRoom::getChatLogsSize)
+			.mapToInt(ChatRoom::sizeChatLogs)
 			.sum();
+	}
+
+	public boolean containsChatRoom(ChatRoom chatRoom) {
+		return chatRooms.contains(chatRoom);
+	}
+
+	public boolean containsImage(Image image) {
+		return images.contains(image);
+	}
+
+	public boolean containsWish(Wish wish) {
+		return wishes.contains(wish);
 	}
 
 	public void wishRegister() {
@@ -164,5 +187,4 @@ public class Item {
 		return String.format("%s, %s(id=%d, title=%s, price=%d, status=%s, region=%s, viewCount=%d)",
 			"상품", this.getClass().getSimpleName(), id, title, price, status, region, viewCount);
 	}
-
 }

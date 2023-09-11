@@ -24,7 +24,9 @@ public enum WishErrorCode implements ErrorCode {
 
 	@Override
 	public String toString() {
-		return String.format("%s, %s(httpStatus=%s, message=%s)", "관심상품 에러", this.getClass().getSimpleName(),
-			httpStatus, message);
+		return String.format("%s, %s(name=%s, httpStatus=%s, message=%s)", "관심상품 에러", this.getClass().getSimpleName(),
+			name(),
+			httpStatus,
+			message);
 	}
 }

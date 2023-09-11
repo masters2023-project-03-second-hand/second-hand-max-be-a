@@ -1,12 +1,13 @@
 package codesquard.app;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import codesquard.app.api.category.CategoryQueryService;
 import codesquard.app.api.item.ItemQueryService;
 import codesquard.app.api.oauth.OauthService;
+import codesquard.app.api.region.RegionQueryService;
 import codesquard.app.domain.category.CategoryRepository;
 import codesquard.app.domain.chat.ChatLogRepository;
 import codesquard.app.domain.chat.ChatRoomRepository;
@@ -14,6 +15,8 @@ import codesquard.app.domain.image.ImageRepository;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTownRepository;
+import codesquard.app.domain.region.RegionPaginationRepository;
+import codesquard.app.domain.region.RegionRepository;
 import codesquard.app.domain.wish.WishRepository;
 
 @SpringBootTest
@@ -52,7 +55,16 @@ public abstract class IntegrationTestSupport {
 	@Autowired
 	protected ChatRoomRepository chatRoomRepository;
 
-	@BeforeEach
+	@Autowired
+	protected RegionPaginationRepository regionPaginationRepository;
+
+	@Autowired
+	protected RegionRepository regionRepository;
+
+	@Autowired
+	protected RegionQueryService regionQueryService;
+
+	@AfterEach
 	void cleanup() {
 		chatLogRepository.deleteAllInBatch();
 		chatRoomRepository.deleteAllInBatch();
@@ -62,5 +74,6 @@ public abstract class IntegrationTestSupport {
 		categoryRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
 		memberTownRepository.deleteAllInBatch();
+		regionRepository.deleteAllInBatch();
 	}
 }

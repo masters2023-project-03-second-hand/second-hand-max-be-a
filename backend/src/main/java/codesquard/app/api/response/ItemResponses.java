@@ -22,6 +22,10 @@ public class ItemResponses {
 
 		private Long nextCursor;
 		private boolean hasNext;
+
+		public static Paging create(Long nextCursor, boolean hasNext) {
+			return new Paging(nextCursor, hasNext);
+		}
 	}
 }
 

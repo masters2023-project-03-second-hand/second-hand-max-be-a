@@ -53,7 +53,6 @@ public class Member {
 		this.avatarUrl = avatarUrl;
 		this.email = email;
 		this.loginId = loginId;
-		this.towns = new ArrayList<>();
 	}
 
 	public static Member create(String avatarUrl, String email, String loginId) {
@@ -61,24 +60,40 @@ public class Member {
 	}
 
 	public void addItem(Item item) {
-		if (item != null && item.getMember() != this) {
-			item.setMember(this);
+		if (item == null) {
+			return;
 		}
-		if (item != null && !items.contains(item)) {
+		if (!containsItem(item)) {
 			items.add(item);
 		}
+		item.changeMember(this);
 	}
 
 	public void addMemberTown(MemberTown town) {
-		if (town != null && !towns.contains(town)) {
+		if (town == null) {
+			return;
+		}
+		if (!containsTown(town)) {
 			towns.add(town);
 		}
 	}
 
 	public void addChatRoom(ChatRoom chatRoom) {
-		if (chatRoom != null && !chatRooms.contains(chatRoom)) {
+		if (chatRoom == null) {
+			return;
+		}
+		if (!containsChatRoom(chatRoom)) {
 			chatRooms.add(chatRoom);
 		}
+		chatRoom.changeMember(this);
+	}
+
+	public void changeAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
+	}
+
+	private boolean containsTown(MemberTown town) {
+		return towns.contains(town);
 	}
 
 	public String createRedisKey() {
@@ -93,8 +108,12 @@ public class Member {
 		return claims;
 	}
 
-	public void setAvatarUrl(String avatarUrl) {
-		this.avatarUrl = avatarUrl;
+	public boolean containsChatRoom(ChatRoom chatRoom) {
+		return chatRooms.contains(chatRoom);
+	}
+
+	public boolean containsItem(Item item) {
+		return items.contains(item);
 	}
 
 	public boolean equalId(Long memberId) {

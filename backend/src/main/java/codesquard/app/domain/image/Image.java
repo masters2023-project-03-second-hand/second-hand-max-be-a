@@ -36,14 +36,21 @@ public class Image {
 		this.imageUrl = imageUrl;
 	}
 
-	public void setItem(Item item) {
-		this.item = item;
-		if (!item.getImages().contains(this)) {
-			item.addImage(this);
-		}
-	}
-
 	public static Image create(String imageUrl) {
 		return new Image(imageUrl);
+	}
+
+	public void changeItem(Item item) {
+		this.item = item;
+		addImageBy(item);
+	}
+
+	private void addImageBy(Item item) {
+		if (item == null) {
+			return;
+		}
+		if (!item.containsImage(this)) {
+			item.addImage(this);
+		}
 	}
 }

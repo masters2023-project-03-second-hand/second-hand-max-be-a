@@ -33,10 +33,10 @@ public class ChatRoom {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private LocalDateTime createdAt;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_id")
 	private Item item;
 
@@ -51,30 +51,49 @@ public class ChatRoom {
 		return new ChatRoom(createdAt);
 	}
 
-	public void setMember(Member member) {
+	public void changeMember(Member member) {
 		this.member = member;
-		if (member != null && !member.getChatRooms().contains(this)) {
+		addChatRoomBy(member);
+	}
+
+	private void addChatRoomBy(Member member) {
+		if (member == null) {
+			return;
+		}
+		if (!member.containsChatRoom(this)) {
 			member.addChatRoom(this);
 		}
 	}
 
-	public void setItem(Item item) {
+	public void changeItem(Item item) {
 		this.item = item;
-		if (item != null && !item.getChatRooms().contains(this)) {
+		addChatRoomBy(item);
+	}
+
+	private void addChatRoomBy(Item item) {
+		if (item == null) {
+			return;
+		}
+		if (!item.containsChatRoom(this)) {
 			item.addChatRoom(this);
 		}
 	}
 
 	public void addChatLog(ChatLog chatLog) {
-		if (chatLog != null && !chatLogs.contains(chatLog)) {
+		if (chatLog == null) {
+			return;
+		}
+		if (!containsChatLog(chatLog)) {
 			chatLogs.add(chatLog);
 		}
-		if (chatLog != null) {
-			chatLog.setChatRoom(this);
-		}
+		chatLog.changeChatRoom(this);
 	}
 
-	public int getChatLogsSize() {
+	public int sizeChatLogs() {
 		return chatLogs.size();
+	}
+
+	public boolean containsChatLog(ChatLog chatLog) {
+		return chatLogs.contains(chatLog);
 	}
 }

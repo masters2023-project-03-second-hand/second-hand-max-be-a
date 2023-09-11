@@ -2,6 +2,7 @@ package codesquard.app.api.oauth;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -52,23 +53,19 @@ public class OauthService {
 		String authorizationCode) {
 		log.info("{}, provider : {}, authorizationCode : {}", request, provider,
 			authorizationCode);
+		Optional<MultipartFile> optionalProfile = Optional.ofNullable(profile);
 
 		validateDuplicateLoginId(request.getLoginId());
 
 		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, authorizationCode);
 
-		validateMultipleSignUp(userProfileResponse.getEmail());
-
-		String avatarUrl = null;
-		if (profile == null) {
-			avatarUrl = userProfileResponse.getProfileImage();
-		} else {
-			avatarUrl = imageService.uploadImage(profile);
-		}
-		log.debug(avatarUrl);
-
+    validateMultipleSignUp(userProfileResponse.getEmail());
+    
+		String avatarUrl = optionalProfile.map(imageService::uploadImage)
+			.orElse(userProfileResponse.getProfileImage());
+		log.debug("회원 가입 서비스에서 생성한 아바타 주소 : {}", avatarUrl);
+		
 		Member member = request.toEntity(avatarUrl, userProfileResponse.getEmail());
-
 		Member saveMember = memberRepository.save(member);
 
 		return OauthSignUpResponse.from(saveMember);
@@ -105,10 +102,10 @@ public class OauthService {
 		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, code);
 
 		Member member = getLoginMember(request, userProfileResponse);
-		log.debug("{}", member);
+		log.debug("로그인 서비스 요청 중 회원 객체 생성 : {}", member);
 
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
-		log.debug("{}", jwt);
+		log.debug("로그인 서비스 요청 중 jwt 객체 생성 : {}", jwt);
 
 		// key: "RT:" + email, value : 리프레쉬 토큰값
 		redisTemplate.opsForValue().set(member.createRedisKey(),

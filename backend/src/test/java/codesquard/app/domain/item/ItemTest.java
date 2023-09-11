@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,18 +23,6 @@ import codesquard.app.domain.wish.Wish;
 
 class ItemTest extends IntegrationTestSupport {
 
-	@BeforeEach
-	void cleanup() {
-		chatLogRepository.deleteAllInBatch();
-		chatRoomRepository.deleteAllInBatch();
-		wishRepository.deleteAllInBatch();
-		imageRepository.deleteAllInBatch();
-		itemRepository.deleteAllInBatch();
-		categoryRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
-		memberTownRepository.deleteAllInBatch();
-	}
-
 	@DisplayName("상품에 회원을 설정한다")
 	@Test
 	public void setMember() {
@@ -49,7 +36,7 @@ class ItemTest extends IntegrationTestSupport {
 		Item item = ItemFixedFactory.createFixedItem(null, category, new ArrayList<>(), new ArrayList<>(), 0L);
 
 		// when
-		item.setMember(member);
+		item.changeMember(member);
 
 		// then
 		Item saveItem = itemRepository.save(item);
@@ -73,7 +60,7 @@ class ItemTest extends IntegrationTestSupport {
 		Item item = ItemFixedFactory.createFixedItem(member, null, new ArrayList<>(), new ArrayList<>(), 0L);
 
 		// when
-		item.setCategory(category);
+		item.changeCategory(category);
 
 		// then
 		Item saveItem = itemRepository.save(item);
@@ -150,7 +137,7 @@ class ItemTest extends IntegrationTestSupport {
 		Item saveItem = itemRepository.save(item);
 
 		// when
-		int sum = saveItem.getTotalChatLogCount();
+		int sum = saveItem.countTotalChatLog();
 
 		// then
 		Assertions.assertThat(sum).isZero();
