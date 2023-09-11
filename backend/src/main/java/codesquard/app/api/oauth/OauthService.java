@@ -23,7 +23,6 @@ import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthLoginMemberResponse;
 import codesquard.app.api.oauth.response.OauthLoginResponse;
-import codesquard.app.api.oauth.response.OauthLogoutResponse;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
@@ -33,7 +32,6 @@ import codesquard.app.domain.member.Member;
 import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
-import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -115,18 +113,27 @@ public class OauthService {
 			.orElseThrow(() -> new RestApiException(OauthErrorCode.FAIL_LOGIN));
 	}
 
-	public OauthLogoutResponse logout(OauthLogoutRequest request) {
-		log.info("{}", request);
-		Principal principal = request.getPrincipal();
+	public void logout(OauthLogoutRequest request) {
+		log.info("로그아웃 서비스 요청 : {}", request);
+		String accessToken = request.getAccessToken();
+		String refreshToken = request.getRefreshToken();
 
-		if (redisTemplate.opsForValue().get(principal.createRedisKey()) != null) {
-			// RefreshToken 삭제
-			redisTemplate.delete(principal.createRedisKey());
+		deleteRefreshTokenBy(refreshToken);
+		registerAccessTokenToBlackList(accessToken);
+	}
+
+	private void deleteRefreshTokenBy(String refreshToken) {
+		String email = findEmailByRefreshToken(refreshToken);
+		redisTemplate.delete(String.format("RT:%s", email));
+	}
+
+	private void registerAccessTokenToBlackList(String accessToken) {
+		try {
+			long expiration = ((Integer)jwtProvider.getClaims(accessToken).get("exp")).longValue();
+			redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+		} catch (RestApiException e) {
+			log.error("액세스 토큰 에러 : {}", e.getMessage());
 		}
-		// 해당 액세스 토큰 유효시간을 가지고 와서 블랙리스트에 저장하기
-		long expiration = request.getPrincipal().getExpireDateAccessToken();
-		redisTemplate.opsForValue().set(principal.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
-		return OauthLogoutResponse.from(principal);
 	}
 
 	public OauthRefreshResponse refreshAccessToken(OauthRefreshRequest request, LocalDateTime now) {
@@ -154,6 +161,6 @@ public class OauthService {
 			.filter(key -> Objects.equals(redisTemplate.opsForValue().get(key), refreshToken))
 			.findAny()
 			.map(email -> email.replace("RT:", ""))
-			.orElseThrow(() -> new RestApiException(JwtTokenErrorCode.INVALID_TOKEN));
+			.orElse(null);
 	}
 }

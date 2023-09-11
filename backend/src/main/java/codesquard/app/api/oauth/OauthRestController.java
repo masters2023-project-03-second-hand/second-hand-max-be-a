@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,10 +65,9 @@ public class OauthRestController {
 	}
 
 	@PostMapping(value = "/logout")
-	public ApiResponse<Void> logout(@AuthPrincipal Principal principal) {
-		log.info("{}", principal);
-		OauthLogoutRequest request = OauthLogoutRequest.create(principal);
-		oauthService.logout(request);
+	public ApiResponse<Void> logout(@RequestAttribute String accessToken, @RequestBody String refreshToken) {
+		log.info("로그아웃 요청 입력 : accessToken={}, refreshToken={}", accessToken, refreshToken);
+		oauthService.logout(OauthLogoutRequest.create(accessToken, refreshToken));
 		return ApiResponse.ok("로그아웃에 성공하였습니다.", null);
 	}
 
