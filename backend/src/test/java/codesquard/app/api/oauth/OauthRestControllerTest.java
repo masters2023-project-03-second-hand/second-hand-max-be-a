@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,12 +32,10 @@ import codesquard.app.api.errors.handler.GlobalExceptionHandler;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.domain.jwt.Jwt;
-import codesquard.app.domain.member.AuthenticateMember;
-import codesquard.app.domain.member.Member;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.filter.JwtAuthorizationFilter;
-import io.jsonwebtoken.Claims;
+import codesquard.app.interceptor.LogoutInterceptor;
 
 class OauthRestControllerTest extends ControllerTestSupport {
 
@@ -53,6 +52,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		mockMvc = MockMvcBuilders.standaloneSetup(new OauthRestController(oauthService))
 			.setControllerAdvice(new GlobalExceptionHandler())
 			.addFilter(new JwtAuthorizationFilter(jwtProvider, authenticationContext))
+			.addMappedInterceptors(new String[] {"/api/auth/logout"}, new LogoutInterceptor())
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
 			.alwaysDo(print())
 			.build();
@@ -127,24 +127,13 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@Test
 	public void logout() throws Exception {
 		// given
-		String avatarUrl = "avatarUrlValue";
-		String loginId = "23Yong";
-		String email = "23Yong@gmail.com";
-		Member member = Member.create(avatarUrl, email, loginId);
-		AuthenticateMember authMember = AuthenticateMember.from(member);
-
-		Claims claims = mock(Claims.class);
-		String authMemberJson = objectMapper.writeValueAsString(authMember);
-
-		// mocking
-		when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-		when(valueOperations.get(anyString())).thenReturn(null);
-		when(jwtProvider.getClaims(anyString())).thenReturn(claims);
-		when(claims.get(anyString(), any())).thenReturn(authMemberJson);
 
 		// when & then
 		mockMvc.perform(post("/api/auth/logout")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer accessTokenValue")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString("refreshTokenValue"))
+				.characterEncoding(StandardCharsets.UTF_8)
 			)
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(200)))

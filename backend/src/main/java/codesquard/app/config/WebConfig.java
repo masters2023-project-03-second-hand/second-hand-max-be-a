@@ -6,12 +6,14 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.AuthenticationContext;
 import codesquard.app.filter.JwtAuthorizationFilter;
+import codesquard.app.interceptor.LogoutInterceptor;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -23,6 +25,13 @@ public class WebConfig implements WebMvcConfigurer {
 	private final JwtProvider jwtProvider;
 
 	private final AuthenticationContext authenticationContext;
+
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(new LogoutInterceptor())
+			.excludePathPatterns("/api/*")
+			.addPathPatterns("/api/auth/logout");
+	}
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {

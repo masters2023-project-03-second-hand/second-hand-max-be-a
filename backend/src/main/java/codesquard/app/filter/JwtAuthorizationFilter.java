@@ -25,11 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-	private static final String AUTHORIZATION = "Authorization";
-	private static final String BEARER = "Bearer";
+	public static final String AUTHORIZATION = "Authorization";
+	public static final String BEARER = "Bearer";
 	private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 	private static final List<String> excludeUrlPatterns = List.of("/api/auth/**/signup", "/api/auth/**/login",
-		"/api/auth/token");
+		"/api/auth/logout", "/api/auth/token");
 	private final JwtProvider jwtProvider;
 	private final AuthenticationContext authenticationContext;
 

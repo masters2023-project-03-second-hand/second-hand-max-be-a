@@ -31,7 +31,6 @@ import codesquard.app.api.oauth.request.OauthRefreshRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthLoginResponse;
-import codesquard.app.api.oauth.response.OauthLogoutResponse;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
@@ -41,7 +40,6 @@ import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
-import codesquard.app.domain.oauth.support.Principal;
 
 class OauthServiceTest extends IntegrationTestSupport {
 
@@ -274,21 +272,57 @@ class OauthServiceTest extends IntegrationTestSupport {
 	public void logout() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		Member saveMember = memberRepository.save(member);
 		LocalDateTime now = createNow();
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
-		Principal principal = jwtProvider.extractPrincipal(jwt.getAccessToken());
-		OauthLogoutRequest request = OauthLogoutRequest.create(principal);
+		OauthLogoutRequest request = OauthLogoutRequest.create(jwt.getAccessToken(), jwt.getRefreshToken());
 
 		// when
-		OauthLogoutResponse response = oauthService.logout(request);
+		oauthService.logout(request);
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(response)
-				.extracting("id", "email")
-				.contains(saveMember.getId(), "dragonbead95@naver.com");
-			softAssertions.assertThat(redisTemplate.opsForValue().get(principal.getAccessToken())).isEqualTo("logout");
+			softAssertions.assertThat(redisTemplate.opsForValue().get(jwt.getAccessToken())).isEqualTo("logout");
+			softAssertions.assertAll();
+		});
+	}
+
+	@DisplayName("만료된 액세스 토큰을 가지고 로그아웃을 요청하면 블랙리스트에 추가하지 않는다")
+	@Test
+	public void logoutWithExpireAccessToken() {
+		// given
+		Member member = OauthFixedFactory.createFixedMember();
+		LocalDateTime now = LocalDateTime.now().minusMinutes(5);
+		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
+		OauthLogoutRequest request = OauthLogoutRequest.create(jwt.getAccessToken(), jwt.getRefreshToken());
+
+		// when
+		oauthService.logout(request);
+
+		// then
+		SoftAssertions.assertSoftly(softAssertions -> {
+			softAssertions.assertThat(redisTemplate.opsForValue().get(jwt.getAccessToken())).isNull();
+			softAssertions.assertAll();
+		});
+	}
+
+	@DisplayName("만료된 리프레쉬 토큰을 가지고 로그아웃을 요청하면 이미 만료되어 아무 처리도 하지 않는다")
+	@Test
+	public void logoutWithExpireRefreshToken() {
+		// given
+		Member member = OauthFixedFactory.createFixedMember();
+		LocalDateTime now = createNow().minusHours(10);
+		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
+		OauthLogoutRequest request = OauthLogoutRequest.create(jwt.getAccessToken(), jwt.getRefreshToken());
+
+		redisTemplate.opsForValue()
+			.set(member.createRedisKey(), jwt.getRefreshToken(),
+				jwt.getExpireDateRefreshTokenTime(), TimeUnit.MILLISECONDS);
+		// when
+		oauthService.logout(request);
+
+		// then
+		SoftAssertions.assertSoftly(softAssertions -> {
+			softAssertions.assertThat(redisTemplate.opsForValue().get(member.createRedisKey())).isNull();
 			softAssertions.assertAll();
 		});
 	}
