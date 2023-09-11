@@ -26,7 +26,7 @@ public class WishItemService {
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		item.wishRegister();
-		wishRepository.save(Wish.create(memberId, itemId));
+		wishRepository.save(new Wish(memberId, itemId));
 	}
 
 	@Transactional
