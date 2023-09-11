@@ -67,7 +67,6 @@ public class LogoutFilter extends OncePerRequestFilter {
 		if (Objects.equals(redisTemplate.opsForValue().get(token), "logout")) {
 			throw new RestApiException(OauthErrorCode.ALREADY_LOGOUT);
 		}
-		log.debug("이미 로그아웃 검증 통과 : {}", token);
 	}
 
 	private Optional<String> extractJwt(HttpServletRequest request) {

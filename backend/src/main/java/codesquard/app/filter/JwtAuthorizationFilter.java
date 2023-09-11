@@ -57,8 +57,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		}
 		try {
 			String token = extractJwt(request).orElseThrow(() -> new RestApiException(JwtTokenErrorCode.EMPTY_TOKEN));
-			validateAlreadyLogout(token);
 			jwtProvider.validateToken(token);
+			validateAlreadyLogout(token);
 			authenticationContext.setPrincipal(jwtProvider.extractPrincipal(token));
 		} catch (RestApiException e) {
 			setErrorResponse(response, e.getErrorCode());
@@ -80,9 +80,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 	private void validateAlreadyLogout(String token) {
 		if (Objects.equals(redisTemplate.opsForValue().get(token), "logout")) {
-			throw new RestApiException(OauthErrorCode.ALREADY_LOGOUT);
+			throw new RestApiException(OauthErrorCode.NOT_LOGIN_STATE);
 		}
-		log.debug("이미 로그아웃 검증 통과 : {}", token);
 	}
 
 	private void setErrorResponse(HttpServletResponse httpServletResponse, ErrorCode errorCode) throws IOException {
