@@ -8,14 +8,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthRefreshResponse {
-	private Jwt jwt;
+	private OauthJwtResponse jwt;
 
-	private OauthRefreshResponse(Jwt jwt) {
+	private OauthRefreshResponse(OauthJwtResponse jwt) {
 		this.jwt = jwt;
 	}
 
 	public static OauthRefreshResponse create(Jwt jwt) {
-		return new OauthRefreshResponse(jwt);
+		return new OauthRefreshResponse(OauthJwtResponse.create(jwt));
 	}
 
 	@Override

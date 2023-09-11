@@ -13,7 +13,9 @@ public class Jwt {
 
 	private String accessToken;
 	private String refreshToken;
+	@JsonIgnore
 	private Date expireDateAccessToken;
+	@JsonIgnore
 	private Date expireDateRefreshToken;
 
 	private Jwt() {
@@ -32,13 +34,7 @@ public class Jwt {
 		return new Jwt(accessToken, refreshToken, expireDateAccessToken, expireDateRefreshToken);
 	}
 
-	@JsonIgnore
-	public long getExpireDateAccessTokenTime() {
-		return expireDateAccessToken.getTime();
-	}
-
-	@JsonIgnore
-	public long getExpireDateRefreshTokenTime() {
+	public long convertExpireDateRefreshTokenTimeWithLong() {
 		return expireDateRefreshToken.getTime();
 	}
 }
