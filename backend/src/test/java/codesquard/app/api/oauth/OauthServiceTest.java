@@ -95,7 +95,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		});
 	}
 
-	@DisplayName("중복됝 로그인 아이디로 회원가입을 할 수 없다")
+	@DisplayName("중복된 로그인 아이디로 회원가입을 할 수 없다")
 	@Test
 	public void signupWithDuplicateLoginId() throws IOException {
 		// given
@@ -125,7 +125,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createOauthSignUpRequest("bruni", List.of("가락 1동"));
+		OauthSignUpRequest request = createOauthSignUpRequest("bruni2", List.of("가락 1동"));
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
 
@@ -316,7 +316,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		redisTemplate.opsForValue()
 			.set(member.createRedisKey(), jwt.getRefreshToken(),
-				jwt.getExpireDateRefreshTokenTime(), TimeUnit.MILLISECONDS);
+				jwt.getExpireDateRefreshToken().getTime(), TimeUnit.MILLISECONDS);
 		// when
 		oauthService.logout(request);
 
@@ -326,7 +326,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 			softAssertions.assertAll();
 		});
 	}
-
+	
 	@DisplayName("리프레쉬 토큰을 가지고 액세스 토큰을 갱신한다")
 	@Test
 	public void refreshAccessToken() {
