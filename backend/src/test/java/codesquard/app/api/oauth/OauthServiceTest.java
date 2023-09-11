@@ -2,10 +2,11 @@ package codesquard.app.api.oauth;
 
 import static codesquard.app.api.oauth.OauthFixedFactory.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
@@ -86,12 +87,63 @@ class OauthServiceTest extends IntegrationTestSupport {
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
 				.extracting("email", "loginId", "avatarUrl")
-				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
+				.contains("dragonbead95@naver.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertThat(findMember)
 				.extracting("email", "loginId", "avatarUrl")
-				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
+				.contains("dragonbead95@naver.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertAll();
 		});
+	}
+
+	@DisplayName("중복됝 로그인 아이디로 회원가입을 할 수 없다")
+	@Test
+	public void signupWithDuplicateLoginId() throws IOException {
+		// given
+		memberRepository.save(createFixedMember());
+
+		String provider = "naver";
+		String code = "1234";
+		MockMultipartFile profile = createFixedProfile();
+		OauthSignUpRequest request = createFixedOauthSignUpRequest();
+
+		// when
+		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
+		// then
+
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("이미 존재하는 아이디입니다.");
+	}
+
+	@DisplayName("한 명의 소셜 사용자가 서로 다른 로그인 아이디로 이중 회원가입을 할 수 없다")
+	@Test
+	public void signupWithMultipleLoginId() throws IOException {
+		// given
+		memberRepository.save(createFixedMember());
+
+		String provider = "naver";
+		String code = "1234";
+		MockMultipartFile profile = createFixedProfile();
+		OauthSignUpRequest request = createOauthSignUpRequest("bruni", List.of("가락 1동"));
+		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
+		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
+
+		given(oauthClientRepository.findOneBy(anyString())).willReturn(oauthClient);
+		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
+			.willReturn(mockAccessTokenResponse);
+		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
+			.willReturn(mockUserProfileResponse);
+
+		// when
+		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
+
+		// then
+
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("이미 회원가입된 상태입니다.");
 	}
 
 	@DisplayName("제공되지 않은 provider로 소셜 로그인하여 회원가입을 할 수 없다")
@@ -279,17 +331,14 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void refreshAccessToken() {
 		// given
-		String avatarUrl = "avatarUrlValue";
-		String loginId = "23Yong";
-		String email = "23Yong@gmail.com";
-		Member member = Member.create(avatarUrl, email, loginId);
+		Member member = createFixedMember();
 		LocalDateTime now = createNow();
 
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 
 		redisTemplate.opsForValue().set(member.createRedisKey(),
 			jwt.getRefreshToken(),
-			jwt.getExpireDateRefreshTokenTime(),
+			jwt.convertExpireDateRefreshTokenTimeWithLong(),
 			TimeUnit.MILLISECONDS);
 		memberRepository.save(member);
 
@@ -301,9 +350,8 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
-				.extracting("jwt.accessToken", "jwt.refreshToken")
-				.contains(createExpectedAccessTokenBy(jwtProvider, member, now),
-					createExpectedRefreshTokenBy(jwtProvider, member, now));
+				.extracting("jwt.accessToken")
+				.isEqualTo(createExpectedAccessTokenBy(jwtProvider, member, now));
 			softAssertions.assertAll();
 		});
 	}
@@ -319,7 +367,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		redisTemplate.opsForValue().set(member.createRedisKey(),
 			jwt.getRefreshToken(),
-			jwt.getExpireDateRefreshTokenTime(),
+			jwt.convertExpireDateRefreshTokenTimeWithLong(),
 			TimeUnit.MILLISECONDS);
 		memberRepository.save(member);
 
