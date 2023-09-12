@@ -1,14 +1,16 @@
 package codesquard.app.api.oauth;
 
 import static codesquard.app.api.oauth.OauthFixedFactory.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.http.HttpHeaders;
@@ -35,6 +37,7 @@ import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.filter.JwtAuthorizationFilter;
+import codesquard.app.filter.LogoutFilter;
 import codesquard.app.interceptor.LogoutInterceptor;
 
 class OauthRestControllerTest extends ControllerTestSupport {
@@ -42,7 +45,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	private MockMvc mockMvc;
 
 	@Mock
-	private ValueOperations<String, Object> valueOperations;
+	ValueOperations<String, Object> valueOperations;
 
 	@MockBean
 	private AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
@@ -51,7 +54,10 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	public void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(new OauthRestController(oauthService))
 			.setControllerAdvice(new GlobalExceptionHandler())
-			.addFilter(new JwtAuthorizationFilter(jwtProvider, authenticationContext))
+			.addFilters(
+				new JwtAuthorizationFilter(jwtProvider, authenticationContext, objectMapper, redisTemplate),
+				new LogoutFilter(redisTemplate, objectMapper)
+			)
 			.addMappedInterceptors(new String[] {"/api/auth/logout"}, new LogoutInterceptor())
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
 			.alwaysDo(print())
@@ -127,12 +133,16 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@Test
 	public void logout() throws Exception {
 		// given
+		Map<String, String> map = new HashMap<>();
+		map.put("refreshToken", "refreshTokenValue");
 
+		given(redisTemplate.opsForValue()).willReturn(valueOperations);
+		given(valueOperations.get(anyString())).willReturn(null);
 		// when & then
 		mockMvc.perform(post("/api/auth/logout")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer accessTokenValue")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString("refreshTokenValue"))
+				.content(objectMapper.writeValueAsString(map))
 				.characterEncoding(StandardCharsets.UTF_8)
 			)
 			.andExpect(status().isOk())
