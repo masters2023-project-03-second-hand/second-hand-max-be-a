@@ -84,4 +84,23 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 			.isEqualTo("회원이 가질 수 있는 개수(최대2개)를 초과하였습니다.");
 	}
 
+	@DisplayName("회원의 동네 추가시 이미 등록된 동네는 중복으로 추가할 수 없다")
+	@Test
+	public void addMemberTownWithDuplicateAddressName() {
+		// given
+		Member member = OauthFixedFactory.createFixedMember();
+		member.addMemberTown(MemberTown.create("신교동"));
+		Member saveMember = memberRepository.save(member);
+
+		Principal principal = Principal.from(saveMember);
+		MemberAddRegionRequest request = MemberAddRegionRequest.create("서울 종로구 신교동", "신교동");
+		// when
+		Throwable throwable = catchThrowable(() -> memberTownService.addMemberTown(principal, request));
+		// then
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("이미 존재하는 동네입니다.");
+	}
+
 }
