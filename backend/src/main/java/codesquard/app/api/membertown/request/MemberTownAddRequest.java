@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberAddRegionRequest {
+public class MemberTownAddRequest {
 
 	@NotBlank(message = "주소 정보는 필수 정보입니다.")
-	private String fullAddressName;
+	private String fullAddress;
 	@NotBlank(message = "주소 정보는 필수 정보입니다.")
-	private String addressName;
-	
-	public static MemberAddRegionRequest create(String fullAddressName, String addressName) {
-		return new MemberAddRegionRequest(fullAddressName, addressName);
+	private String address;
+
+	public static MemberTownAddRequest create(String fullAddressName, String addressName) {
+		return new MemberTownAddRequest(fullAddressName, addressName);
 	}
 }

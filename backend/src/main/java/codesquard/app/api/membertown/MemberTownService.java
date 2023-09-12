@@ -7,7 +7,7 @@ import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
 import codesquard.app.api.errors.errorcode.RegionErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
-import codesquard.app.api.membertown.request.MemberAddRegionRequest;
+import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
 import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
@@ -28,15 +28,15 @@ public class MemberTownService {
 	private final MemberRepository memberRepository;
 	private final RegionRepository regionRepository;
 
-	public MemberAddRegionResponse addMemberTown(Principal principal, MemberAddRegionRequest request) {
-		log.info("회원 동네 추가 서비스 요청 : 회원아이디={}, 추가할 동네이름={}", principal.getLoginId(), request.getAddressName());
+	public MemberAddRegionResponse addMemberTown(Principal principal, MemberTownAddRequest request) {
+		log.info("회원 동네 추가 서비스 요청 : 회원아이디={}, 추가할 동네이름={}", principal.getLoginId(), request.getAddress());
 
-		validateExistFullAddress(request.getFullAddressName());
-		validateContainsAddress(request.getFullAddressName(), request.getAddressName());
+		validateExistFullAddress(request.getFullAddress());
+		validateContainsAddress(request.getFullAddress(), request.getAddress());
 		validateDuplicateAddress(principal, request);
 
 		Member member = findMemberBy(principal);
-		MemberTown town = MemberTown.create(request.getAddressName());
+		MemberTown town = MemberTown.create(request.getAddress());
 
 		member.addMemberTown(town);
 		return MemberAddRegionResponse.create(town);
@@ -70,9 +70,9 @@ public class MemberTownService {
 		}
 	}
 
-	private void validateDuplicateAddress(Principal principal, MemberAddRegionRequest request) {
+	private void validateDuplicateAddress(Principal principal, MemberTownAddRequest request) {
 		Member member = findMemberBy(principal);
-		if (member.containsAddressName(request.getAddressName())) {
+		if (member.containsAddressName(request.getAddress())) {
 			throw new RestApiException(MemberTownErrorCode.ALREADY_ADDRESS_NAME);
 		}
 	}
