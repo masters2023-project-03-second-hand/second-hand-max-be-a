@@ -1,6 +1,7 @@
-package codesquard.app.domain.item;
+package codesquard.app.domain.wish;
 
 import static codesquard.app.domain.item.QItem.*;
+import static codesquard.app.domain.wish.QWish.*;
 
 import java.util.List;
 
@@ -16,11 +17,11 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Repository
-public class ItemPaginationRepository extends PaginationUtils {
+public class WishPaginationRepository extends PaginationUtils {
 
 	private final JPAQueryFactory queryFactory;
 
-	public Slice<ItemResponse> findByIdAndRegion(Long itemId, String region, int size, Long categoryId) {
+	public Slice<ItemResponse> findAll(Long categoryId, int size, Long cursor) {
 		List<ItemResponse> itemResponses = queryFactory.select(Projections.fields(ItemResponse.class,
 				item.id.as("itemId"),
 				item.thumbnailUrl,
@@ -31,12 +32,12 @@ public class ItemPaginationRepository extends PaginationUtils {
 				item.status,
 				item.wishCount,
 				item.chatCount))
-			.from(item)
-			.where(lessThanItemId(itemId),
-				equalCategoryId(categoryId),
-				equalTradingRegion(region)
-			)
-			.orderBy(item.createdAt.desc())
+			.from(wish)
+			.join(wish.item, item)
+			.on(wish.item.id.eq(item.id))
+			.where(lessThanItemId(cursor),
+				equalCategoryId(categoryId))
+			.orderBy(wish.createdAt.desc())
 			.limit(size + 1)
 			.fetch();
 		return checkLastPage(size, itemResponses);

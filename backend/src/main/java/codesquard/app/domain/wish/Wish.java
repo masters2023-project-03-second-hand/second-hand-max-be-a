@@ -36,7 +36,7 @@ public class Wish {
 	private Item item;
 	private LocalDateTime createdAt;
 
-	private Wish(Long memberId, Long itemId) {
+	public Wish(Long memberId, Long itemId) {
 		this.member = new Member(memberId);
 		this.item = new Item(itemId);
 		this.createdAt = LocalDateTime.now();
