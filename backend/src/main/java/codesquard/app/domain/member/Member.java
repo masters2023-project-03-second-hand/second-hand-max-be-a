@@ -88,7 +88,7 @@ public class Member {
 
 	private void validateMaximumMemberTownSize() {
 		if (towns.size() >= MAXIMUM_MEMBER_TOWN_SIZE) {
-			log.error("회원이 추가할 수 있는 동내 개수 초과 에러, 현재 개수={}", towns.size());
+			log.error("회원이 추가할 수 있는 동네의 개수 초과 에러, 현재 개수={}", towns.size());
 			throw new RestApiException(MemberTownErrorCode.MAXIMUM_MEMBER_TOWN_SIZE);
 		}
 	}
