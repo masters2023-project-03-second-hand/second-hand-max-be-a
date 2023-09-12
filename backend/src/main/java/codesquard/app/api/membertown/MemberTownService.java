@@ -31,12 +31,15 @@ public class MemberTownService {
 	public MemberAddRegionResponse addMemberTown(Principal principal, MemberTownAddRequest request) {
 		log.info("회원 동네 추가 서비스 요청 : 회원아이디={}, 추가할 동네이름={}", principal.getLoginId(), request.getAddress());
 
-		validateExistFullAddress(request.getFullAddress());
-		validateContainsAddress(request.getFullAddress(), request.getAddress());
+		String fullAddress = request.getFullAddress();
+		String address = request.getAddress();
+
+		validateExistFullAddress(fullAddress);
+		validateContainsAddress(fullAddress, address);
 		validateDuplicateAddress(principal, request);
 
 		Member member = findMemberBy(principal);
-		MemberTown town = MemberTown.create(request.getAddress());
+		MemberTown town = MemberTown.create(address);
 
 		member.addMemberTown(town);
 		return MemberAddRegionResponse.create(town);
