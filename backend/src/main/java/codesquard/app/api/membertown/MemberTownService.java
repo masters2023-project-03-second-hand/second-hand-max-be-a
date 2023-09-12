@@ -24,8 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class MemberTownService {
 
-	private static final int MAXIMUM_MEMBER_TOWN_SIZE = 2;
-
 	private final MemberRepository memberRepository;
 	private final MemberTownRepository memberTownRepository;
 	private final RegionRepository regionRepository;
@@ -33,7 +31,7 @@ public class MemberTownService {
 	public MemberAddRegionResponse addMemberTown(Principal principal, MemberAddRegionRequest request) {
 		validateExistFullAddress(request);
 		validateContainsAddress(request);
-		validateMaximumMemberTownSize(principal);
+		validateDuplicateAddress(principal, request);
 
 		Member member = memberRepository.findById(principal.getMemberId())
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
@@ -55,11 +53,11 @@ public class MemberTownService {
 		}
 	}
 
-	private void validateMaximumMemberTownSize(Principal principal) {
-		int currentMemberTownSize = memberTownRepository.countMemberTownById(principal.getMemberId());
-		log.debug("현재 등록된 회원 동네 개수 : {}", currentMemberTownSize);
-		if (currentMemberTownSize >= MAXIMUM_MEMBER_TOWN_SIZE) {
-			throw new RestApiException(MemberTownErrorCode.MAXIMUM_MEMBER_TOWN_SIZE);
+	private void validateDuplicateAddress(Principal principal, MemberAddRegionRequest request) {
+		Member member = memberRepository.findById(principal.getMemberId())
+			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
+		if (member.containsAddressName(request.getAddressName())) {
+			throw new RestApiException(MemberTownErrorCode.ALREADY_ADDRESS_NAME);
 		}
 	}
 }

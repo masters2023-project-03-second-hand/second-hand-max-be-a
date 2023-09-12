@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 public enum MemberTownErrorCode implements ErrorCode {
 
-	MAXIMUM_MEMBER_TOWN_SIZE(HttpStatus.CONFLICT, "회원이 가질 수 있는 개수(최대2개)를 초과하였습니다.");
+	MAXIMUM_MEMBER_TOWN_SIZE(HttpStatus.BAD_REQUEST, "회원이 가질 수 있는 개수(최대2개)를 초과하였습니다."),
+	ALREADY_ADDRESS_NAME(HttpStatus.CONFLICT, "이미 존재하는 동네입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
