@@ -57,12 +57,12 @@ public class OauthService {
 
 		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, authorizationCode);
 
-    validateMultipleSignUp(userProfileResponse.getEmail());
-    
+		validateMultipleSignUp(userProfileResponse.getEmail());
+
 		String avatarUrl = optionalProfile.map(imageService::uploadImage)
 			.orElse(userProfileResponse.getProfileImage());
 		log.debug("회원 가입 서비스에서 생성한 아바타 주소 : {}", avatarUrl);
-		
+
 		Member member = request.toEntity(avatarUrl, userProfileResponse.getEmail());
 		Member saveMember = memberRepository.save(member);
 
@@ -151,9 +151,10 @@ public class OauthService {
 		log.debug("refreshToken is valid token : {}", refreshToken);
 
 		String email = findEmailByRefreshToken(refreshToken);
+		log.debug("findEmailByRefreshToken 결과 : email={}", email);
 		Member member = memberRepository.findMemberByEmail(email)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
-		log.debug("{}", member);
+		log.debug("findMemberByEmail 결과 : member={}", member);
 
 		Jwt jwt = jwtProvider.createJwtWithRefreshTokenBasedOnMember(member, refreshToken, now);
 

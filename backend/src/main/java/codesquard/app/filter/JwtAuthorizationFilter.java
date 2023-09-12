@@ -35,8 +35,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	public static final String AUTHORIZATION = "Authorization";
 	public static final String BEARER = "Bearer";
 	private static final AntPathMatcher pathMatcher = new AntPathMatcher();
-	private static final List<String> excludeUrlPatterns = List.of("/api/auth/**/signup", "/api/auth/**/login",
-		"/api/auth/logout", "/api/auth/token");
+	private static final List<String> excludeUrlPatterns = List.of(
+		"/api/auth/**/signup",
+		"/api/auth/**/login",
+		"/api/auth/token",
+		"/api/auth/logout",
+		"/api/categories");
 	private final JwtProvider jwtProvider;
 	private final AuthenticationContext authenticationContext;
 	private final ObjectMapper objectMapper;
@@ -44,6 +48,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
+		if (pathMatcher.match("/api/regions", request.getRequestURI())
+			&& Objects.equals("GET", request.getMethod())) {
+			return true;
+		}
+		if (pathMatcher.match("/api/items", request.getRequestURI())
+			&& Objects.equals("GET", request.getMethod())) {
+			return true;
+		}
 		return excludeUrlPatterns.stream()
 			.anyMatch(pattern -> pathMatcher.match(pattern, request.getRequestURI()));
 	}
