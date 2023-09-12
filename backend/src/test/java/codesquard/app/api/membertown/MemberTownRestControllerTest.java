@@ -95,9 +95,8 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("statusCode").value(equalTo(400)))
 			.andExpect(jsonPath("message").value(equalTo("유효하지 않은 입력형식입니다.")))
-			.andExpect(jsonPath("data[0].field").value(equalTo("fullAddress")))
-			.andExpect(jsonPath("data[0].defaultMessage").value(equalTo("주소 정보는 필수 정보입니다.")))
-			.andExpect(jsonPath("data[1].field").value(equalTo("address")))
-			.andExpect(jsonPath("data[1].defaultMessage").value(equalTo("주소 정보는 필수 정보입니다.")));
+			.andExpect(jsonPath("data[*].field").value(containsInAnyOrder("fullAddress", "address")))
+			.andExpect(jsonPath("data[*].defaultMessage")
+				.value(containsInAnyOrder("주소 정보는 필수 정보입니다.", "주소 정보는 필수 정보입니다.")));
 	}
 }
