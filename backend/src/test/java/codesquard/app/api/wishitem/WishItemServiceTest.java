@@ -44,7 +44,7 @@ class WishItemServiceTest extends IntegrationTestSupport {
 		Item item1 = supportRepository.save(request.toEntity(member, "thumbnail"));
 
 		// when
-		wishItemService.register(item1.getId(), member.getId(), "yes");
+		wishItemService.register(item1.getId(), member.getId());
 
 		// then
 		Item item = em.find(Item.class, item1.getId());
@@ -61,7 +61,7 @@ class WishItemServiceTest extends IntegrationTestSupport {
 			"선풍기", 12000L, null, "가양 1동", "판매중", category.getId(), null);
 		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "piepie"));
 		Item saveItem = supportRepository.save(request1.toEntity(member, "thumbnail"));
-		wishItemService.register(saveItem.getId(), member.getId(), "yes");
+		wishItemService.register(saveItem.getId(), member.getId());
 
 		// when
 		wishItemService.cancel(saveItem.getId());
@@ -88,22 +88,23 @@ class WishItemServiceTest extends IntegrationTestSupport {
 		Item item1 = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		Item item2 = supportRepository.save(request2.toEntity(member, "thumb"));
 		Item item3 = supportRepository.save(request3.toEntity(member, "nail"));
-		wishItemService.register(item1.getId(), member.getId(), "yes");
-		wishItemService.register(item2.getId(), member.getId(), "yes");
-		wishItemService.register(item3.getId(), member.getId(), "yes");
+		wishItemService.register(item1.getId(), member.getId());
+		wishItemService.register(item2.getId(), member.getId());
+		wishItemService.register(item3.getId(), member.getId());
 
 		// when
-		ItemResponses responses = wishItemService.findAll(null, 2, null);
+		Long categoryId = null;
+		Long cursor = null;
+		ItemResponses responses = wishItemService.findAll(categoryId, 2, cursor);
 
 		// then
 		List<ItemResponse> contents = responses.getContents();
 		assertAll(
-			() -> assertThat(contents.size()).isEqualTo(2),
+			() -> assertThat(contents).hasSize(2),
 			() -> assertThat(contents.get(0).getTitle()).isEqualTo("노트북"),
 			() -> assertThat(responses.getPaging().isHasNext()).isTrue(),
 			() -> assertThat(responses.getPaging().getNextCursor()).isEqualTo(item2.getId())
 		);
-
 	}
 
 	@Test
@@ -124,15 +125,15 @@ class WishItemServiceTest extends IntegrationTestSupport {
 		Item item1 = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		Item item2 = supportRepository.save(request2.toEntity(member, "thumb"));
 		Item item3 = supportRepository.save(request3.toEntity(member, "nail"));
-		wishItemService.register(item1.getId(), member.getId(), "yes");
-		wishItemService.register(item2.getId(), member.getId(), "yes");
-		wishItemService.register(item3.getId(), member.getId(), "yes");
+		wishItemService.register(item1.getId(), member.getId());
+		wishItemService.register(item2.getId(), member.getId());
+		wishItemService.register(item3.getId(), member.getId());
 
 		// when
 		ItemResponses responses = wishItemService.findAll(category1.getId(), 10, null);
 
 		// then
-		assertThat(responses.getContents().size()).isEqualTo(2);
+		assertThat(responses.getContents()).hasSize(2);
 
 	}
 }

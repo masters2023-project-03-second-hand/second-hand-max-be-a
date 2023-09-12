@@ -12,12 +12,12 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import codesquard.app.api.response.ItemResponse;
-import codesquard.app.domain.pagination.Pagination;
+import codesquard.app.domain.pagination.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Repository
-public class WishPaginationRepository implements Pagination {
+public class WishPaginationRepository extends PaginationUtils {
 
 	private final JPAQueryFactory queryFactory;
 

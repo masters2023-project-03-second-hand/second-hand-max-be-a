@@ -5,10 +5,12 @@ import java.util.List;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import codesquard.app.api.converter.RequestConverter;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.AuthenticationContext;
@@ -21,10 +23,9 @@ import lombok.RequiredArgsConstructor;
 public class WebConfig implements WebMvcConfigurer {
 
 	private final AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
-
 	private final JwtProvider jwtProvider;
-
 	private final AuthenticationContext authenticationContext;
+	private final RequestConverter requestConverter;
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
@@ -45,5 +46,10 @@ public class WebConfig implements WebMvcConfigurer {
 		filterFilterRegistrationBean.setFilter(new JwtAuthorizationFilter(jwtProvider, authenticationContext));
 		filterFilterRegistrationBean.addUrlPatterns("/api/*");
 		return filterFilterRegistrationBean;
+	}
+
+	@Override
+	public void addFormatters(FormatterRegistry registry) {
+		registry.addConverter(new RequestConverter());
 	}
 }

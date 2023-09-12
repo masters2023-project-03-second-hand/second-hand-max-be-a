@@ -12,9 +12,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 
 import codesquard.app.api.response.ItemResponse;
 
-public interface Pagination {
+public class PaginationUtils {
 
-	default BooleanExpression lessThanItemId(Long itemId) {
+	public static BooleanExpression lessThanItemId(Long itemId) {
 		if (itemId == null) {
 			return null;
 		}
@@ -22,7 +22,7 @@ public interface Pagination {
 		return item.id.lt(itemId);
 	}
 
-	default BooleanExpression equalCategoryId(Long categoryId) {
+	public static BooleanExpression equalCategoryId(Long categoryId) {
 		if (categoryId == null) {
 			return null;
 		}
@@ -30,7 +30,7 @@ public interface Pagination {
 		return item.category.id.eq(categoryId);
 	}
 
-	default BooleanExpression equalTradingRegion(String region) {
+	public static BooleanExpression equalTradingRegion(String region) {
 		if (region == null) {
 			return null;
 		}
@@ -38,7 +38,7 @@ public interface Pagination {
 		return item.region.like(region + "%");
 	}
 
-	default Slice<ItemResponse> checkLastPage(int size, List<ItemResponse> results) {
+	public static Slice<ItemResponse> checkLastPage(int size, List<ItemResponse> results) {
 
 		boolean hasNext = false;
 
