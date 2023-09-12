@@ -28,8 +28,6 @@ import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.response.ApiResponse;
 import codesquard.app.config.ValidationSequence;
-import codesquard.app.domain.oauth.support.AuthPrincipal;
-import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -75,12 +73,11 @@ public class OauthRestController {
 
 	@ResponseStatus(OK)
 	@PostMapping("/token")
-	public ApiResponse<OauthRefreshResponse> refreshAccessToken(@AuthPrincipal Principal principal,
-		@RequestBody OauthRefreshRequest request) {
-		log.info("{}, {}", principal, request);
+	public ApiResponse<OauthRefreshResponse> refreshAccessToken(@RequestBody OauthRefreshRequest request) {
+		log.info("리프레시 토큰 API 요청 : {}", request);
 
 		OauthRefreshResponse response = oauthService.refreshAccessToken(request, LocalDateTime.now());
-		log.debug("{}", response);
+		log.debug("리프레시 토큰 API 응답 : {}", response);
 		return ApiResponse.ok("액세스 토큰 갱신에 성공하였습니다.", response);
 	}
 

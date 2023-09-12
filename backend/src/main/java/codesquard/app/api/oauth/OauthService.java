@@ -151,9 +151,10 @@ public class OauthService {
 		log.debug("refreshToken is valid token : {}", refreshToken);
 
 		String email = findEmailByRefreshToken(refreshToken);
+		log.debug("findEmailByRefreshToken 결과 : email={}", email);
 		Member member = memberRepository.findMemberByEmail(email)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
-		log.debug("{}", member);
+		log.debug("findMemberByEmail 결과 : member={}", member);
 
 		Jwt jwt = jwtProvider.createJwtWithRefreshTokenBasedOnMember(member, refreshToken, now);
 
