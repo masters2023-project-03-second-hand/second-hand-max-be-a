@@ -9,4 +9,13 @@ import lombok.NoArgsConstructor;
 public class MemberTownRemoveRequest {
 	private String fullAddress;
 	private String address;
+
+	private MemberTownRemoveRequest(String fullAddress, String address) {
+		this.fullAddress = fullAddress;
+		this.address = address;
+	}
+
+	public static MemberTownRemoveRequest create(String fullAddress, String address) {
+		return new MemberTownRemoveRequest(fullAddress, address);
+	}
 }

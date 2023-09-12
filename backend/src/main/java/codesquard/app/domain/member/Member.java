@@ -44,13 +44,13 @@ public class Member {
 	@Column(name = "login_id", nullable = false, unique = true)
 	private String loginId; // 닉네임
 
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	private List<MemberTown> towns = new ArrayList<>(); // 동네
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	private List<Item> items = new ArrayList<>(); // 회원이 등록한 상품
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	private List<ChatRoom> chatRooms = new ArrayList<>(); // 채팅방
 
 	public Member(Long id) {
@@ -139,10 +139,14 @@ public class Member {
 			.contains(addressName);
 	}
 
-	public boolean removeMemberTown(String addressName) {
+	public Long removeMemberTown(String addressName) {
 		MemberTown removeTown = validateUnRegisteredAddressName(addressName);
 		validateMinimumMemberTownSize();
-		return towns.remove(removeTown);
+		boolean result = towns.remove(removeTown);
+		if (!result) {
+			throw new RestApiException(MemberTownErrorCode.FAIL_REMOVE_ADDRESS);
+		}
+		return removeTown.getId();
 	}
 
 	private MemberTown validateUnRegisteredAddressName(String addressName) {
