@@ -95,7 +95,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		});
 	}
 
-	@DisplayName("중복됝 로그인 아이디로 회원가입을 할 수 없다")
+	@DisplayName("중복된 로그인 아이디로 회원가입을 할 수 없다")
 	@Test
 	public void signupWithDuplicateLoginId() throws IOException {
 		// given
@@ -316,7 +316,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		redisTemplate.opsForValue()
 			.set(member.createRedisKey(), jwt.getRefreshToken(),
-				jwt.getExpireDateRefreshTokenTime(), TimeUnit.MILLISECONDS);
+				jwt.getExpireDateRefreshToken().getTime(), TimeUnit.MILLISECONDS);
 		// when
 		oauthService.logout(request);
 
