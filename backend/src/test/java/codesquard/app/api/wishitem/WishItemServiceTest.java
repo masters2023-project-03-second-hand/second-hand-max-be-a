@@ -1,6 +1,9 @@
 package codesquard.app.api.wishitem;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -11,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.ItemRegisterRequest;
+import codesquard.app.api.response.ItemResponse;
 import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.item.Item;
@@ -89,10 +93,16 @@ class WishItemServiceTest extends IntegrationTestSupport {
 		wishItemService.register(item3.getId(), member.getId(), "yes");
 
 		// when
-		ItemResponses responses = wishItemService.findAll(null, 10, null);
+		ItemResponses responses = wishItemService.findAll(null, 2, null);
 
 		// then
-		assertThat(responses.getContents().size()).isEqualTo(3);
+		List<ItemResponse> contents = responses.getContents();
+		assertAll(
+			() -> assertThat(contents.size()).isEqualTo(2),
+			() -> assertThat(contents.get(0).getTitle()).isEqualTo("노트북"),
+			() -> assertThat(responses.getPaging().isHasNext()).isTrue(),
+			() -> assertThat(responses.getPaging().getNextCursor()).isEqualTo(item2.getId())
+		);
 
 	}
 
