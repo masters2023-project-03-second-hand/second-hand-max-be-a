@@ -8,7 +8,10 @@ import lombok.Getter;
 public enum MemberTownErrorCode implements ErrorCode {
 
 	MAXIMUM_MEMBER_TOWN_SIZE(HttpStatus.BAD_REQUEST, "회원이 가질 수 있는 개수(최대2개)를 초과하였습니다."),
-	ALREADY_ADDRESS_NAME(HttpStatus.CONFLICT, "이미 존재하는 동네입니다.");
+	MINIMUM_MEMBER_TOWN_SIZE(HttpStatus.BAD_REQUEST, "동네는 최소 1개 이상 선택해야 해요. 새로운 동네를 등록한 후 삭제해주세요."),
+	ALREADY_ADDRESS_NAME(HttpStatus.CONFLICT, "이미 존재하는 동네입니다."),
+	UNREGISTERED_ADDRESS_TO_REMOVE(HttpStatus.BAD_REQUEST, "등록되지 않은 동네를 삭제할 수 없습니다."),
+	FAIL_REMOVE_ADDRESS(HttpStatus.INTERNAL_SERVER_ERROR, "동네 삭제를 실패하였습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;

@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Member {
 
 	private static final int MAXIMUM_MEMBER_TOWN_SIZE = 2;
+	private static final int MINIMUM_MEMBER_TOWN_SIZE = 1;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -138,6 +139,25 @@ public class Member {
 			.contains(addressName);
 	}
 
+	public boolean removeMemberTown(String addressName) {
+		MemberTown removeTown = validateUnRegisteredAddressName(addressName);
+		validateMinimumMemberTownSize();
+		return towns.remove(removeTown);
+	}
+
+	private MemberTown validateUnRegisteredAddressName(String addressName) {
+		return towns.stream()
+			.filter(town -> Objects.equals(town.getName(), addressName))
+			.findAny()
+			.orElseThrow(() -> new RestApiException(MemberTownErrorCode.UNREGISTERED_ADDRESS_TO_REMOVE));
+	}
+
+	private void validateMinimumMemberTownSize() {
+		if (towns.size() <= MINIMUM_MEMBER_TOWN_SIZE) {
+			throw new RestApiException(MemberTownErrorCode.MINIMUM_MEMBER_TOWN_SIZE);
+		}
+	}
+
 	public boolean equalId(Long memberId) {
 		return Objects.equals(id, memberId);
 	}
@@ -147,4 +167,5 @@ public class Member {
 		return String.format("%s, %s(id=%d, email=%s, loginId=%s)", "회원", this.getClass().getSimpleName(), id, email,
 			loginId);
 	}
+
 }

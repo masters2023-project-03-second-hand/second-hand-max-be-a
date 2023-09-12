@@ -8,6 +8,7 @@ import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
 import codesquard.app.api.errors.errorcode.RegionErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.membertown.request.MemberAddRegionRequest;
+import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.member.MemberRepository;
@@ -29,8 +30,8 @@ public class MemberTownService {
 	private final RegionRepository regionRepository;
 
 	public MemberAddRegionResponse addMemberTown(Principal principal, MemberAddRegionRequest request) {
-		validateExistFullAddress(request);
-		validateContainsAddress(request);
+		validateExistFullAddress(request.getFullAddressName());
+		validateContainsAddress(request.getFullAddressName(), request.getAddressName());
 		validateDuplicateAddress(principal, request);
 
 		Member member = memberRepository.findById(principal.getMemberId())
@@ -41,14 +42,31 @@ public class MemberTownService {
 		return MemberAddRegionResponse.create(town);
 	}
 
-	private void validateExistFullAddress(MemberAddRegionRequest request) {
-		if (!regionRepository.existsRegionByName(request.getFullAddressName())) {
+	public boolean removeMemberTown(Principal principal, MemberTownRemoveRequest request) {
+		String fullAddressName = request.getFullAddress();
+		String addressName = request.getAddress();
+
+		validateExistFullAddress(fullAddressName);
+		validateContainsAddress(fullAddressName, addressName);
+
+		Member member = memberRepository.findById(principal.getMemberId())
+			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
+		boolean result = member.removeMemberTown(request.getAddress());
+
+		if (!result) {
+			throw new RestApiException(MemberTownErrorCode.FAIL_REMOVE_ADDRESS);
+		}
+		return result;
+	}
+
+	private void validateExistFullAddress(String fullAddressName) {
+		if (!regionRepository.existsRegionByName(fullAddressName)) {
 			throw new RestApiException(RegionErrorCode.NOT_FOUND_REGION);
 		}
 	}
 
-	private void validateContainsAddress(MemberAddRegionRequest request) {
-		if (!request.getFullAddressName().contains(request.getAddressName())) {
+	private void validateContainsAddress(String fullAddressName, String addressName) {
+		if (!fullAddressName.contains(addressName)) {
 			throw new RestApiException(RegionErrorCode.NOT_MATCH_ADDRESS);
 		}
 	}
