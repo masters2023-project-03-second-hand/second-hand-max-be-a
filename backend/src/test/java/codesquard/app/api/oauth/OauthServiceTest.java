@@ -125,7 +125,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createOauthSignUpRequest("bruni", List.of("가락 1동"));
+		OauthSignUpRequest request = createOauthSignUpRequest("bruni2", List.of("가락 1동"));
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
 
@@ -326,7 +326,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 			softAssertions.assertAll();
 		});
 	}
-
+	
 	@DisplayName("리프레쉬 토큰을 가지고 액세스 토큰을 갱신한다")
 	@Test
 	public void refreshAccessToken() {

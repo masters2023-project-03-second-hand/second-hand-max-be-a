@@ -12,6 +12,8 @@ import codesquard.app.api.category.CategoryRestController;
 import codesquard.app.api.item.ItemController;
 import codesquard.app.api.item.ItemQueryService;
 import codesquard.app.api.item.ItemService;
+import codesquard.app.api.membertown.MemberTownRestController;
+import codesquard.app.api.membertown.MemberTownService;
 import codesquard.app.api.oauth.OauthRestController;
 import codesquard.app.api.oauth.OauthService;
 import codesquard.app.api.region.RegionQueryService;
@@ -23,7 +25,8 @@ import codesquard.app.domain.oauth.support.AuthenticationContext;
 	OauthRestController.class,
 	CategoryRestController.class,
 	ItemController.class,
-	RegionRestController.class
+	RegionRestController.class,
+	MemberTownRestController.class
 })
 public abstract class ControllerTestSupport {
 
@@ -53,4 +56,7 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected RegionQueryService regionQueryService;
+
+	@MockBean
+	protected MemberTownService memberTownService;
 }

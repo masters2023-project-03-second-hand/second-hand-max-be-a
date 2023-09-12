@@ -1,5 +1,7 @@
 package codesquard.app.filter;
 
+import static codesquard.app.filter.JwtAuthorizationFilter.*;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -23,41 +25,24 @@ import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.response.ApiResponse;
-import codesquard.app.domain.jwt.JwtProvider;
-import codesquard.app.domain.oauth.support.AuthenticationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class JwtAuthorizationFilter extends OncePerRequestFilter {
+public class LogoutFilter extends OncePerRequestFilter {
 
-	public static final String AUTHORIZATION = "Authorization";
-	public static final String BEARER = "Bearer";
-	private static final AntPathMatcher pathMatcher = new AntPathMatcher();
-	private static final List<String> excludeUrlPatterns = List.of(
-		"/api/auth/**/signup",
-		"/api/auth/**/login",
-		"/api/auth/token",
-		"/api/auth/logout",
-		"/api/categories");
-	private final JwtProvider jwtProvider;
-	private final AuthenticationContext authenticationContext;
-	private final ObjectMapper objectMapper;
 	private final RedisTemplate<String, Object> redisTemplate;
+	private final ObjectMapper objectMapper;
+
+	private static final AntPathMatcher pathMatcher = new AntPathMatcher();
+	private static final List<String> excludeUrlPatterns = List.of("/api/**");
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
-		if (pathMatcher.match("/api/regions", request.getRequestURI())
-			&& Objects.equals("GET", request.getMethod())) {
-			return true;
-		}
-		if (pathMatcher.match("/api/items", request.getRequestURI())
-			&& Objects.equals("GET", request.getMethod())) {
-			return true;
-		}
 		return excludeUrlPatterns.stream()
-			.anyMatch(pattern -> pathMatcher.match(pattern, request.getRequestURI()));
+			.anyMatch(pattern -> pathMatcher.match(pattern, request.getRequestURI()))
+			&& !pathMatcher.match("/api/auth/logout", request.getRequestURI());
 	}
 
 	@Override
@@ -69,15 +54,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		}
 		try {
 			String token = extractJwt(request).orElseThrow(() -> new RestApiException(JwtTokenErrorCode.EMPTY_TOKEN));
-			jwtProvider.validateToken(token);
 			validateAlreadyLogout(token);
-			authenticationContext.setPrincipal(jwtProvider.extractPrincipal(token));
 		} catch (RestApiException e) {
 			setErrorResponse(response, e.getErrorCode());
 			return;
 		}
 
 		filterChain.doFilter(request, response);
+	}
+
+	private void validateAlreadyLogout(String token) {
+		if (Objects.equals(redisTemplate.opsForValue().get(token), "logout")) {
+			throw new RestApiException(OauthErrorCode.ALREADY_LOGOUT);
+		}
 	}
 
 	private Optional<String> extractJwt(HttpServletRequest request) {
@@ -88,12 +77,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		}
 
 		return Optional.of(header.split(" ")[1]);
-	}
-
-	private void validateAlreadyLogout(String token) {
-		if (Objects.equals(redisTemplate.opsForValue().get(token), "logout")) {
-			throw new RestApiException(OauthErrorCode.NOT_LOGIN_STATE);
-		}
 	}
 
 	private void setErrorResponse(HttpServletResponse httpServletResponse, ErrorCode errorCode) throws IOException {

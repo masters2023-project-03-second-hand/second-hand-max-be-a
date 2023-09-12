@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
+import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.membertown.MemberTown;
@@ -21,12 +24,16 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id")
 @Entity
 public class Member {
+
+	private static final int MAXIMUM_MEMBER_TOWN_SIZE = 2;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,11 +77,19 @@ public class Member {
 	}
 
 	public void addMemberTown(MemberTown town) {
+		validateMaximumMemberTownSize();
 		if (town == null) {
 			return;
 		}
 		if (!containsTown(town)) {
 			towns.add(town);
+		}
+	}
+
+	private void validateMaximumMemberTownSize() {
+		if (towns.size() >= MAXIMUM_MEMBER_TOWN_SIZE) {
+			log.error("회원이 추가할 수 있는 동네의 개수 초과 에러, 현재 개수={}", towns.size());
+			throw new RestApiException(MemberTownErrorCode.MAXIMUM_MEMBER_TOWN_SIZE);
 		}
 	}
 
@@ -114,6 +129,13 @@ public class Member {
 
 	public boolean containsItem(Item item) {
 		return items.contains(item);
+	}
+
+	public boolean containsAddressName(String addressName) {
+		return towns.stream()
+			.map(MemberTown::getName)
+			.collect(Collectors.toUnmodifiableList())
+			.contains(addressName);
 	}
 
 	public boolean equalId(Long memberId) {
