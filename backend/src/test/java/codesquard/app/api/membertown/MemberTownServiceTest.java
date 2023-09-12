@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test;
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.membertown.request.MemberAddRegionRequest;
+import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
+import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
 import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
@@ -101,6 +103,26 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("이미 존재하는 동네입니다.");
+	}
+
+	@DisplayName("주소를 가지고 회원의 등록된 동네를 제거한다")
+	@Test
+	public void removeMemberTown() {
+		// given
+		Member member = OauthFixedFactory.createFixedMember();
+		member.addMemberTown(MemberTown.create("가락동"));
+		member.addMemberTown(MemberTown.create("부안동"));
+		Member saveMember = memberRepository.save(member);
+
+		Principal principal = Principal.from(saveMember);
+		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 송파구 가락동", "가락동");
+		// when
+		MemberTownRemoveResponse response = memberTownService.removeMemberTown(principal, request);
+		// then
+		assertAll(() -> {
+			assertThat(response.getId()).isNotNull();
+			assertThat(memberTownRepository.findById(response.getId()).isEmpty()).isTrue();
+		});
 	}
 
 }
