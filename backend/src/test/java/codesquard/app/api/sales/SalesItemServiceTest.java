@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.ItemRegisterRequest;
@@ -14,15 +12,8 @@ import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.sales.SalesStatus;
-import codesquard.support.SupportRepository;
 
-@SpringBootTest
 class SalesItemServiceTest extends IntegrationTestSupport {
-
-	@Autowired
-	private SalesItemService salesItemService;
-	@Autowired
-	private SupportRepository supportRepository;
 
 	@Test
 	@DisplayName("판매상품목록 전체 조회에 성공한다.")
