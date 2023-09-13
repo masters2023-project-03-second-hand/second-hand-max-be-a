@@ -48,9 +48,9 @@ public class ItemDetailResponse {
 		this.price = price;
 	}
 
-	public static ItemDetailResponse create(Item item, Member seller, Long loginMemberId, List<String> imageUrls) {
+	public static ItemDetailResponse create(Item item, Member seller, Long loginMemberId, List<String> imageUrls,
+		int chatCount) {
 		boolean isSeller = seller.equalId(loginMemberId);
-
 		return ItemDetailResponse.builder()
 			.isSeller(isSeller)
 			.imageUrls(imageUrls)
@@ -60,7 +60,7 @@ public class ItemDetailResponse {
 			.categoryName(item.getCategory().getName())
 			.createdAt(item.getCreatedAt())
 			.content(item.getContent())
-			.chatCount(item.countTotalChatLog())
+			.chatCount(chatCount)
 			.wishCount(item.getWishes().size())
 			.viewCount(item.getViewCount())
 			.price(item.getPrice())

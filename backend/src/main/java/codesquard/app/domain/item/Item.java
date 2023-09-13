@@ -17,7 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import codesquard.app.domain.category.Category;
-import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.wish.Wish;
 import lombok.AllArgsConstructor;
@@ -59,9 +58,6 @@ public class Item {
 
 	@OneToMany(mappedBy = "item", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	private List<Wish> wishes = new ArrayList<>();
-
-	@OneToMany(mappedBy = "item", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-	private List<ChatRoom> chatRooms = new ArrayList<>();
 
 	public Item(Long id) {
 		this.id = id;
@@ -110,26 +106,6 @@ public class Item {
 			this.wishes.add(wish);
 		}
 		wish.changeItem(this);
-	}
-
-	public void addChatRoom(ChatRoom chatRoom) {
-		if (chatRoom == null) {
-			return;
-		}
-		if (!containsChatRoom(chatRoom)) {
-			chatRooms.add(chatRoom);
-		}
-		chatRoom.changeItem(this);
-	}
-
-	public int countTotalChatLog() {
-		return chatRooms.stream()
-			.mapToInt(ChatRoom::sizeChatLogs)
-			.sum();
-	}
-
-	public boolean containsChatRoom(ChatRoom chatRoom) {
-		return chatRooms.contains(chatRoom);
 	}
 
 	public boolean containsWish(Wish wish) {

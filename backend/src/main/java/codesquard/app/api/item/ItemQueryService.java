@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.item.response.ItemDetailResponse;
+import codesquard.app.domain.chat.ChatLogRepository;
+import codesquard.app.domain.chat.ChatRoom;
+import codesquard.app.domain.chat.ChatRoomRepository;
 import codesquard.app.domain.image.Image;
 import codesquard.app.domain.image.ImageRepository;
 import codesquard.app.domain.item.Item;
@@ -25,6 +28,8 @@ public class ItemQueryService {
 
 	private final ItemRepository itemRepository;
 	private final ImageRepository imageRepository;
+	private final ChatRoomRepository chatRoomRepository;
+	private final ChatLogRepository chatLogRepository;
 
 	public ItemDetailResponse findDetailItemBy(Long itemId, Long loginMemberId) {
 		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
@@ -33,12 +38,21 @@ public class ItemQueryService {
 		List<Image> images = imageRepository.findAllByItemId(item.getId());
 		List<String> imageUrls = mapToImageUrls(images);
 		Member seller = item.getMember();
-		return ItemDetailResponse.create(item, seller, loginMemberId, imageUrls);
+		int chatCount = getChatCount(item);
+
+		return ItemDetailResponse.create(item, seller, loginMemberId, imageUrls, chatCount);
 	}
 
 	private List<String> mapToImageUrls(List<Image> images) {
 		return images.stream()
 			.map(Image::getImageUrl)
 			.collect(Collectors.toUnmodifiableList());
+	}
+
+	private int getChatCount(Item item) {
+		List<ChatRoom> chatRooms = chatRoomRepository.findAllByItemId(item.getId());
+		return chatRooms.stream()
+			.mapToInt(chatRoom -> chatLogRepository.countChatLogByChatRoomId(chatRoom.getId()))
+			.sum();
 	}
 }
