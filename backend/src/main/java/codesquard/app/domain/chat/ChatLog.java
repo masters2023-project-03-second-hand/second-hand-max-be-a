@@ -33,29 +33,16 @@ public class ChatLog {
 	@JoinColumn(name = "chat_room_id")
 	private ChatRoom chatRoom;
 
-	private ChatLog(String message, String sender, String receiver, LocalDateTime createdAt) {
+	private ChatLog(String message, String sender, String receiver, LocalDateTime createdAt, ChatRoom chatRoom) {
 		this.message = message;
 		this.sender = sender;
 		this.receiver = receiver;
 		this.createdAt = createdAt;
-	}
-
-	public static ChatLog create(String message, String sender, String receiver, LocalDateTime createdAt) {
-		return new ChatLog(message, sender, receiver, createdAt);
-	}
-
-	public void changeChatRoom(ChatRoom chatRoom) {
 		this.chatRoom = chatRoom;
-		addChatLogBy(chatRoom);
 	}
 
-	private void addChatLogBy(ChatRoom chatRoom) {
-		if (chatRoom == null) {
-			return;
-		}
-		if (!chatRoom.containsChatLog(this)) {
-			chatRoom.addChatLog(this);
-		}
+	public static ChatLog create(String message, String sender, String receiver, LocalDateTime createdAt,
+		ChatRoom chatRoom) {
+		return new ChatLog(message, sender, receiver, createdAt, chatRoom);
 	}
-
 }
