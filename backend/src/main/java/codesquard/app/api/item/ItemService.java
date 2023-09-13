@@ -1,7 +1,5 @@
 package codesquard.app.api.item;
 
-import static codesquard.app.domain.pagination.PaginationUtils.*;
-
 import java.util.List;
 
 import org.springframework.data.domain.Slice;
@@ -18,6 +16,7 @@ import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemPaginationRepository;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.pagination.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -45,6 +44,6 @@ public class ItemService {
 	public ItemResponses findAll(String region, int size, Long cursor, Long categoryId) {
 		Slice<ItemResponse> itemResponses = itemPaginationRepository.findByIdAndRegion(cursor, region, size,
 			categoryId);
-		return getItemResponses(itemResponses);
+		return PaginationUtils.getItemResponses(itemResponses);
 	}
 }
