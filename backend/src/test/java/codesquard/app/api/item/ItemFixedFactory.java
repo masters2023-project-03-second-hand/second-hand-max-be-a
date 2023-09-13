@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import codesquard.app.domain.category.Category;
-import codesquard.app.domain.image.Image;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
@@ -19,11 +18,10 @@ public class ItemFixedFactory {
 	private static final String REGION = "가락 1동";
 	private static final LocalDateTime CREATED_AT = LocalDateTime.of(2023, 1, 1, 0, 0);
 
-	public static Item createFixedItem(Member member, Category category, List<Image> images, List<Wish> wishes,
+	public static Item createFixedItem(Member member, Category category, List<Wish> wishes,
 		Long viewCount) {
 		Item item = Item.create(TITLE, CONTENT, PRICE, STATUS, REGION, CREATED_AT, viewCount, member);
 		item.changeCategory(category);
-		images.forEach(item::addImage);
 		wishes.forEach(item::addWish);
 		return item;
 	}

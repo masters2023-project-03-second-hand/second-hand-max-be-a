@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -58,9 +59,10 @@ class ItemControllerTest extends ControllerTestSupport {
 		long itemId = 1L;
 		Member seller = OauthFixedFactory.createFixedMember();
 		Category category = CategoryFixedFactory.createdFixedCategory();
-		List<Image> images = ImageFixedFactory.createFixedImages();
-		Item item = ItemFixedFactory.createFixedItem(seller, category, images, new ArrayList<>(), 0L);
-		ItemDetailResponse response = ItemDetailResponse.create(item, seller, seller.getId());
+		Item item = ItemFixedFactory.createFixedItem(seller, category, new ArrayList<>(), 0L);
+		List<Image> images = ImageFixedFactory.createFixedImages(item);
+		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
+		ItemDetailResponse response = ItemDetailResponse.create(item, seller, seller.getId(), imageUrls);
 		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))
@@ -88,9 +90,10 @@ class ItemControllerTest extends ControllerTestSupport {
 		long itemId = 1L;
 		Member seller = OauthFixedFactory.createFixedMember();
 		Category category = CategoryFixedFactory.createdFixedCategory();
-		List<Image> images = ImageFixedFactory.createFixedImages();
-		Item item = ItemFixedFactory.createFixedItem(seller, category, images, new ArrayList<>(), 0L);
-		ItemDetailResponse response = ItemDetailResponse.create(item, seller, 9999L);
+		Item item = ItemFixedFactory.createFixedItem(seller, category, new ArrayList<>(), 0L);
+		List<Image> images = ImageFixedFactory.createFixedImages(item);
+		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
+		ItemDetailResponse response = ItemDetailResponse.create(item, seller, 9999L, imageUrls);
 		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))

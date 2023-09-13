@@ -3,7 +3,6 @@ package codesquard.app.domain.item;
 import static codesquard.app.api.category.CategoryFixedFactory.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
@@ -12,12 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.IntegrationTestSupport;
-import codesquard.app.api.item.ImageFixedFactory;
 import codesquard.app.api.item.ItemFixedFactory;
 import codesquard.app.api.item.WishFixedFactory;
 import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.category.Category;
-import codesquard.app.domain.image.Image;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.wish.Wish;
 
@@ -33,7 +30,7 @@ class ItemTest extends IntegrationTestSupport {
 		Member member = OauthFixedFactory.createFixedMember();
 		memberRepository.save(member);
 
-		Item item = ItemFixedFactory.createFixedItem(member, null, new ArrayList<>(), new ArrayList<>(), 0L);
+		Item item = ItemFixedFactory.createFixedItem(member, null, new ArrayList<>(), 0L);
 
 		// when
 		item.changeCategory(category);
@@ -41,32 +38,6 @@ class ItemTest extends IntegrationTestSupport {
 		// then
 		Item saveItem = itemRepository.save(item);
 		Assertions.assertThat(saveItem.getCategory()).isEqualTo(category);
-	}
-
-	@DisplayName("상품에 이미지를 추가한다")
-	@Test
-	public void addImage() {
-		// given
-		Category category = createdFixedCategory();
-		categoryRepository.save(category);
-
-		Member member = OauthFixedFactory.createFixedMember();
-		memberRepository.save(member);
-
-		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(), 0L);
-
-		List<Image> images = ImageFixedFactory.createFixedImages();
-		// when
-		images.forEach(item::addImage);
-
-		// then
-		Item saveItem = itemRepository.save(item);
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(saveItem.getImages()).hasSize(2).containsAll(images);
-			softAssertions.assertThat(images.stream().map(Image::getItem))
-				.allMatch(imageItem -> imageItem.equals(saveItem));
-			softAssertions.assertAll();
-		});
 	}
 
 	@Transactional
@@ -77,7 +48,7 @@ class ItemTest extends IntegrationTestSupport {
 		Category category = createdFixedCategory();
 		Member member = OauthFixedFactory.createFixedMember();
 
-		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(),
+		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(),
 			0L);
 
 		Wish wish = WishFixedFactory.createWish(member);
@@ -107,7 +78,7 @@ class ItemTest extends IntegrationTestSupport {
 		Member member = OauthFixedFactory.createFixedMember();
 		memberRepository.save(member);
 
-		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(),
+		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(),
 			0L);
 
 		Item saveItem = itemRepository.save(item);

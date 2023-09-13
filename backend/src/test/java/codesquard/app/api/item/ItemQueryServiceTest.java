@@ -35,14 +35,14 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 		Member member = OauthFixedFactory.createFixedMember();
 		memberRepository.save(member);
 
-		List<Image> images = ImageFixedFactory.createFixedImages();
 		long viewCount = 4L;
 		List<Wish> wishes = List.of(
 			WishFixedFactory.createWish(member),
 			WishFixedFactory.createWish(member),
 			WishFixedFactory.createWish(member)
 		);
-		Item item = ItemFixedFactory.createFixedItem(member, findCategory, images, wishes, viewCount);
+		Item item = ItemFixedFactory.createFixedItem(member, findCategory, wishes, viewCount);
+		List<Image> images = ImageFixedFactory.createFixedImages(item);
 		itemRepository.save(item);
 		wishRepository.saveAll(wishes);
 		imageRepository.saveAll(images);
