@@ -11,6 +11,9 @@ import org.springframework.data.domain.SliceImpl;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 import codesquard.app.api.response.ItemResponse;
+import codesquard.app.api.response.ItemResponses;
+import codesquard.app.domain.item.ItemStatus;
+import codesquard.app.domain.sales.SalesStatus;
 
 public class PaginationUtils {
 
@@ -38,6 +41,15 @@ public class PaginationUtils {
 		return item.region.like(region + "%");
 	}
 
+	public static BooleanExpression equalsStatus(SalesStatus status) {
+		if (status == SalesStatus.ON_SALE) {
+			return item.status.in(ItemStatus.ON_SALE, ItemStatus.RESERVED);
+		} else if (status == SalesStatus.SOLD_OUT) {
+			return item.status.eq(ItemStatus.SOLD_OUT);
+		}
+		return item.status.in(ItemStatus.ON_SALE, ItemStatus.RESERVED, ItemStatus.SOLD_OUT);
+	}
+
 	public static Slice<ItemResponse> checkLastPage(int size, List<ItemResponse> results) {
 
 		boolean hasNext = false;
@@ -49,5 +61,16 @@ public class PaginationUtils {
 		}
 
 		return new SliceImpl<>(results, PageRequest.ofSize(size), hasNext);
+	}
+
+	public static ItemResponses getItemResponses(Slice<ItemResponse> itemResponses) {
+		List<ItemResponse> contents = itemResponses.getContent();
+
+		boolean hasNext = itemResponses.hasNext();
+		Long nextCursor = null;
+		if (hasNext) {
+			nextCursor = contents.get(contents.size() - 1).getItemId();
+		}
+		return new ItemResponses(contents, hasNext, nextCursor);
 	}
 }

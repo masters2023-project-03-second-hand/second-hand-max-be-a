@@ -2,6 +2,7 @@ package codesquard.app.api.wishitem;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import static codesquard.app.domain.pagination.PaginationUtils.*;
 
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -51,14 +52,6 @@ public class WishItemService {
 	@Transactional(readOnly = true)
 	public ItemResponses findAll(Long categoryId, int size, Long cursor) {
 		Slice<ItemResponse> itemResponses = wishPaginationRepository.findAll(categoryId, size, cursor);
-
-		List<ItemResponse> contents = itemResponses.getContent();
-
-		boolean hasNext = itemResponses.hasNext();
-		Long nextCursor = null;
-		if (hasNext) {
-			nextCursor = contents.get(contents.size() - 1).getItemId();
-		}
-		return new ItemResponses(contents, hasNext, nextCursor);
+		return getItemResponses(itemResponses);
 	}
 }
