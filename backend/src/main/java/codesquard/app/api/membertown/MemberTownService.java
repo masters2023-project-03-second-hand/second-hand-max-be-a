@@ -4,17 +4,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
-import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
-import codesquard.app.api.errors.errorcode.RegionErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
-import codesquard.app.api.membertown.request.MemberAddRegionRequest;
+import codesquard.app.api.membertown.request.MemberTownAddRequest;
+import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
+import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTown;
-import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.oauth.support.Principal;
-import codesquard.app.domain.region.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,39 +23,37 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberTownService {
 
 	private final MemberRepository memberRepository;
-	private final MemberTownRepository memberTownRepository;
-	private final RegionRepository regionRepository;
+	private final MemberTownValidator validator;
 
-	public MemberAddRegionResponse addMemberTown(Principal principal, MemberAddRegionRequest request) {
-		validateExistFullAddress(request);
-		validateContainsAddress(request);
-		validateDuplicateAddress(principal, request);
+	public MemberAddRegionResponse addMemberTown(Principal principal, MemberTownAddRequest request) {
+		log.info("회원 동네 추가 서비스 요청 : 회원아이디={}, 추가할 동네이름={}", principal.getLoginId(), request.getAddress());
 
-		Member member = memberRepository.findById(principal.getMemberId())
-			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
-		MemberTown town = MemberTown.create(request.getAddressName());
+		String fullAddress = request.getFullAddress();
+		String address = request.getAddress();
+		Member member = findMemberBy(principal);
+		validator.validateAddMemberTown(member, fullAddress, address);
 
+		MemberTown town = MemberTown.create(address);
 		member.addMemberTown(town);
 		return MemberAddRegionResponse.create(town);
 	}
 
-	private void validateExistFullAddress(MemberAddRegionRequest request) {
-		if (!regionRepository.existsRegionByName(request.getFullAddressName())) {
-			throw new RestApiException(RegionErrorCode.NOT_FOUND_REGION);
-		}
+	public MemberTownRemoveResponse removeMemberTown(Principal principal, MemberTownRemoveRequest request) {
+		log.info("회원 동네 삭제 서비스 요청 : 회원아이디={}, 삭제할 동네이름={}", principal.getLoginId(), request.getAddress());
+
+		String fullAddress = request.getFullAddress();
+		String address = request.getAddress();
+		validator.validateRemoveMemberTown(fullAddress, address);
+
+		Member member = findMemberBy(principal);
+		Long removeId = member.removeMemberTown(address);
+
+		log.info("삭제한 회원동네 등록번호 : {}", removeId);
+		return MemberTownRemoveResponse.create(removeId);
 	}
 
-	private void validateContainsAddress(MemberAddRegionRequest request) {
-		if (!request.getFullAddressName().contains(request.getAddressName())) {
-			throw new RestApiException(RegionErrorCode.NOT_MATCH_ADDRESS);
-		}
-	}
-
-	private void validateDuplicateAddress(Principal principal, MemberAddRegionRequest request) {
-		Member member = memberRepository.findById(principal.getMemberId())
+	private Member findMemberBy(Principal principal) {
+		return memberRepository.findById(principal.getMemberId())
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
-		if (member.containsAddressName(request.getAddressName())) {
-			throw new RestApiException(MemberTownErrorCode.ALREADY_ADDRESS_NAME);
-		}
 	}
 }

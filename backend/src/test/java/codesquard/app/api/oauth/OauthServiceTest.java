@@ -120,6 +120,9 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signupWithMultipleLoginId() throws IOException {
 		// given
+		imageRepository.deleteAllInBatch();
+		itemRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
 		memberRepository.save(createFixedMember());
 
 		String provider = "naver";
@@ -326,7 +329,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 			softAssertions.assertAll();
 		});
 	}
-	
+
 	@DisplayName("리프레쉬 토큰을 가지고 액세스 토큰을 갱신한다")
 	@Test
 	public void refreshAccessToken() {

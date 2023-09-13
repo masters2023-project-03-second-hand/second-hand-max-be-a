@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Member {
 
 	private static final int MAXIMUM_MEMBER_TOWN_SIZE = 2;
+	private static final int MINIMUM_MEMBER_TOWN_SIZE = 1;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,13 +44,13 @@ public class Member {
 	@Column(name = "login_id", nullable = false, unique = true)
 	private String loginId; // 닉네임
 
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	private List<MemberTown> towns = new ArrayList<>(); // 동네
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	private List<Item> items = new ArrayList<>(); // 회원이 등록한 상품
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	private List<ChatRoom> chatRooms = new ArrayList<>(); // 채팅방
 
 	public Member(Long id) {
@@ -88,7 +89,7 @@ public class Member {
 
 	private void validateMaximumMemberTownSize() {
 		if (towns.size() >= MAXIMUM_MEMBER_TOWN_SIZE) {
-			log.error("회원이 추가할 수 있는 동네의 개수 초과 에러, 현재 개수={}", towns.size());
+			log.error("회원이 추가할 수 있는 동내 개수 초과 에러, 현재 개수={}", towns.size());
 			throw new RestApiException(MemberTownErrorCode.MAXIMUM_MEMBER_TOWN_SIZE);
 		}
 	}
@@ -138,6 +139,29 @@ public class Member {
 			.contains(addressName);
 	}
 
+	public Long removeMemberTown(String addressName) {
+		MemberTown removeTown = validateUnRegisteredAddressName(addressName);
+		validateMinimumMemberTownSize();
+		boolean result = towns.remove(removeTown);
+		if (!result) {
+			throw new RestApiException(MemberTownErrorCode.FAIL_REMOVE_ADDRESS);
+		}
+		return removeTown.getId();
+	}
+
+	private MemberTown validateUnRegisteredAddressName(String addressName) {
+		return towns.stream()
+			.filter(town -> Objects.equals(town.getName(), addressName))
+			.findAny()
+			.orElseThrow(() -> new RestApiException(MemberTownErrorCode.UNREGISTERED_ADDRESS_TO_REMOVE));
+	}
+
+	private void validateMinimumMemberTownSize() {
+		if (towns.size() <= MINIMUM_MEMBER_TOWN_SIZE) {
+			throw new RestApiException(MemberTownErrorCode.MINIMUM_MEMBER_TOWN_SIZE);
+		}
+	}
+
 	public boolean equalId(Long memberId) {
 		return Objects.equals(id, memberId);
 	}
@@ -147,4 +171,5 @@ public class Member {
 		return String.format("%s, %s(id=%d, email=%s, loginId=%s)", "회원", this.getClass().getSimpleName(), id, email,
 			loginId);
 	}
+
 }

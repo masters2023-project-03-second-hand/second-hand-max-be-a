@@ -23,7 +23,7 @@ VALUES ('인기매물', 'https://i.ibb.co/LSkHKbL/star.png'),
        ('삽니다', 'https://i.ibb.co/g7Gc1w0/buy.png');
 
 INSERT INTO member(email, login_id)
-VALUES ('dragonbead95@naver.com', 'bruni');
+VALUES ('dragonbead95@naver.com', '23Yong');
 
 INSERT INTO item(title, content, price, status, region,
                  created_at, thumbnail_url, wish_count,
