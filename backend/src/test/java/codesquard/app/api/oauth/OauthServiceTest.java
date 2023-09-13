@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
@@ -40,6 +41,7 @@ import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
+import codesquard.app.domain.region.Region;
 
 class OauthServiceTest extends IntegrationTestSupport {
 
@@ -62,10 +64,11 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signUp() throws IOException {
 		// given
+		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createFixedOauthSignUpRequest();
+		OauthSignUpRequest request = createFixedOauthSignUpRequest(addressIds);
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
 
@@ -83,14 +86,16 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// then
 		Member findMember = memberRepository.findMemberByLoginId("23Yong")
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
+		List<MemberTown> memberTowns = memberTownRepository.findAllByMemberId(findMember.getId());
 
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
 				.extracting("email", "loginId", "avatarUrl")
-				.contains("dragonbead95@naver.com", "23Yong", "avatarUrlValue");
+				.contains("23Yong@naver.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertThat(findMember)
 				.extracting("email", "loginId", "avatarUrl")
-				.contains("dragonbead95@naver.com", "23Yong", "avatarUrlValue");
+				.contains("23Yong@naver.com", "23Yong", "avatarUrlValue");
+			softAssertions.assertThat(memberTowns).hasSize(1);
 			softAssertions.assertAll();
 		});
 	}
@@ -99,12 +104,13 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signupWithDuplicateLoginId() throws IOException {
 		// given
-		memberRepository.save(createFixedMember());
+		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
 
+		memberRepository.save(createFixedMember());
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createFixedOauthSignUpRequest();
+		OauthSignUpRequest request = createFixedOauthSignUpRequest(addressIds);
 
 		// when
 		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
@@ -113,7 +119,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		assertThat(throwable)
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
-			.isEqualTo("이미 존재하는 아이디입니다.");
+			.isEqualTo("중복된 아이디입니다.");
 	}
 
 	@DisplayName("한 명의 소셜 사용자가 서로 다른 로그인 아이디로 이중 회원가입을 할 수 없다")
@@ -124,11 +130,12 @@ class OauthServiceTest extends IntegrationTestSupport {
 		itemRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
 		memberRepository.save(createFixedMember());
+		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
 
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createOauthSignUpRequest("bruni2", List.of("가락 1동"));
+		OauthSignUpRequest request = createOauthSignUpRequest("bruni2", addressIds);
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
 
@@ -153,10 +160,12 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signUpWithInvalidProvider() throws IOException {
 		// given
+		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
+
 		String provider = "github";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createFixedOauthSignUpRequest();
+		OauthSignUpRequest request = createFixedOauthSignUpRequest(addressIds);
 
 		// mocking
 		when(oauthClientRepository.findOneBy(anyString())).thenThrow(
@@ -176,10 +185,12 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signUpWithInvalidCode() throws IOException {
 		// given
+		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
+
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createFixedOauthSignUpRequest();
+		OauthSignUpRequest request = createFixedOauthSignUpRequest(addressIds);
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 
 		// mocking
@@ -204,6 +215,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signUpWhenDuplicateLoginId() throws IOException {
 		// given
+		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
 		Member member = Member.create("avatarUrlValue", "23Yong1234@gmail.com", "23Yong");
 		MemberTown memberTown = MemberTown.create("가락 1동", member);
 		memberRepository.save(member);
@@ -212,7 +224,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createFixedOauthSignUpRequest();
+		OauthSignUpRequest request = createFixedOauthSignUpRequest(addressIds);
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
 
@@ -230,7 +242,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		assertThat(throwable)
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
-			.isEqualTo("이미 존재하는 아이디입니다.");
+			.isEqualTo("중복된 아이디입니다.");
 	}
 
 	@DisplayName("로그인 아이디와 인가코드를 가지고 소셜 로그인을 한다")
@@ -384,5 +396,12 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("유효하지 않은 토큰입니다.");
+	}
+
+	private List<Long> getAddressIds(String fullAddress) {
+		List<Region> regions = regionRepository.findAllByNameIn(List.of(fullAddress));
+		return regions.stream()
+			.map(Region::getId)
+			.collect(Collectors.toUnmodifiableList());
 	}
 }
