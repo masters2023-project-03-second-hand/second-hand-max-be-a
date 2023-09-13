@@ -1,10 +1,7 @@
 package codesquard.app.domain.item;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -14,11 +11,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.wish.Wish;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -55,9 +50,6 @@ public class Item {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
-
-	@OneToMany(mappedBy = "item", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-	private List<Wish> wishes = new ArrayList<>();
 
 	public Item(Long id) {
 		this.id = id;
@@ -96,20 +88,6 @@ public class Item {
 
 	public void changeCategory(Category category) {
 		this.category = category;
-	}
-
-	public void addWish(Wish wish) {
-		if (wish == null) {
-			return;
-		}
-		if (!containsWish(wish)) {
-			this.wishes.add(wish);
-		}
-		wish.changeItem(this);
-	}
-
-	public boolean containsWish(Wish wish) {
-		return wishes.contains(wish);
 	}
 
 	public void wishRegister() {

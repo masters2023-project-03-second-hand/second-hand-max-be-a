@@ -17,6 +17,7 @@ import codesquard.app.domain.image.ImageRepository;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.wish.WishRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +31,7 @@ public class ItemQueryService {
 	private final ImageRepository imageRepository;
 	private final ChatRoomRepository chatRoomRepository;
 	private final ChatLogRepository chatLogRepository;
+	private final WishRepository wishRepository;
 
 	public ItemDetailResponse findDetailItemBy(Long itemId, Long loginMemberId) {
 		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
@@ -39,8 +41,9 @@ public class ItemQueryService {
 		List<String> imageUrls = mapToImageUrls(images);
 		Member seller = item.getMember();
 		int chatCount = getChatCount(item);
+		int wishCount = getWishCount(item);
 
-		return ItemDetailResponse.create(item, seller, loginMemberId, imageUrls, chatCount);
+		return ItemDetailResponse.create(item, seller, loginMemberId, imageUrls, chatCount, wishCount);
 	}
 
 	private List<String> mapToImageUrls(List<Image> images) {
@@ -54,5 +57,9 @@ public class ItemQueryService {
 		return chatRooms.stream()
 			.mapToInt(chatRoom -> chatLogRepository.countChatLogByChatRoomId(chatRoom.getId()))
 			.sum();
+	}
+
+	private int getWishCount(Item item) {
+		return wishRepository.countWishByItemId(item.getId());
 	}
 }
