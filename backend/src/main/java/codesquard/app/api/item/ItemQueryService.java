@@ -37,8 +37,7 @@ public class ItemQueryService {
 		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
-		List<Image> images = imageRepository.findAllByItemId(item.getId());
-		List<String> imageUrls = mapToImageUrls(images);
+		List<String> imageUrls = mapToImageUrls(item);
 		Member seller = item.getMember();
 		int chatCount = getChatCount(item);
 		int wishCount = getWishCount(item);
@@ -46,7 +45,8 @@ public class ItemQueryService {
 		return ItemDetailResponse.create(item, seller, loginMemberId, imageUrls, chatCount, wishCount);
 	}
 
-	private List<String> mapToImageUrls(List<Image> images) {
+	private List<String> mapToImageUrls(Item item) {
+		List<Image> images = imageRepository.findAllByItemId(item.getId());
 		return images.stream()
 			.map(Image::getImageUrl)
 			.collect(Collectors.toUnmodifiableList());
