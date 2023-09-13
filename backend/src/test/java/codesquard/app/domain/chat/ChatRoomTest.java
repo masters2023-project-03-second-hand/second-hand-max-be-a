@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.category.CategoryFixedFactory;
@@ -17,39 +16,14 @@ import codesquard.app.domain.member.Member;
 
 class ChatRoomTest extends IntegrationTestSupport {
 
-	@Transactional
-	@DisplayName("채팅방에 상품을 설정한다")
-	@Test
-	public void setItem() {
-		// given
-		Member member = OauthFixedFactory.createFixedMember();
-		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom(member);
-		Category category = CategoryFixedFactory.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), 0L);
-		// when
-		chatRoom.changeItem(item);
-		// then
-		categoryRepository.save(category);
-		memberRepository.save(member);
-		Item saveItem = itemRepository.save(item);
-		ChatRoom saveChatRoom = chatRoomRepository.save(chatRoom);
-
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(saveChatRoom.getItem()).isEqualTo(saveItem);
-			softAssertions.assertThat(saveItem.getChatRooms()).contains(saveChatRoom).hasSize(1);
-			softAssertions.assertAll();
-		});
-	}
-
 	@DisplayName("채팅방에 채팅을 추가한다")
 	@Test
 	public void addChatLog() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom(member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), 0L);
-		chatRoom.changeItem(item);
+		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom(member, item);
 		ChatLog chatLog = ChatLogFixedFactory.createFixedChatLog(null);
 		// when
 		chatRoom.addChatLog(chatLog);

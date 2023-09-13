@@ -68,25 +68,4 @@ class ItemTest extends IntegrationTestSupport {
 			softAssertions.assertAll();
 		});
 	}
-
-	@DisplayName("한 상품에 대한 모든 채팅방의 채팅 개수를 가져온다")
-	@Test
-	public void getTotalChatLogCount() {
-		// given
-		Category category = createdFixedCategory();
-		categoryRepository.save(category);
-		Member member = OauthFixedFactory.createFixedMember();
-		memberRepository.save(member);
-
-		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(),
-			0L);
-
-		Item saveItem = itemRepository.save(item);
-
-		// when
-		int sum = saveItem.countTotalChatLog();
-
-		// then
-		Assertions.assertThat(sum).isZero();
-	}
 }

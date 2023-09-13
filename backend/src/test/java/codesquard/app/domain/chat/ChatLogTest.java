@@ -1,11 +1,17 @@
 package codesquard.app.domain.chat;
 
+import java.util.ArrayList;
+
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import codesquard.app.IntegrationTestSupport;
+import codesquard.app.api.category.CategoryFixedFactory;
+import codesquard.app.api.item.ItemFixedFactory;
 import codesquard.app.api.oauth.OauthFixedFactory;
+import codesquard.app.domain.category.Category;
+import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
 
 class ChatLogTest extends IntegrationTestSupport {
@@ -14,8 +20,10 @@ class ChatLogTest extends IntegrationTestSupport {
 	@Test
 	public void setChatRoom() {
 		// given
+		Category category = CategoryFixedFactory.createdFixedCategory();
 		Member member = OauthFixedFactory.createFixedMember();
-		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom(member);
+		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), 0L);
+		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom(member, item);
 		ChatLog chatLog = ChatLogFixedFactory.createFixedChatLog(null);
 		// when
 		chatLog.changeChatRoom(chatRoom);
