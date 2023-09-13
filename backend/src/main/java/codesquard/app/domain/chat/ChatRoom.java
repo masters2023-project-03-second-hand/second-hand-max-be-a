@@ -43,26 +43,13 @@ public class ChatRoom {
 	@OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
 	private List<ChatLog> chatLogs = new ArrayList<>();
 
-	private ChatRoom(LocalDateTime createdAt) {
+	public ChatRoom(LocalDateTime createdAt, Member member) {
 		this.createdAt = createdAt;
-	}
-
-	public static ChatRoom create(LocalDateTime createdAt) {
-		return new ChatRoom(createdAt);
-	}
-
-	public void changeMember(Member member) {
 		this.member = member;
-		addChatRoomBy(member);
 	}
 
-	private void addChatRoomBy(Member member) {
-		if (member == null) {
-			return;
-		}
-		if (!member.containsChatRoom(this)) {
-			member.addChatRoom(this);
-		}
+	public static ChatRoom create(LocalDateTime createdAt, Member member) {
+		return new ChatRoom(createdAt, member);
 	}
 
 	public void changeItem(Item item) {

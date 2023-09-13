@@ -14,7 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.item.Item;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -40,9 +39,6 @@ public class Member {
 	@OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	private List<Item> items = new ArrayList<>(); // 회원이 등록한 상품
 
-	@OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-	private List<ChatRoom> chatRooms = new ArrayList<>(); // 채팅방
-
 	public Member(Long id) {
 		this.id = id;
 	}
@@ -67,16 +63,6 @@ public class Member {
 		item.changeMember(this);
 	}
 
-	public void addChatRoom(ChatRoom chatRoom) {
-		if (chatRoom == null) {
-			return;
-		}
-		if (!containsChatRoom(chatRoom)) {
-			chatRooms.add(chatRoom);
-		}
-		chatRoom.changeMember(this);
-	}
-
 	public void changeAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
 	}
@@ -91,10 +77,6 @@ public class Member {
 		claims.put("email", email);
 		claims.put("loginId", loginId);
 		return claims;
-	}
-
-	public boolean containsChatRoom(ChatRoom chatRoom) {
-		return chatRooms.contains(chatRoom);
 	}
 
 	public boolean containsItem(Item item) {
