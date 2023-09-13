@@ -6,7 +6,6 @@ import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
 import codesquard.app.api.errors.errorcode.RegionErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.region.RegionRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 public class MemberTownValidator {
 
 	private final RegionRepository regionRepository;
-	private final MemberRepository memberRepository;
 
 	public void validateAddMemberTown(Member member, String fullAddress, String address) {
 		validateExistFullAddress(fullAddress);
