@@ -18,8 +18,8 @@ public class SalesItemController {
 	private final SalesItemService salesItemService;
 
 	@GetMapping
-	public ApiResponse<ItemResponses> findAll(@RequestParam SalesStatus salesStatus,
+	public ApiResponse<ItemResponses> findAll(@RequestParam SalesStatus status,
 		@RequestParam(required = false, defaultValue = "10") int size, @RequestParam(required = false) Long cursor) {
-		return ApiResponse.ok("판매 내역 조회에 성공하였습니다.", salesItemService.findAll(salesStatus, size, cursor));
+		return ApiResponse.ok("판매 내역 조회에 성공하였습니다.", salesItemService.findAll(status, size, cursor));
 	}
 }
