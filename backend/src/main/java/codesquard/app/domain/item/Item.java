@@ -74,7 +74,7 @@ public class Item {
 
 	@Builder
 	public Item(String title, String content, Long price, ItemStatus status, String region, LocalDateTime createdAt,
-		String thumbnailUrl, LocalDateTime modifiedAt, Long wishCount, Long chatCount, Long viewCount) {
+		String thumbnailUrl, LocalDateTime modifiedAt, Long wishCount, Long chatCount, Long viewCount, Member member) {
 		this.title = title;
 		this.content = content;
 		this.price = price;
@@ -86,10 +86,11 @@ public class Item {
 		this.wishCount = wishCount;
 		this.chatCount = chatCount;
 		this.viewCount = viewCount;
+		this.member = member;
 	}
 
 	public static Item create(String title, String content, Long price, ItemStatus status, String region,
-		LocalDateTime createdAt, Long viewCount) {
+		LocalDateTime createdAt, Long viewCount, Member member) {
 		return Item.builder()
 			.title(title)
 			.content(content)
@@ -98,22 +99,8 @@ public class Item {
 			.region(region)
 			.createdAt(createdAt)
 			.viewCount(viewCount)
+			.member(member)
 			.build();
-	}
-
-	public void changeMember(Member member) {
-		this.member = member;
-		addItemBy(member);
-	}
-
-	private void addItemBy(Member member) {
-		if (member == null) {
-			return;
-		}
-
-		if (!member.containsItem(this)) {
-			member.addItem(this);
-		}
 	}
 
 	public void changeCategory(Category category) {

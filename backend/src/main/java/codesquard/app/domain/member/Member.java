@@ -1,20 +1,15 @@
 package codesquard.app.domain.member;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
-import codesquard.app.domain.item.Item;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -36,9 +31,6 @@ public class Member {
 	@Column(name = "login_id", nullable = false, unique = true)
 	private String loginId; // 닉네임
 
-	@OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-	private List<Item> items = new ArrayList<>(); // 회원이 등록한 상품
-
 	public Member(Long id) {
 		this.id = id;
 	}
@@ -51,16 +43,6 @@ public class Member {
 
 	public static Member create(String avatarUrl, String email, String loginId) {
 		return new Member(avatarUrl, email, loginId);
-	}
-
-	public void addItem(Item item) {
-		if (item == null) {
-			return;
-		}
-		if (!containsItem(item)) {
-			items.add(item);
-		}
-		item.changeMember(this);
 	}
 
 	public void changeAvatarUrl(String avatarUrl) {
@@ -77,10 +59,6 @@ public class Member {
 		claims.put("email", email);
 		claims.put("loginId", loginId);
 		return claims;
-	}
-
-	public boolean containsItem(Item item) {
-		return items.contains(item);
 	}
 
 	public boolean equalId(Long memberId) {
