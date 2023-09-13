@@ -1,6 +1,7 @@
 package codesquard.app.api.oauth;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -30,6 +31,8 @@ import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.member.MemberRepository;
+import codesquard.app.domain.membertown.MemberTown;
+import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +46,7 @@ public class OauthService {
 
 	private final OauthClientRepository oauthClientRepository;
 	private final MemberRepository memberRepository;
+	private final MemberTownRepository memberTownRepository;
 	private final ImageService imageService;
 	private final JwtProvider jwtProvider;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -65,6 +69,11 @@ public class OauthService {
 
 		Member member = request.toEntity(avatarUrl, userProfileResponse.getEmail());
 		Member saveMember = memberRepository.save(member);
+		log.debug("회원 엔티티 저장 결과 : {}", saveMember);
+
+		List<MemberTown> memberTowns = MemberTown.create(request.getAddressNames(), member);
+		memberTownRepository.saveAll(memberTowns);
+		log.debug("회원 동네 저장 결과 : {}", memberTowns);
 
 		return OauthSignUpResponse.from(saveMember);
 	}

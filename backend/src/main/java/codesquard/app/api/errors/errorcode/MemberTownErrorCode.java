@@ -28,7 +28,7 @@ public enum MemberTownErrorCode implements ErrorCode {
 
 	@Override
 	public String toString() {
-		return String.format("%s, %s(name=%s, httpStatus=%s, message=%s)", "회원 에러", this.getClass().getSimpleName(),
+		return String.format("%s, %s(name=%s, httpStatus=%s, message=%s)", "회원동네 에러", this.getClass().getSimpleName(),
 			name(),
 			httpStatus,
 			message);

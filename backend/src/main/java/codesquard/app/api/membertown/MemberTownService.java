@@ -1,5 +1,7 @@
 package codesquard.app.api.membertown;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,7 @@ import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTown;
+import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberTownService {
 
 	private final MemberRepository memberRepository;
+	private final MemberTownRepository memberTownRepository;
 	private final MemberTownValidator validator;
 
 	public MemberAddRegionResponse addMemberTown(Principal principal, MemberTownAddRequest request) {
@@ -30,11 +34,14 @@ public class MemberTownService {
 
 		String fullAddress = request.getFullAddress();
 		String address = request.getAddress();
-		Member member = findMemberBy(principal);
-		validator.validateAddMemberTown(member, fullAddress, address);
 
-		MemberTown town = MemberTown.create(address);
-		member.addMemberTown(town);
+		Member member = findMemberBy(principal);
+		List<MemberTown> memberTowns = memberTownRepository.findAllByMemberId(principal.getMemberId());
+		validator.validateAddMemberTown(memberTowns, fullAddress, address);
+
+		MemberTown town = MemberTown.create(address, member);
+		memberTownRepository.save(town);
+
 		return MemberAddRegionResponse.create(town);
 	}
 
@@ -43,13 +50,13 @@ public class MemberTownService {
 
 		String fullAddress = request.getFullAddress();
 		String address = request.getAddress();
-		validator.validateRemoveMemberTown(fullAddress, address);
+		List<MemberTown> memberTowns = memberTownRepository.findAllByMemberId(principal.getMemberId());
+		validator.validateRemoveMemberTown(memberTowns, fullAddress, address);
 
 		Member member = findMemberBy(principal);
-		Long removeId = member.removeMemberTown(address);
+		memberTownRepository.deleteMemberTownByMemberIdAndName(member.getId(), address);
 
-		log.info("삭제한 회원동네 등록번호 : {}", removeId);
-		return MemberTownRemoveResponse.create(removeId);
+		return MemberTownRemoveResponse.create(address);
 	}
 
 	private Member findMemberBy(Principal principal) {

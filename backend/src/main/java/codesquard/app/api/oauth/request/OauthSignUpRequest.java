@@ -5,7 +5,6 @@ import java.util.List;
 import codesquard.app.annotation.Addresses;
 import codesquard.app.annotation.LoginId;
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.membertown.MemberTown;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,11 +29,7 @@ public class OauthSignUpRequest {
 	}
 
 	public Member toEntity(String avatarUrl, String email) {
-		Member member = Member.create(avatarUrl, email, loginId);
-		addressNames.stream()
-			.map(MemberTown::create)
-			.forEach(member::addMemberTown);
-		return member;
+		return Member.create(avatarUrl, email, loginId);
 	}
 
 	@Override

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,11 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.item.Item;
-import codesquard.app.domain.membertown.MemberTown;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,9 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 public class Member {
 
-	private static final int MAXIMUM_MEMBER_TOWN_SIZE = 2;
-	private static final int MINIMUM_MEMBER_TOWN_SIZE = 1;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id; // 회원 등록번호
@@ -43,9 +36,6 @@ public class Member {
 	private String email; // 소셜 사용자의 이메일
 	@Column(name = "login_id", nullable = false, unique = true)
 	private String loginId; // 닉네임
-
-	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-	private List<MemberTown> towns = new ArrayList<>(); // 동네
 
 	@OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	private List<Item> items = new ArrayList<>(); // 회원이 등록한 상품
@@ -77,23 +67,6 @@ public class Member {
 		item.changeMember(this);
 	}
 
-	public void addMemberTown(MemberTown town) {
-		validateMaximumMemberTownSize();
-		if (town == null) {
-			return;
-		}
-		if (!containsTown(town)) {
-			towns.add(town);
-		}
-	}
-
-	private void validateMaximumMemberTownSize() {
-		if (towns.size() >= MAXIMUM_MEMBER_TOWN_SIZE) {
-			log.error("회원이 추가할 수 있는 동내 개수 초과 에러, 현재 개수={}", towns.size());
-			throw new RestApiException(MemberTownErrorCode.MAXIMUM_MEMBER_TOWN_SIZE);
-		}
-	}
-
 	public void addChatRoom(ChatRoom chatRoom) {
 		if (chatRoom == null) {
 			return;
@@ -106,10 +79,6 @@ public class Member {
 
 	public void changeAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
-	}
-
-	private boolean containsTown(MemberTown town) {
-		return towns.contains(town);
 	}
 
 	public String createRedisKey() {
@@ -130,36 +99,6 @@ public class Member {
 
 	public boolean containsItem(Item item) {
 		return items.contains(item);
-	}
-
-	public boolean containsAddressName(String addressName) {
-		return towns.stream()
-			.map(MemberTown::getName)
-			.collect(Collectors.toUnmodifiableList())
-			.contains(addressName);
-	}
-
-	public Long removeMemberTown(String addressName) {
-		MemberTown removeTown = validateUnRegisteredAddressName(addressName);
-		validateMinimumMemberTownSize();
-		boolean result = towns.remove(removeTown);
-		if (!result) {
-			throw new RestApiException(MemberTownErrorCode.FAIL_REMOVE_ADDRESS);
-		}
-		return removeTown.getId();
-	}
-
-	private MemberTown validateUnRegisteredAddressName(String addressName) {
-		return towns.stream()
-			.filter(town -> Objects.equals(town.getName(), addressName))
-			.findAny()
-			.orElseThrow(() -> new RestApiException(MemberTownErrorCode.UNREGISTERED_ADDRESS_TO_REMOVE));
-	}
-
-	private void validateMinimumMemberTownSize() {
-		if (towns.size() <= MINIMUM_MEMBER_TOWN_SIZE) {
-			throw new RestApiException(MemberTownErrorCode.MINIMUM_MEMBER_TOWN_SIZE);
-		}
 	}
 
 	public boolean equalId(Long memberId) {
