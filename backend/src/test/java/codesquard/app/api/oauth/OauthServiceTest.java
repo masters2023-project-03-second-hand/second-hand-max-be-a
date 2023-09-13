@@ -205,9 +205,9 @@ class OauthServiceTest extends IntegrationTestSupport {
 	public void signUpWhenDuplicateLoginId() throws IOException {
 		// given
 		Member member = Member.create("avatarUrlValue", "23Yong1234@gmail.com", "23Yong");
-		MemberTown memberTown = MemberTown.create("가락 1동");
-		member.addMemberTown(memberTown);
+		MemberTown memberTown = MemberTown.create("가락 1동", member);
 		memberRepository.save(member);
+		memberTownRepository.save(memberTown);
 
 		String provider = "naver";
 		String code = "1234";

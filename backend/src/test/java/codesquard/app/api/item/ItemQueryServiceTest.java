@@ -32,7 +32,7 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 			.findAny()
 			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 
-		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		memberRepository.save(member);
 
 		List<Image> images = ImageFixedFactory.createFixedImages();
@@ -65,7 +65,7 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 	@Test
 	public void findDetailItemWithNotExistItem() {
 		// given
-		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		Long itemId = 9999L;
 		// when
 		Throwable throwable = Assertions.catchThrowable(

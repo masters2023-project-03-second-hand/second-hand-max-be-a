@@ -13,7 +13,6 @@ import codesquard.app.api.item.ItemFixedFactory;
 import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.item.Item;
-import codesquard.app.domain.membertown.MemberTown;
 
 class MemberTest extends IntegrationTestSupport {
 
@@ -24,7 +23,7 @@ class MemberTest extends IntegrationTestSupport {
 	@Test
 	public void addItem() {
 		// given
-		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		categoryRepository.save(category);
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(), 0L);
@@ -37,22 +36,6 @@ class MemberTest extends IntegrationTestSupport {
 			softAssertions.assertThat(saveMember.getItems()).hasSize(1);
 			softAssertions.assertThat(item.getMember()).isEqualTo(saveMember);
 			softAssertions.assertAll();
-		});
-	}
-
-	@DisplayName("회원이 동네를 추가한다")
-	@Test
-	public void addMemberTown() {
-		// given
-		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown town = MemberTown.create("가락 1동");
-		// when
-		member.addMemberTown(town);
-		// then
-		Member saveMember = memberRepository.save(member);
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(saveMember.getTowns()).contains(town);
-			softAssertions.assertThat(saveMember.getTowns()).hasSize(1);
 		});
 	}
 }

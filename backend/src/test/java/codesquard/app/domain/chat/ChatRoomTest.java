@@ -22,7 +22,7 @@ class ChatRoomTest extends IntegrationTestSupport {
 	@Test
 	public void setMember() {
 		// given
-		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
 		// when
 		chatRoom.changeMember(member);
@@ -42,7 +42,7 @@ class ChatRoomTest extends IntegrationTestSupport {
 	@Test
 	public void setItem() {
 		// given
-		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
 		chatRoom.changeMember(member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
@@ -66,7 +66,7 @@ class ChatRoomTest extends IntegrationTestSupport {
 	@Test
 	public void addChatLog() {
 		// given
-		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
 		chatRoom.changeMember(member);
 		Category category = CategoryFixedFactory.createdFixedCategory();

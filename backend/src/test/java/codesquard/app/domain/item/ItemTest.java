@@ -1,7 +1,6 @@
 package codesquard.app.domain.item;
 
 import static codesquard.app.api.category.CategoryFixedFactory.*;
-import static codesquard.app.api.oauth.OauthFixedFactory.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +15,7 @@ import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.ImageFixedFactory;
 import codesquard.app.api.item.ItemFixedFactory;
 import codesquard.app.api.item.WishFixedFactory;
+import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.image.Image;
 import codesquard.app.domain.member.Member;
@@ -30,7 +30,7 @@ class ItemTest extends IntegrationTestSupport {
 		Category category = createdFixedCategory();
 		categoryRepository.save(category);
 
-		Member member = createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		memberRepository.save(member);
 
 		Item item = ItemFixedFactory.createFixedItem(null, category, new ArrayList<>(), new ArrayList<>(), 0L);
@@ -54,7 +54,7 @@ class ItemTest extends IntegrationTestSupport {
 		Category category = createdFixedCategory();
 		categoryRepository.save(category);
 
-		Member member = createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		memberRepository.save(member);
 
 		Item item = ItemFixedFactory.createFixedItem(member, null, new ArrayList<>(), new ArrayList<>(), 0L);
@@ -74,7 +74,7 @@ class ItemTest extends IntegrationTestSupport {
 		Category category = createdFixedCategory();
 		categoryRepository.save(category);
 
-		Member member = createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		memberRepository.save(member);
 
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(), 0L);
@@ -99,7 +99,7 @@ class ItemTest extends IntegrationTestSupport {
 	public void addInterest() {
 		// given
 		Category category = createdFixedCategory();
-		Member member = createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(),
 			0L);
@@ -128,7 +128,7 @@ class ItemTest extends IntegrationTestSupport {
 		// given
 		Category category = createdFixedCategory();
 		categoryRepository.save(category);
-		Member member = createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		memberRepository.save(member);
 
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(),

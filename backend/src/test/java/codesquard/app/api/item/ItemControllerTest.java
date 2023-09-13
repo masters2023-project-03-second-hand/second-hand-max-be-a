@@ -56,7 +56,7 @@ class ItemControllerTest extends ControllerTestSupport {
 	public void findDetailItemBySeller() throws Exception {
 		// given
 		long itemId = 1L;
-		Member seller = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Member seller = OauthFixedFactory.createFixedMember();
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		List<Image> images = ImageFixedFactory.createFixedImages();
 		Item item = ItemFixedFactory.createFixedItem(seller, category, images, new ArrayList<>(), 0L);
@@ -86,7 +86,7 @@ class ItemControllerTest extends ControllerTestSupport {
 	public void findDetailItemByBuyer() throws Exception {
 		// given
 		long itemId = 1L;
-		Member seller = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Member seller = OauthFixedFactory.createFixedMember();
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		List<Image> images = ImageFixedFactory.createFixedImages();
 		Item item = ItemFixedFactory.createFixedItem(seller, category, images, new ArrayList<>(), 0L);

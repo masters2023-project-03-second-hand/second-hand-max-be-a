@@ -21,6 +21,8 @@ import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
 import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
+import codesquard.app.api.oauth.OauthFixedFactory;
+import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.Principal;
@@ -46,7 +48,9 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 	public void addMemberTown() throws Exception {
 		// given
 		MemberTownAddRequest request = MemberTownAddRequest.create("서울 송파구 가락동", "가락동");
-		MemberAddRegionResponse response = MemberAddRegionResponse.create(MemberTown.create("가락동"));
+		Member member = OauthFixedFactory.createFixedMember();
+		MemberTown memberTown = MemberTown.create("가락동", member);
+		MemberAddRegionResponse response = MemberAddRegionResponse.create(memberTown);
 		given(memberTownService.addMemberTown(
 			ArgumentMatchers.any(Principal.class),
 			ArgumentMatchers.any(MemberTownAddRequest.class)))
@@ -67,7 +71,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 	public void removeMemberTown() throws Exception {
 		// given
 		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 송파구 가락동", "가락동");
-		MemberTownRemoveResponse response = MemberTownRemoveResponse.create(1L);
+		MemberTownRemoveResponse response = MemberTownRemoveResponse.create("가락동");
 		given(memberTownService.removeMemberTown(
 			ArgumentMatchers.any(Principal.class),
 			ArgumentMatchers.any(MemberTownRemoveRequest.class)))
