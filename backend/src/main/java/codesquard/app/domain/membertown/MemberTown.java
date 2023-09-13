@@ -29,7 +29,7 @@ public class MemberTown {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	public MemberTown(String name, Member member) {
+	private MemberTown(String name, Member member) {
 		this.name = name;
 		this.member = member;
 	}
