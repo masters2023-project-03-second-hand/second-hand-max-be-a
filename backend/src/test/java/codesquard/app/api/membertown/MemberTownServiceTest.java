@@ -72,9 +72,9 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void addMemberTownWithOverTheMaximumMemberTownSize() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		member.addMemberTown(MemberTown.create("가락동"));
-		member.addMemberTown(MemberTown.create("부안동"));
+		List<MemberTown> memberTowns = MemberTown.create(List.of("가락동", "부안동"), member);
 		Member saveMember = memberRepository.save(member);
+		memberTownRepository.saveAll(memberTowns);
 
 		Principal principal = Principal.from(saveMember);
 		MemberTownAddRequest request = MemberTownAddRequest.create("서울 종로구 청운동", "청운동");
@@ -92,8 +92,9 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void addMemberTownWithDuplicateAddressName() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		member.addMemberTown(MemberTown.create("신교동"));
+		MemberTown memberTown = MemberTown.create("신교동", member);
 		Member saveMember = memberRepository.save(member);
+		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
 		MemberTownAddRequest request = MemberTownAddRequest.create("서울 종로구 신교동", "신교동");
@@ -111,9 +112,9 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void removeMemberTown() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		member.addMemberTown(MemberTown.create("가락동"));
-		member.addMemberTown(MemberTown.create("부안동"));
+		List<MemberTown> memberTowns = MemberTown.create(List.of("가락동", "부안동"), member);
 		Member saveMember = memberRepository.save(member);
+		memberTownRepository.saveAll(memberTowns);
 
 		Principal principal = Principal.from(saveMember);
 		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 송파구 가락동", "가락동");
@@ -121,8 +122,9 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 		MemberTownRemoveResponse response = memberTownService.removeMemberTown(principal, request);
 		// then
 		assertAll(() -> {
-			assertThat(response.getId()).isNotNull();
-			assertThat(memberTownRepository.findById(response.getId()).isEmpty()).isTrue();
+			assertThat(response.getAddress()).isEqualTo("가락동");
+			assertThat(memberTownRepository.findMemberTownByMemberIdAndName(saveMember.getId(), "가락동")
+				.isEmpty()).isTrue();
 		});
 	}
 
@@ -131,8 +133,9 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void removeMemberTownWithNotMatchAddressName() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		member.addMemberTown(MemberTown.create("가락동"));
+		MemberTown memberTown = MemberTown.create("가락동", member);
 		Member saveMember = memberRepository.save(member);
+		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
 		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 송파구 가락동", "부안동");
@@ -150,8 +153,9 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void removeMemberTownWithNotExistFullAddressName() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		member.addMemberTown(MemberTown.create("가락동"));
+		MemberTown memberTown = MemberTown.create("가락동", member);
 		Member saveMember = memberRepository.save(member);
+		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
 		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 없는구 없동", "가락동");
@@ -169,8 +173,9 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void removeMemberTownWithNotRegisteredAddressName() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		member.addMemberTown(MemberTown.create("가락동"));
+		MemberTown memberTown = MemberTown.create("가락동", member);
 		Member saveMember = memberRepository.save(member);
+		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
 		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 종로구 효자동", "효자동");
@@ -188,8 +193,9 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void removeMemberTownWithMinimumMemberTownSize() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		member.addMemberTown(MemberTown.create("창성동"));
+		MemberTown memberTown = MemberTown.create("창성동", member);
 		Member saveMember = memberRepository.save(member);
+		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
 		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 종로구 창성동", "창성동");

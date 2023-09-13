@@ -38,8 +38,8 @@ public class ItemRegisterRequest {
 			.wishCount(0L)
 			.chatCount(0L)
 			.viewCount(0L)
+			.member(member)
 			.build();
-		item.changeMember(member);
 		item.changeCategory(new Category(categoryId));
 		return item;
 	}

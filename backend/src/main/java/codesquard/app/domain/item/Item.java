@@ -1,11 +1,7 @@
 package codesquard.app.domain.item;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,13 +11,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import codesquard.app.domain.category.Category;
-import codesquard.app.domain.chat.ChatRoom;
-import codesquard.app.domain.image.Image;
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.wish.Wish;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -59,22 +51,13 @@ public class Item {
 	@JoinColumn(name = "category_id")
 	private Category category;
 
-	@OneToMany(mappedBy = "item", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-	private List<Wish> wishes = new ArrayList<>();
-
-	@OneToMany(mappedBy = "item", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-	private List<ChatRoom> chatRooms = new ArrayList<>();
-
-	@OneToMany(mappedBy = "item", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-	private List<Image> images = new ArrayList<>();
-
 	public Item(Long id) {
 		this.id = id;
 	}
 
 	@Builder
 	public Item(String title, String content, Long price, ItemStatus status, String region, LocalDateTime createdAt,
-		String thumbnailUrl, LocalDateTime modifiedAt, Long wishCount, Long chatCount, Long viewCount) {
+		String thumbnailUrl, LocalDateTime modifiedAt, Long wishCount, Long chatCount, Long viewCount, Member member) {
 		this.title = title;
 		this.content = content;
 		this.price = price;
@@ -86,10 +69,11 @@ public class Item {
 		this.wishCount = wishCount;
 		this.chatCount = chatCount;
 		this.viewCount = viewCount;
+		this.member = member;
 	}
 
 	public static Item create(String title, String content, Long price, ItemStatus status, String region,
-		LocalDateTime createdAt, Long viewCount) {
+		LocalDateTime createdAt, Long viewCount, Member member) {
 		return Item.builder()
 			.title(title)
 			.content(content)
@@ -98,74 +82,12 @@ public class Item {
 			.region(region)
 			.createdAt(createdAt)
 			.viewCount(viewCount)
+			.member(member)
 			.build();
-	}
-
-	public void changeMember(Member member) {
-		this.member = member;
-		addItemBy(member);
-	}
-
-	private void addItemBy(Member member) {
-		if (member == null) {
-			return;
-		}
-
-		if (!member.containsItem(this)) {
-			member.addItem(this);
-		}
 	}
 
 	public void changeCategory(Category category) {
 		this.category = category;
-	}
-
-	public void addImage(Image image) {
-		if (image == null) {
-			return;
-		}
-		if (!containsImage(image)) {
-			this.images.add(image);
-		}
-		image.changeItem(this);
-	}
-
-	public void addWish(Wish wish) {
-		if (wish == null) {
-			return;
-		}
-		if (!containsWish(wish)) {
-			this.wishes.add(wish);
-		}
-		wish.changeItem(this);
-	}
-
-	public void addChatRoom(ChatRoom chatRoom) {
-		if (chatRoom == null) {
-			return;
-		}
-		if (!containsChatRoom(chatRoom)) {
-			chatRooms.add(chatRoom);
-		}
-		chatRoom.changeItem(this);
-	}
-
-	public int countTotalChatLog() {
-		return chatRooms.stream()
-			.mapToInt(ChatRoom::sizeChatLogs)
-			.sum();
-	}
-
-	public boolean containsChatRoom(ChatRoom chatRoom) {
-		return chatRooms.contains(chatRoom);
-	}
-
-	public boolean containsImage(Image image) {
-		return images.contains(image);
-	}
-
-	public boolean containsWish(Wish wish) {
-		return wishes.contains(wish);
 	}
 
 	public void wishRegister() {
@@ -174,12 +96,6 @@ public class Item {
 
 	public void wishCancel() {
 		this.wishCount--;
-	}
-
-	public List<String> getImageUrls() {
-		return images.stream()
-			.map(Image::getImageUrl)
-			.collect(Collectors.toUnmodifiableList());
 	}
 
 	@Override

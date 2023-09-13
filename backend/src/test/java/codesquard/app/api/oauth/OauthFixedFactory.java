@@ -21,7 +21,6 @@ import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.membertown.MemberTown;
 
 public class OauthFixedFactory {
 	private static final String LOGIN_ID = "23Yong";
@@ -84,12 +83,6 @@ public class OauthFixedFactory {
 
 	public static Member createFixedMember() {
 		return Member.create(AVATAR_URL, EMAIL, LOGIN_ID);
-	}
-
-	public static Member createFixedMemberWithMemberTown() {
-		Member member = createFixedMember();
-		member.addMemberTown(MemberTown.create("가락 1동"));
-		return member;
 	}
 
 	public static String createExpectedAccessTokenBy(JwtProvider jwtProvider, Member member,

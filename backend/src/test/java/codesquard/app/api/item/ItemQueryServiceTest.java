@@ -25,24 +25,25 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 	@Test
 	public void findDetailItemBySeller() {
 		// given
+		Category category = CategoryFixedFactory.createdFixedCategory();
 		List<Category> categories = CategoryFixedFactory.createFixedCategories();
 		categoryRepository.saveAll(categories);
 		Category findCategory = categories.stream()
-			.filter(category -> category.getName().equals("가구/인테리어"))
+			.filter(c -> c.getName().equals("가구/인테리어"))
 			.findAny()
 			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 
-		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		memberRepository.save(member);
 
-		List<Image> images = ImageFixedFactory.createFixedImages();
 		long viewCount = 4L;
+		Item item = ItemFixedFactory.createFixedItem(member, findCategory, viewCount);
 		List<Wish> wishes = List.of(
-			WishFixedFactory.createWish(member),
-			WishFixedFactory.createWish(member),
-			WishFixedFactory.createWish(member)
+			WishFixedFactory.createWish(member, item),
+			WishFixedFactory.createWish(member, item),
+			WishFixedFactory.createWish(member, item)
 		);
-		Item item = ItemFixedFactory.createFixedItem(member, findCategory, images, wishes, viewCount);
+		List<Image> images = ImageFixedFactory.createFixedImages(item);
 		itemRepository.save(item);
 		wishRepository.saveAll(wishes);
 		imageRepository.saveAll(images);
@@ -65,7 +66,7 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 	@Test
 	public void findDetailItemWithNotExistItem() {
 		// given
-		Member member = OauthFixedFactory.createFixedMemberWithMemberTown();
+		Member member = OauthFixedFactory.createFixedMember();
 		Long itemId = 9999L;
 		// when
 		Throwable throwable = Assertions.catchThrowable(

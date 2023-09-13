@@ -80,7 +80,7 @@ public abstract class IntegrationTestSupport {
 		imageRepository.deleteAllInBatch();
 		itemRepository.deleteAllInBatch();
 		categoryRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
 		memberTownRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
 	}
 }

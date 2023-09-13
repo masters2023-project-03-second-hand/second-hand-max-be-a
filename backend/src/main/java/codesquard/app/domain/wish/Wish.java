@@ -36,35 +36,13 @@ public class Wish {
 	private Item item;
 	private LocalDateTime createdAt;
 
-	public Wish(Long memberId, Long itemId) {
-		this.member = new Member(memberId);
-		this.item = new Item(itemId);
-		this.createdAt = LocalDateTime.now();
-	}
-
-	public static Wish create(LocalDateTime createdAt) {
-		return new Wish(null, null, null, createdAt);
-	}
-
-	public static Wish create(Long memberId, Long itemId) {
-		return new Wish(memberId, itemId);
-	}
-
-	public void changeMember(Member member) {
+	private Wish(Member member, Item item, LocalDateTime createdAt) {
 		this.member = member;
-	}
-
-	public void changeItem(Item item) {
 		this.item = item;
-		addWishBy(item);
+		this.createdAt = createdAt;
 	}
 
-	private void addWishBy(Item item) {
-		if (item == null) {
-			return;
-		}
-		if (!item.containsWish(this)) {
-			this.item.addWish(this);
-		}
+	public static Wish create(Member member, Item item, LocalDateTime createdAt) {
+		return new Wish(member, item, createdAt);
 	}
 }
