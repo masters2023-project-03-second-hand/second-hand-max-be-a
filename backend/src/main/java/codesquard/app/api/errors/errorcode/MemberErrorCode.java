@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum MemberErrorCode implements ErrorCode {
 
-	ALREADY_EXIST_ID(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
+	ALREADY_EXIST_ID(HttpStatus.CONFLICT, "중복된 아이디입니다."),
 	NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "회원을 찾지 못하였습니다.");
 
 	private final HttpStatus httpStatus;
