@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +68,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	public void signup() throws Exception {
 		// given
 		MockMultipartFile mockProfile = createFixedProfile();
-		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest());
+		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest(List.of(1L)));
 
 		// mocking
 		when(oauthService.signUp(any(), any(OauthSignUpRequest.class), anyString(), anyString()))
@@ -91,7 +90,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		// given
 		MockMultipartFile mockProfile = createFixedProfile();
 		MockMultipartFile mockSignupData = createFixedSignUpData(
-			createFixedOauthSignUpRequest(loginId, List.of("가락 1동")));
+			createFixedOauthSignUpRequest(loginId, List.of(1L)));
 
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
@@ -106,15 +105,13 @@ class OauthRestControllerTest extends ControllerTestSupport {
 				Matchers.equalTo("아이디는 띄어쓰기 없이 영문, 숫자로 구성되며 2~12글자로 구성되어야 합니다.")));
 	}
 
-	@DisplayName("비어 있는 주소를 전달하여 회원가입을 요청할 때 에러를 응답한다")
-	@MethodSource(value = "provideInvalidAddrName")
+	@DisplayName("유효하지 않은 입력 형식의 주소 등록번호를 전달하여 회원가입을 요청할 때 에러를 응답한다")
+	@MethodSource(value = "provideInvalidAddressIds")
 	@ParameterizedTest
-	public void signupWhenInvalidAddrName(String addrName) throws Exception {
+	public void signupWhenInvalidAddrName(List<Long> addressIds) throws Exception {
 		// given
-		List<String> addressNames = new ArrayList<>();
-		addressNames.add(addrName);
 		MockMultipartFile mockProfile = createFixedProfile();
-		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest("23Yong", addressNames));
+		MockMultipartFile mockSignupData = createFixedSignUpData(createFixedOauthSignUpRequest("23Yong", addressIds));
 
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
@@ -124,7 +121,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(400)))
 			.andExpect(jsonPath("message").value(Matchers.equalTo("유효하지 않은 입력형식입니다.")))
-			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("addressNames")))
+			.andExpect(jsonPath("data[0].field").value(Matchers.equalTo("addressIds")))
 			.andExpect(jsonPath("data[0].defaultMessage").value(
 				Matchers.equalTo("동네 주소는 최소 1개 최대 2개를 입력해주세요.")));
 	}
@@ -181,10 +178,12 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		);
 	}
 
-	private static Stream<Arguments> provideInvalidAddrName() {
+	private static Stream<Arguments> provideInvalidAddressIds() {
 		return Stream.of(
 			Arguments.of((Object)null),
-			Arguments.of("")
+			Arguments.of(List.of()),
+			Arguments.of(List.of(0L)),
+			Arguments.of(List.of(1L, 2L, 3L))
 		);
 	}
 }

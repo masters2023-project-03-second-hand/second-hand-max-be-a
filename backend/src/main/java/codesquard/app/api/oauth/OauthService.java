@@ -1,6 +1,9 @@
 package codesquard.app.api.oauth;
 
+import static java.util.stream.Collectors.*;
+
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +38,8 @@ import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
+import codesquard.app.domain.region.Region;
+import codesquard.app.domain.region.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +52,7 @@ public class OauthService {
 	private final OauthClientRepository oauthClientRepository;
 	private final MemberRepository memberRepository;
 	private final MemberTownRepository memberTownRepository;
+	private final RegionRepository regionRepository;
 	private final ImageService imageService;
 	private final JwtProvider jwtProvider;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -71,7 +77,8 @@ public class OauthService {
 		Member saveMember = memberRepository.save(member);
 		log.debug("회원 엔티티 저장 결과 : {}", saveMember);
 
-		List<MemberTown> memberTowns = MemberTown.create(request.getAddressNames(), member);
+		List<String> regionShortAddress = getRegionNamesBy(request);
+		List<MemberTown> memberTowns = MemberTown.create(regionShortAddress, member);
 		memberTownRepository.saveAll(memberTowns);
 		log.debug("회원 동네 저장 결과 : {}", memberTowns);
 
@@ -101,6 +108,15 @@ public class OauthService {
 			oauthClient.getUserProfileByAccessToken(accessTokenResponse);
 		log.debug("{}", userProfileResponse);
 		return userProfileResponse;
+	}
+
+	private List<String> getRegionNamesBy(OauthSignUpRequest request) {
+		final int SKIP_COUNT = 2; // 주소의 동 주소만을 추출하기 위한 스킵할 개수
+		return regionRepository.findAllById(request.getAddressIds())
+			.stream()
+			.map(Region::getName)
+			.map(fullAddress -> Arrays.stream(fullAddress.split(" ")).skip(SKIP_COUNT).collect(joining()))
+			.collect(toUnmodifiableList());
 	}
 
 	public OauthLoginResponse login(OauthLoginRequest request, String provider, String code, LocalDateTime now) {
