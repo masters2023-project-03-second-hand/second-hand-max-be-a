@@ -3,7 +3,6 @@ package codesquard.app.api.sales;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.api.response.ItemResponses;
@@ -19,8 +18,7 @@ public class SalesItemService {
 	private final SalesPaginationRepository salesPaginationRepository;
 
 	@Transactional(readOnly = true)
-	public ItemResponses findAll(@RequestParam SalesStatus status, @RequestParam(required = false) int size,
-		@RequestParam(required = false) Long cursor) {
+	public ItemResponses findAll(SalesStatus status, int size, Long cursor) {
 		Slice<ItemResponse> itemResponses = salesPaginationRepository.findAll(status, size, cursor);
 		return PaginationUtils.getItemResponses(itemResponses);
 	}
