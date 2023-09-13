@@ -1,7 +1,5 @@
 package codesquard.app.domain.chat;
 
-import java.util.ArrayList;
-
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +20,7 @@ class ChatRoomTest extends IntegrationTestSupport {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		Category category = CategoryFixedFactory.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), 0L);
+		Item item = ItemFixedFactory.createFixedItem(member, category, 0L);
 		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom(member, item);
 		ChatLog chatLog = ChatLogFixedFactory.createFixedChatLog(null);
 		// when
