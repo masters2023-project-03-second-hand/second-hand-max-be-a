@@ -1,6 +1,5 @@
 package codesquard.app.api.item;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Slice;
@@ -31,17 +30,12 @@ public class ItemService {
 	@Transactional
 	public void register(ItemRegisterRequest request, List<MultipartFile> itemImage, Long memberId) {
 		List<String> serverFileUrls = imageService.uploadImages(itemImage);
-		List<Image> images = new ArrayList<>();
-
 		Member writer = new Member(memberId);
 		String thumbnailUrl = serverFileUrls.get(0);
 		Item item = request.toEntity(writer, thumbnailUrl);
 		Item saveItem = itemRepository.save(item);
 
-		for (String serverFileUrl : serverFileUrls) {
-			images.add(new Image(saveItem, serverFileUrl));
-		}
-
+		List<Image> images = Image.create(serverFileUrls, saveItem);
 		imageRepository.saveAll(images);
 	}
 

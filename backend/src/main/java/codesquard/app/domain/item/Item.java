@@ -3,7 +3,6 @@ package codesquard.app.domain.item;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -19,7 +18,6 @@ import javax.persistence.OneToMany;
 
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.chat.ChatRoom;
-import codesquard.app.domain.image.Image;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.wish.Wish;
 import lombok.AllArgsConstructor;
@@ -65,9 +63,6 @@ public class Item {
 	@OneToMany(mappedBy = "item", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	private List<ChatRoom> chatRooms = new ArrayList<>();
 
-	@OneToMany(mappedBy = "item", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-	private List<Image> images = new ArrayList<>();
-
 	public Item(Long id) {
 		this.id = id;
 	}
@@ -107,16 +102,6 @@ public class Item {
 		this.category = category;
 	}
 
-	public void addImage(Image image) {
-		if (image == null) {
-			return;
-		}
-		if (!containsImage(image)) {
-			this.images.add(image);
-		}
-		image.changeItem(this);
-	}
-
 	public void addWish(Wish wish) {
 		if (wish == null) {
 			return;
@@ -147,10 +132,6 @@ public class Item {
 		return chatRooms.contains(chatRoom);
 	}
 
-	public boolean containsImage(Image image) {
-		return images.contains(image);
-	}
-
 	public boolean containsWish(Wish wish) {
 		return wishes.contains(wish);
 	}
@@ -161,12 +142,6 @@ public class Item {
 
 	public void wishCancel() {
 		this.wishCount--;
-	}
-
-	public List<String> getImageUrls() {
-		return images.stream()
-			.map(Image::getImageUrl)
-			.collect(Collectors.toUnmodifiableList());
 	}
 
 	@Override
