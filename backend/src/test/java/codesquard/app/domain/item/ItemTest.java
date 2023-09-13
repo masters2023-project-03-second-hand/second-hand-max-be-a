@@ -23,30 +23,6 @@ import codesquard.app.domain.wish.Wish;
 
 class ItemTest extends IntegrationTestSupport {
 
-	@DisplayName("상품에 회원을 설정한다")
-	@Test
-	public void setMember() {
-		// given
-		Category category = createdFixedCategory();
-		categoryRepository.save(category);
-
-		Member member = OauthFixedFactory.createFixedMember();
-		memberRepository.save(member);
-
-		Item item = ItemFixedFactory.createFixedItem(null, category, new ArrayList<>(), new ArrayList<>(), 0L);
-
-		// when
-		item.changeMember(member);
-
-		// then
-		Item saveItem = itemRepository.save(item);
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(saveItem.getMember()).isEqualTo(member);
-			softAssertions.assertThat(member.getItems()).contains(saveItem).hasSize(1);
-			softAssertions.assertAll();
-		});
-	}
-
 	@DisplayName("상품에 카테고리를 설정한다")
 	@Test
 	public void setCategory() {

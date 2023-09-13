@@ -21,8 +21,7 @@ public class ItemFixedFactory {
 
 	public static Item createFixedItem(Member member, Category category, List<Image> images, List<Wish> wishes,
 		Long viewCount) {
-		Item item = Item.create(TITLE, CONTENT, PRICE, STATUS, REGION, CREATED_AT, viewCount);
-		item.changeMember(member);
+		Item item = Item.create(TITLE, CONTENT, PRICE, STATUS, REGION, CREATED_AT, viewCount, member);
 		item.changeCategory(category);
 		images.forEach(item::addImage);
 		wishes.forEach(item::addWish);
