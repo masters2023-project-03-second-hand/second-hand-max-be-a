@@ -18,33 +18,12 @@ import codesquard.app.domain.member.Member;
 class ChatRoomTest extends IntegrationTestSupport {
 
 	@Transactional
-	@DisplayName("채팅방에 회원을 설정한다")
-	@Test
-	public void setMember() {
-		// given
-		Member member = OauthFixedFactory.createFixedMember();
-		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
-		// when
-		chatRoom.changeMember(member);
-		// then
-		Member saveMember = memberRepository.save(member);
-		ChatRoom saveChatRoom = chatRoomRepository.save(chatRoom);
-
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(saveChatRoom.getMember()).isEqualTo(saveMember);
-			softAssertions.assertThat(saveMember.getChatRooms()).contains(saveChatRoom).hasSize(1);
-			softAssertions.assertAll();
-		});
-	}
-
-	@Transactional
 	@DisplayName("채팅방에 상품을 설정한다")
 	@Test
 	public void setItem() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
-		chatRoom.changeMember(member);
+		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom(member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(), 0L);
 		// when
@@ -67,8 +46,7 @@ class ChatRoomTest extends IntegrationTestSupport {
 	public void addChatLog() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
-		chatRoom.changeMember(member);
+		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom(member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(member, category, new ArrayList<>(), new ArrayList<>(), 0L);
 		chatRoom.changeItem(item);

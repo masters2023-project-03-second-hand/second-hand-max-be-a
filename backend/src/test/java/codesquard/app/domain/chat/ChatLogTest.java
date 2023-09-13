@@ -5,6 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import codesquard.app.IntegrationTestSupport;
+import codesquard.app.api.oauth.OauthFixedFactory;
+import codesquard.app.domain.member.Member;
 
 class ChatLogTest extends IntegrationTestSupport {
 
@@ -12,7 +14,8 @@ class ChatLogTest extends IntegrationTestSupport {
 	@Test
 	public void setChatRoom() {
 		// given
-		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom();
+		Member member = OauthFixedFactory.createFixedMember();
+		ChatRoom chatRoom = ChatRoomFixedFactory.createFixedChatRoom(member);
 		ChatLog chatLog = ChatLogFixedFactory.createFixedChatLog(null);
 		// when
 		chatLog.changeChatRoom(chatRoom);
