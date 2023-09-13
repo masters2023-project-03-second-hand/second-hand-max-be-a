@@ -5,22 +5,18 @@ import java.util.stream.Collectors;
 
 import codesquard.app.domain.region.Region;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegionItemResponse {
 
 	private Long addressId;
 	private String fullAddressName;
 	private String addressName;
-
-	private RegionItemResponse(Long addressId, String fullAddressName, String addressName) {
-		this.addressId = addressId;
-		this.fullAddressName = fullAddressName;
-		this.addressName = addressName;
-	}
 
 	public static RegionItemResponse from(Region region) {
 		Long addressId = region.getId();

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.image.ImageService;
+import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.image.Image;
@@ -53,4 +54,8 @@ public class ItemService {
 		return new ItemResponses(contents, hasNext, nextCursor);
 	}
 
+	@Transactional
+	public void modifyItem(ItemModifyRequest request) {
+
+	}
 }
