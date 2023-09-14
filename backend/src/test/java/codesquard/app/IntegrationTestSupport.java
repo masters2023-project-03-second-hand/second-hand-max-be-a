@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import codesquard.app.api.category.CategoryQueryService;
 import codesquard.app.api.item.ItemQueryService;
+import codesquard.app.api.item.ItemService;
 import codesquard.app.api.member.MemberService;
 import codesquard.app.api.membertown.MemberTownService;
 import codesquard.app.api.oauth.OauthService;
@@ -77,6 +78,9 @@ public abstract class IntegrationTestSupport {
 
 	@Autowired
 	protected MemberTownService memberTownService;
+
+	@Autowired
+	protected ItemService itemService;
 
 	@Autowired
 	protected SalesItemService salesItemService;

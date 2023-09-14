@@ -1,20 +1,17 @@
 package codesquard.app.api.oauth.request;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthLogoutRequest {
 
 	private String accessToken;
 	private String refreshToken;
-
-	private OauthLogoutRequest(String accessToken, String refreshToken) {
-		this.accessToken = accessToken;
-		this.refreshToken = refreshToken;
-	}
 
 	public static OauthLogoutRequest create(String accessToken, String refreshToken) {
 		return new OauthLogoutRequest(accessToken, refreshToken);

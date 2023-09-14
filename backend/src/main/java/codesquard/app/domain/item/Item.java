@@ -1,6 +1,7 @@
 package codesquard.app.domain.item;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -12,8 +13,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import codesquard.app.api.errors.errorcode.ItemErrorCode;
+import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.oauth.support.Principal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -57,7 +61,8 @@ public class Item {
 
 	@Builder
 	public Item(String title, String content, Long price, ItemStatus status, String region, LocalDateTime createdAt,
-		String thumbnailUrl, LocalDateTime modifiedAt, Long wishCount, Long chatCount, Long viewCount, Member member) {
+		String thumbnailUrl, LocalDateTime modifiedAt, Long wishCount, Long chatCount, Long viewCount, Member member,
+		Category category) {
 		this.title = title;
 		this.content = content;
 		this.price = price;
@@ -70,6 +75,7 @@ public class Item {
 		this.chatCount = chatCount;
 		this.viewCount = viewCount;
 		this.member = member;
+		this.category = category;
 	}
 
 	public static Item create(String title, String content, Long price, ItemStatus status, String region,
@@ -90,6 +96,14 @@ public class Item {
 		this.category = category;
 	}
 
+	public void changeBy(Item changeItem) {
+		this.title = changeItem.title;
+		this.price = changeItem.price;
+		this.content = changeItem.content;
+		this.region = changeItem.region;
+		this.status = changeItem.status;
+	}
+
 	public void wishRegister() {
 		this.wishCount++;
 	}
@@ -102,5 +116,11 @@ public class Item {
 	public String toString() {
 		return String.format("%s, %s(id=%d, title=%s, price=%d, status=%s, region=%s, viewCount=%d)",
 			"상품", this.getClass().getSimpleName(), id, title, price, status, region, viewCount);
+	}
+
+	public void validateAuthorization(Principal writer) {
+		if (!Objects.equals(member.getId(), writer.getMemberId())) {
+			throw new RestApiException(ItemErrorCode.ITEM_FORBIDDEN);
+		}
 	}
 }
