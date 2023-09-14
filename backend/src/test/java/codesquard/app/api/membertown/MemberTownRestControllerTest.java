@@ -26,6 +26,7 @@ import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.Principal;
+import codesquard.app.domain.region.Region;
 
 class MemberTownRestControllerTest extends ControllerTestSupport {
 
@@ -43,13 +44,13 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 			.build();
 	}
 
-	@DisplayName("전체 주소와 동 주소를 가지고 회원 동네를 추가한다")
+	@DisplayName("주소 등록번호를 가지고 회원 동네를 추가한다")
 	@Test
 	public void addMemberTown() throws Exception {
 		// given
-		MemberTownAddRequest request = MemberTownAddRequest.create("서울 송파구 가락동", "가락동");
+		MemberTownAddRequest request = MemberTownAddRequest.create(1L);
 		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create("가락동", member);
+		MemberTown memberTown = MemberTown.create(Region.create("서울 송파구 가락동"), member);
 		MemberAddRegionResponse response = MemberAddRegionResponse.create(memberTown);
 		given(memberTownService.addMemberTown(
 			ArgumentMatchers.any(Principal.class),
@@ -66,12 +67,12 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("data").value(equalTo(null)));
 	}
 
-	@DisplayName("전체 주소와 동주소를 가지고 회원의 동네를 삭제한다")
+	@DisplayName("주소 등록번호를 가지고 회원의 동네를 삭제한다")
 	@Test
 	public void removeMemberTown() throws Exception {
 		// given
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 송파구 가락동", "가락동");
-		MemberTownRemoveResponse response = MemberTownRemoveResponse.create("가락동");
+		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(1L);
+		MemberTownRemoveResponse response = MemberTownRemoveResponse.create("서울 송파구 가락동");
 		given(memberTownService.removeMemberTown(
 			ArgumentMatchers.any(Principal.class),
 			ArgumentMatchers.any(MemberTownRemoveRequest.class)))
@@ -87,11 +88,11 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("data").value(equalTo(null)));
 	}
 
-	@DisplayName("전체 주소와 동주소의 이름은 null이면 회원의 동네를 제거할 수 없다")
+	@DisplayName("주소 등록번호가 null이면 회원의 동네를 제거할 수 없다")
 	@Test
 	public void removeMemberTownWithAddressIsNull() throws Exception {
 		// given
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(null, null);
+		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(null);
 		// when & then
 		mockMvc.perform(delete("/api/regions")
 				.content(objectMapper.writeValueAsString(request))
@@ -99,8 +100,8 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("statusCode").value(equalTo(400)))
 			.andExpect(jsonPath("message").value(equalTo("유효하지 않은 입력형식입니다.")))
-			.andExpect(jsonPath("data[*].field").value(containsInAnyOrder("fullAddress", "address")))
+			.andExpect(jsonPath("data[*].field").value(containsInAnyOrder("addressId")))
 			.andExpect(jsonPath("data[*].defaultMessage")
-				.value(containsInAnyOrder("주소 정보는 필수 정보입니다.", "주소 정보는 필수 정보입니다.")));
+				.value(containsInAnyOrder("주소 정보는 필수 정보입니다.")));
 	}
 }
