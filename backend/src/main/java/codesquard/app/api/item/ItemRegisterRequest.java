@@ -22,7 +22,7 @@ public class ItemRegisterRequest {
 	private Long price;
 	private String content;
 	private String region;
-	private String status;
+	private ItemStatus status;
 	private Long categoryId;
 	private String categoryName;
 
@@ -31,7 +31,7 @@ public class ItemRegisterRequest {
 			.title(title)
 			.content(content)
 			.price(price)
-			.status(ItemStatus.of(status))
+			.status(status)
 			.region(region)
 			.createdAt(LocalDateTime.now())
 			.thumbnailUrl(thumbnailUrl)
@@ -43,5 +43,4 @@ public class ItemRegisterRequest {
 		item.changeCategory(new Category(categoryId));
 		return item;
 	}
-
 }
