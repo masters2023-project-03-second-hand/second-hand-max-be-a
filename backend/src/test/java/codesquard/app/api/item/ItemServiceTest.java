@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -118,6 +119,9 @@ class ItemServiceTest extends IntegrationTestSupport {
 
 		List<MultipartFile> addImages = ImageFixedFactory.createFixedMultipartFile();
 		ItemModifyRequest request = ItemFixedFactory.createFixedItemModifyRequest(category, saveImages);
+
+		BDDMockito.given(imageUploader.uploadImageToS3(any(), any()))
+			.willReturn("http://s3_image1.com", "http://s3_image2.com");
 		// when
 		itemService.modifyItem(saveItem.getId(), request, addImages);
 		// then
