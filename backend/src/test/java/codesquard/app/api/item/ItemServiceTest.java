@@ -11,26 +11,27 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.IntegrationTestSupport;
+import codesquard.app.api.category.CategoryFixedFactory;
 import codesquard.app.api.image.ImageUploader;
+import codesquard.app.api.item.request.ItemModifyRequest;
+import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.category.Category;
+import codesquard.app.domain.image.Image;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.membertown.MemberTown;
 import codesquard.support.SupportRepository;
 
-@SpringBootTest
 class ItemServiceTest extends IntegrationTestSupport {
 
-	@Autowired
-	private ItemService itemService;
 	@Autowired
 	private SupportRepository supportRepository;
 	@MockBean
@@ -95,5 +96,33 @@ class ItemServiceTest extends IntegrationTestSupport {
 			() -> assertThat(contents.get(0).getTitle()).isEqualTo("노트북"),
 			() -> assertThat(all.getPaging().isHasNext()).isTrue(),
 			() -> assertThat(all.getPaging().getNextCursor()).isEqualTo(item.getId()));
+	}
+
+	@DisplayName("회원은 상품의 정보를 수정한다")
+	@Test
+	public void modifyItem() {
+		// given
+		Member member = OauthFixedFactory.createFixedMember();
+		List<MemberTown> memberTowns = MemberTown.create(List.of("가락동"), member);
+		Category category = CategoryFixedFactory.createdFixedCategory();
+		Item item = ItemFixedFactory.createFixedItem(member, category, 0L);
+		List<Image> images = ImageFixedFactory.createFixedImages(item);
+		categoryRepository.save(category);
+		memberRepository.save(member);
+		memberTownRepository.saveAll(memberTowns);
+		Item saveItem = itemRepository.save(item);
+		List<Image> saveImages = imageRepository.saveAll(images);
+
+		ItemModifyRequest request = ItemFixedFactory.createFixedItemModifyRequest(category, saveImages);
+		// when
+		itemService.modifyItem(saveItem.getId(), request);
+		// then
+		Item modifiedItem = itemRepository.findById(saveItem.getId()).orElseThrow();
+		assertAll(() -> {
+			assertThat(modifiedItem)
+				.extracting("title", "content", "price", "status", "region")
+				.contains(request.getTitle(), request.getContent(), request.getPrice(), request.getItemStatus(),
+					request.getRegion());
+		});
 	}
 }
