@@ -11,6 +11,7 @@ import codesquard.app.api.member.MemberService;
 import codesquard.app.api.membertown.MemberTownService;
 import codesquard.app.api.oauth.OauthService;
 import codesquard.app.api.region.RegionQueryService;
+import codesquard.app.api.sales.SalesItemService;
 import codesquard.app.domain.category.CategoryRepository;
 import codesquard.app.domain.chat.ChatLogRepository;
 import codesquard.app.domain.chat.ChatRoomRepository;
@@ -21,6 +22,7 @@ import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.region.RegionPaginationRepository;
 import codesquard.app.domain.region.RegionRepository;
 import codesquard.app.domain.wish.WishRepository;
+import codesquard.support.SupportRepository;
 
 @SpringBootTest
 public abstract class IntegrationTestSupport {
@@ -75,6 +77,12 @@ public abstract class IntegrationTestSupport {
 
 	@Autowired
 	protected ItemService itemService;
+
+	@Autowired
+	protected SalesItemService salesItemService;
+
+	@Autowired
+	protected SupportRepository supportRepository;
 
 	@AfterEach
 	void cleanup() {

@@ -23,6 +23,7 @@ import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemPaginationRepository;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.pagination.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +36,6 @@ public class ItemService {
 	private final ImageRepository imageRepository;
 	private final ImageService imageService;
 	private final ItemPaginationRepository itemPaginationRepository;
-	private final CategoryRepository categoryRepository;
 
 	@Transactional
 	public void register(ItemRegisterRequest request, List<MultipartFile> itemImage, Long memberId) {
@@ -53,14 +53,7 @@ public class ItemService {
 	public ItemResponses findAll(String region, int size, Long cursor, Long categoryId) {
 		Slice<ItemResponse> itemResponses = itemPaginationRepository.findByIdAndRegion(cursor, region, size,
 			categoryId);
-
-		List<ItemResponse> contents = itemResponses.getContent();
-		boolean hasNext = itemResponses.hasNext();
-		Long nextCursor = null;
-		if (hasNext) {
-			nextCursor = contents.get(contents.size() - 1).getItemId();
-		}
-		return new ItemResponses(contents, hasNext, nextCursor);
+		return PaginationUtils.getItemResponses(itemResponses);
 	}
 
 	@Transactional

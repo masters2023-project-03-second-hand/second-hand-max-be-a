@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import codesquard.app.domain.wish.WishStatus;
 
 @Component
-public class RequestConverter implements Converter<String, WishStatus> {
+public class WishRequestConverter implements Converter<String, WishStatus> {
 	@Override
 	public WishStatus convert(String status) {
 		return WishStatus.of(status);
