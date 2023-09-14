@@ -47,4 +47,10 @@ public class Image {
 		}
 		return images;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(id=%d, imageUrl=%s, item_id=%d)",
+			"상품의 이미지", this.getClass().getSimpleName(), id, imageUrl, item.getId());
+	}
 }

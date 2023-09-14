@@ -19,13 +19,14 @@ import lombok.NoArgsConstructor;
 public class ItemModifyRequest {
 	@NotBlank(message = "제목은 필수 정보입니다.")
 	private String title;
-	@PositiveOrZero
+	@PositiveOrZero(message = "가격은 음수이면 안됩니다.")
 	private Long price;
 	@NotBlank(message = "내용은 필수 정보입니다.")
 	private String content;
+	@NotBlank(message = "동네는 필수 정보입니다.")
 	private String region;
 	private ItemStatus itemStatus;
-	@Positive
+	@Positive(message = "카테고리 등록번호는 양수여야 합니다.")
 	private Long categoryId;
 	@NotBlank(message = "카테고리명은 필수 정보입니다.")
 	private String categoryName;
