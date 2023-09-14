@@ -1,4 +1,4 @@
-package codesquard.app.api.item;
+package codesquard.app.api.item.request;
 
 import java.time.LocalDateTime;
 

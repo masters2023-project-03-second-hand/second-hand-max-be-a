@@ -1,4 +1,4 @@
-package codesquard.app.api.item;
+package codesquard.app.api.item.request;
 
 import codesquard.app.domain.item.ItemStatus;
 import lombok.Getter;

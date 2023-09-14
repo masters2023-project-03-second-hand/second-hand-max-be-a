@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.item.request.ItemModifyRequest;
+import codesquard.app.api.item.request.ItemRegisterRequest;
+import codesquard.app.api.item.request.ItemStatusModifyRequest;
 import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.api.response.ApiResponse;
 import codesquard.app.api.response.ItemResponses;

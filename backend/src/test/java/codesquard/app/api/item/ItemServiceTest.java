@@ -23,6 +23,7 @@ import codesquard.app.api.category.CategoryFixedFactory;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
+import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.api.response.ItemResponses;

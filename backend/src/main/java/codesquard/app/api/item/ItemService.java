@@ -13,6 +13,7 @@ import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageService;
 import codesquard.app.api.item.request.ItemModifyRequest;
+import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.category.Category;
