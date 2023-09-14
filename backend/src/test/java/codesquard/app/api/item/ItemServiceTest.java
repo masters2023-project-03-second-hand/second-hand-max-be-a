@@ -31,6 +31,7 @@ import codesquard.app.domain.image.Image;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
+import codesquard.app.domain.oauth.support.Principal;
 import codesquard.support.SupportRepository;
 
 class ItemServiceTest extends IntegrationTestSupport {
@@ -113,6 +114,8 @@ class ItemServiceTest extends IntegrationTestSupport {
 
 		categoryRepository.save(category);
 		memberRepository.save(member);
+		Principal principal = Principal.from(member);
+
 		memberTownRepository.saveAll(memberTowns);
 		Item saveItem = itemRepository.save(item);
 		List<Image> saveImages = imageRepository.saveAll(images);
@@ -123,13 +126,13 @@ class ItemServiceTest extends IntegrationTestSupport {
 		BDDMockito.given(imageUploader.uploadImageToS3(any(), any()))
 			.willReturn("http://s3_image1.com", "http://s3_image2.com");
 		// when
-		itemService.modifyItem(saveItem.getId(), request, addImages);
+		itemService.modifyItem(saveItem.getId(), request, addImages, principal);
 		// then
 		Item modifiedItem = itemRepository.findById(saveItem.getId()).orElseThrow();
 		assertAll(() -> {
 			assertThat(modifiedItem)
 				.extracting("title", "content", "price", "status", "region")
-				.contains(request.getTitle(), request.getContent(), request.getPrice(), request.getItemStatus(),
+				.contains(request.getTitle(), request.getContent(), request.getPrice(), request.getStatus(),
 					request.getRegion());
 		});
 
@@ -153,7 +156,9 @@ class ItemServiceTest extends IntegrationTestSupport {
 		List<MultipartFile> addImages = ImageFixedFactory.createFixedMultipartFile();
 
 		categoryRepository.save(category);
-		memberRepository.save(member);
+		Member saveMember = memberRepository.save(member);
+		Principal principal = Principal.from(saveMember);
+
 		memberTownRepository.saveAll(memberTowns);
 		Item saveItem = itemRepository.save(item);
 		imageRepository.saveAll(images);
@@ -161,7 +166,8 @@ class ItemServiceTest extends IntegrationTestSupport {
 		List<Image> deleteImages = List.of(Image.create("http://invalidurl.com", item));
 		ItemModifyRequest request = ItemFixedFactory.createFixedItemModifyRequest(category, deleteImages);
 		// when
-		Throwable throwable = catchThrowable(() -> itemService.modifyItem(saveItem.getId(), request, addImages));
+		Throwable throwable = catchThrowable(
+			() -> itemService.modifyItem(saveItem.getId(), request, addImages, principal));
 		// then
 		assertThat(throwable)
 			.isInstanceOf(RestApiException.class)
