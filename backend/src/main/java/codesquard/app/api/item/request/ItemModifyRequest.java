@@ -6,6 +6,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import codesquard.app.api.converter.ItemRequestConverter;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemStatus;
 import lombok.AccessLevel;
@@ -21,11 +24,11 @@ public class ItemModifyRequest {
 	private String title;
 	@PositiveOrZero(message = "가격은 음수이면 안됩니다.")
 	private Long price;
-	@NotBlank(message = "내용은 필수 정보입니다.")
 	private String content;
 	@NotBlank(message = "동네는 필수 정보입니다.")
 	private String region;
-	private ItemStatus itemStatus;
+	@JsonDeserialize(converter = ItemRequestConverter.class)
+	private ItemStatus status;
 	@Positive(message = "카테고리 등록번호는 양수여야 합니다.")
 	private Long categoryId;
 	@NotBlank(message = "카테고리명은 필수 정보입니다.")
@@ -43,7 +46,7 @@ public class ItemModifyRequest {
 			.price(price)
 			.content(content)
 			.region(region)
-			.status(itemStatus)
+			.status(status)
 			.thumbnailUrl(thumbnailUrl)
 			.build();
 	}
@@ -51,6 +54,6 @@ public class ItemModifyRequest {
 	@Override
 	public String toString() {
 		return String.format("%s, %s(title=%s, price=%d, region=%s, itemStatus=%s, categoryId=%d)",
-			"상품 수정 요청", this.getClass().getSimpleName(), title, price, region, itemStatus, categoryId);
+			"상품 수정 요청", this.getClass().getSimpleName(), title, price, region, status, categoryId);
 	}
 }

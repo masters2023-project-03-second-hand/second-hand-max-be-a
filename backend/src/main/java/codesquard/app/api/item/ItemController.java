@@ -2,9 +2,12 @@ package codesquard.app.api.item;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.api.response.ApiResponse;
 import codesquard.app.api.response.ItemResponses;
@@ -31,8 +35,8 @@ public class ItemController {
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResponse<Void> register(@RequestPart ItemRegisterRequest request,
-		@RequestPart List<MultipartFile> itemImage,
+	public ApiResponse<Void> register(@RequestPart("item") ItemRegisterRequest request,
+		@RequestPart("images") List<MultipartFile> itemImage,
 		@AuthPrincipal Principal principal) {
 		itemService.register(request, itemImage, principal.getMemberId());
 		return ApiResponse.created("상품 등록이 완료되었습니다.", null);
@@ -52,5 +56,14 @@ public class ItemController {
 		Long memberId = principal.getMemberId();
 		ItemDetailResponse response = itemQueryService.findDetailItemBy(itemId, memberId);
 		return ApiResponse.ok("상품 상세 조회에 성공하였습니다.", response);
+	}
+
+	@PatchMapping("/{itemId}")
+	public ApiResponse<Void> modifyItem(@PathVariable Long itemId,
+		@RequestPart("images") List<MultipartFile> addImages,
+		@Valid @RequestPart("item") ItemModifyRequest request,
+		@AuthPrincipal Principal principal) {
+		itemService.modifyItem(itemId, request, addImages, principal);
+		return ApiResponse.ok("상품 수정을 완료하였습니다.", null);
 	}
 }

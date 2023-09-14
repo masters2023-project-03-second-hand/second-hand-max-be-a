@@ -23,6 +23,7 @@ import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemPaginationRepository;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.domain.pagination.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,12 +60,13 @@ public class ItemService {
 	}
 
 	@Transactional
-	public void modifyItem(Long itemId, ItemModifyRequest request, List<MultipartFile> addImages) {
-		log.info("상품 수정 서비스 요청 : itemId={}, request={}", itemId, request);
+	public void modifyItem(Long itemId, ItemModifyRequest request, List<MultipartFile> addImages, Principal writer) {
+		log.info("상품 수정 서비스 요청 : itemId={}, request={}, writer={}", itemId, request, writer.getLoginId());
 		Long changeCategoryId = request.getCategoryId();
 		List<String> deleteImageUrls = request.getDeleteImageUrls();
 
 		itemValidator.validateContainsImage(deleteImageUrls, itemId);
+		itemValidator.validateAuthorization(writer, itemId);
 
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
