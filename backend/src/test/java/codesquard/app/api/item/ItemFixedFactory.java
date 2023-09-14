@@ -2,6 +2,7 @@ package codesquard.app.api.item;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.domain.category.Category;
@@ -26,7 +27,7 @@ public class ItemFixedFactory {
 	}
 
 	public static ItemModifyRequest createFixedItemModifyRequest(Category category, List<Image> images) {
-		List<String> deleteImageUrls = List.of(images.get(0).getImageUrl());
+		List<String> deleteImageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
 		return ItemModifyRequest.create("빈티지 롤러 스케이트", 169000L, "내용", "가락동", ItemStatus.ON_SALE, category.getId(),
 			category.getName(), deleteImageUrls);
 	}

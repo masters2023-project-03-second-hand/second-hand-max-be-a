@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.category.CategoryFixedFactory;
+import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.api.oauth.OauthFixedFactory;
@@ -100,22 +102,24 @@ class ItemServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("회원은 상품의 정보를 수정한다")
 	@Test
-	public void modifyItem() {
+	public void modifyItem() throws IOException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		List<MemberTown> memberTowns = MemberTown.create(List.of("가락동"), member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(member, category, 0L);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
+
 		categoryRepository.save(category);
 		memberRepository.save(member);
 		memberTownRepository.saveAll(memberTowns);
 		Item saveItem = itemRepository.save(item);
 		List<Image> saveImages = imageRepository.saveAll(images);
 
+		List<MultipartFile> addImages = ImageFixedFactory.createFixedMultipartFile();
 		ItemModifyRequest request = ItemFixedFactory.createFixedItemModifyRequest(category, saveImages);
 		// when
-		itemService.modifyItem(saveItem.getId(), request);
+		itemService.modifyItem(saveItem.getId(), request, addImages);
 		// then
 		Item modifiedItem = itemRepository.findById(saveItem.getId()).orElseThrow();
 		assertAll(() -> {
@@ -124,5 +128,40 @@ class ItemServiceTest extends IntegrationTestSupport {
 				.contains(request.getTitle(), request.getContent(), request.getPrice(), request.getItemStatus(),
 					request.getRegion());
 		});
+
+		verifyItemImageSize(saveItem, 2);
+	}
+
+	private void verifyItemImageSize(Item item, int expeted) {
+		List<Image> images = imageRepository.findAllByItemId(item.getId());
+		assertThat(images).hasSize(expeted);
+	}
+
+	@DisplayName("회원은 상품을 수정할때 상품 이미지에 존재하지 않는 URL을 이용하여 이미지를 제거할 수 없다")
+	@Test
+	public void modifyItemWithNotExistDeleteUrls() throws IOException {
+		// given
+		Member member = OauthFixedFactory.createFixedMember();
+		List<MemberTown> memberTowns = MemberTown.create(List.of("가락동"), member);
+		Category category = CategoryFixedFactory.createdFixedCategory();
+		Item item = ItemFixedFactory.createFixedItem(member, category, 0L);
+		List<Image> images = ImageFixedFactory.createFixedImages(item);
+		List<MultipartFile> addImages = ImageFixedFactory.createFixedMultipartFile();
+
+		categoryRepository.save(category);
+		memberRepository.save(member);
+		memberTownRepository.saveAll(memberTowns);
+		Item saveItem = itemRepository.save(item);
+		imageRepository.saveAll(images);
+
+		List<Image> deleteImages = List.of(Image.create("http://invalidurl.com", item));
+		ItemModifyRequest request = ItemFixedFactory.createFixedItemModifyRequest(category, deleteImages);
+		// when
+		Throwable throwable = catchThrowable(() -> itemService.modifyItem(saveItem.getId(), request, addImages));
+		// then
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("해당 이미지 URL이 존재하지 안습니다.");
 	}
 }
