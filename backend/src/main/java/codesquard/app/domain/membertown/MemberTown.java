@@ -1,9 +1,7 @@
 package codesquard.app.domain.membertown;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -49,17 +47,14 @@ public class MemberTown {
 	public static List<MemberTown> create(List<Region> regions, Member member) {
 		List<MemberTown> memberTowns = new ArrayList<>();
 		for (Region region : regions) {
-			String name = convertShortAddressName(region.getName());
-			memberTowns.add(create(name, member, region));
+			memberTowns.add(create(region, member));
 		}
 		return memberTowns;
 	}
 
-	private static String convertShortAddressName(String fullAddressName) {
-		final String space = " ";
-		return Arrays.stream(fullAddressName.split(space))
-			.skip(2)
-			.collect(Collectors.joining(space));
+	public static MemberTown create(Region region, Member member) {
+		String name = region.getShortAddress();
+		return create(name, member, region);
 	}
 
 	@Override

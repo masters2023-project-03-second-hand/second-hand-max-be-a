@@ -8,6 +8,7 @@ import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
 import codesquard.app.api.errors.errorcode.RegionErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.membertown.MemberTown;
+import codesquard.app.domain.region.Region;
 import codesquard.app.domain.region.RegionRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -20,17 +21,13 @@ public class MemberTownValidator {
 
 	private final RegionRepository regionRepository;
 
-	public void validateAddMemberTown(List<MemberTown> memberTowns, String fullAddress, String address) {
-		validateExistFullAddress(fullAddress);
-		validateContainsAddress(fullAddress, address);
-		validateDuplicateAddress(memberTowns, address);
+	public void validateAddMemberTown(List<MemberTown> memberTowns, Region region) {
+		validateDuplicateAddress(memberTowns, region);
 		validateMaximumMemberTownSize(memberTowns);
 	}
 
-	public void validateRemoveMemberTown(List<MemberTown> memberTowns, String fullAddress, String address) {
-		validateExistFullAddress(fullAddress);
-		validateContainsAddress(fullAddress, address);
-		validateUnRegisteredAddress(memberTowns, address);
+	public void validateRemoveMemberTown(List<MemberTown> memberTowns, Region region) {
+		validateUnRegisteredAddress(memberTowns, region);
 		validateMinimumMemberTownSize(memberTowns);
 	}
 
@@ -46,20 +43,20 @@ public class MemberTownValidator {
 		}
 	}
 
-	private void validateDuplicateAddress(List<MemberTown> memberTowns, String address) {
+	private void validateDuplicateAddress(List<MemberTown> memberTowns, Region region) {
 		boolean match = memberTowns.stream()
-			.map(MemberTown::getName)
-			.anyMatch(name -> name.equals(address));
+			.map(MemberTown::getRegion)
+			.anyMatch(r -> r.equals(region));
 
 		if (match) {
 			throw new RestApiException(MemberTownErrorCode.ALREADY_ADDRESS_NAME);
 		}
 	}
 
-	private void validateUnRegisteredAddress(List<MemberTown> memberTowns, String address) {
+	private void validateUnRegisteredAddress(List<MemberTown> memberTowns, Region region) {
 		boolean noneMatch = memberTowns.stream()
-			.map(MemberTown::getName)
-			.noneMatch(name -> name.equals(address));
+			.map(MemberTown::getRegion)
+			.noneMatch(r -> r.equals(region));
 
 		if (noneMatch) {
 			throw new RestApiException(MemberTownErrorCode.UNREGISTERED_ADDRESS_TO_REMOVE);

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
+import codesquard.app.api.errors.errorcode.RegionErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
@@ -16,6 +17,8 @@ import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.oauth.support.Principal;
+import codesquard.app.domain.region.Region;
+import codesquard.app.domain.region.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,36 +30,39 @@ public class MemberTownService {
 
 	private final MemberRepository memberRepository;
 	private final MemberTownRepository memberTownRepository;
+	private final RegionRepository regionRepository;
 	private final MemberTownValidator validator;
 
 	public MemberAddRegionResponse addMemberTown(Principal principal, MemberTownAddRequest request) {
-		log.info("회원 동네 추가 서비스 요청 : 회원아이디={}, 추가할 동네이름={}", principal.getLoginId(), request.getAddress());
-
-		String fullAddress = request.getFullAddress();
-		String address = request.getAddress();
+		log.info("회원 동네 추가 서비스 요청 : 회원아이디={}, 추가할 동네 등록번호={}", principal.getLoginId(), request.getAddressId());
 
 		Member member = findMemberBy(principal);
 		List<MemberTown> memberTowns = memberTownRepository.findAllByMemberId(principal.getMemberId());
-		validator.validateAddMemberTown(memberTowns, fullAddress, address);
+		Region region = getAddressIdBy(request.getAddressId());
+		validator.validateAddMemberTown(memberTowns, region);
 
-		MemberTown town = MemberTown.create(address, member);
+		MemberTown town = MemberTown.create(region, member);
 		memberTownRepository.save(town);
 
 		return MemberAddRegionResponse.create(town);
 	}
 
 	public MemberTownRemoveResponse removeMemberTown(Principal principal, MemberTownRemoveRequest request) {
-		log.info("회원 동네 삭제 서비스 요청 : 회원아이디={}, 삭제할 동네이름={}", principal.getLoginId(), request.getAddress());
+		log.info("회원 동네 삭제 서비스 요청 : 회원아이디={}, 삭제할 동네 등록번호={}", principal.getLoginId(), request.getAddressId());
 
-		String fullAddress = request.getFullAddress();
-		String address = request.getAddress();
 		List<MemberTown> memberTowns = memberTownRepository.findAllByMemberId(principal.getMemberId());
-		validator.validateRemoveMemberTown(memberTowns, fullAddress, address);
+		Region region = getAddressIdBy(request.getAddressId());
+		validator.validateRemoveMemberTown(memberTowns, region);
 
 		Member member = findMemberBy(principal);
-		memberTownRepository.deleteMemberTownByMemberIdAndName(member.getId(), address);
+		memberTownRepository.deleteMemberTownByMemberIdAndRegionId(member.getId(), region.getId());
 
-		return MemberTownRemoveResponse.create(address);
+		return MemberTownRemoveResponse.create(region.getName());
+	}
+
+	private Region getAddressIdBy(Long addressId) {
+		return regionRepository.findById(addressId)
+			.orElseThrow(() -> new RestApiException(RegionErrorCode.NOT_FOUND_REGION));
 	}
 
 	private Member findMemberBy(Principal principal) {

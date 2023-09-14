@@ -1,6 +1,6 @@
 package codesquard.app.api.membertown.request;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,12 +12,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberTownAddRequest {
 
-	@NotBlank(message = "주소 정보는 필수 정보입니다.")
-	private String fullAddress;
-	@NotBlank(message = "주소 정보는 필수 정보입니다.")
-	private String address;
+	@NotNull(message = "주소 정보는 필수 정보입니다.")
+	private Long addressId;
 
-	public static MemberTownAddRequest create(String fullAddressName, String addressName) {
-		return new MemberTownAddRequest(fullAddressName, addressName);
+	public static MemberTownAddRequest create(Long addressId) {
+		return new MemberTownAddRequest(addressId);
 	}
 }

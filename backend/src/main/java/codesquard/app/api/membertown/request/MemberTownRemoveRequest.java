@@ -1,25 +1,21 @@
 package codesquard.app.api.membertown.request;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberTownRemoveRequest {
-	@NotBlank(message = "주소 정보는 필수 정보입니다.")
-	private String fullAddress;
-	@NotBlank(message = "주소 정보는 필수 정보입니다.")
-	private String address;
 
-	private MemberTownRemoveRequest(String fullAddress, String address) {
-		this.fullAddress = fullAddress;
-		this.address = address;
-	}
+	@NotNull(message = "주소 정보는 필수 정보입니다.")
+	private Long addressId;
 
-	public static MemberTownRemoveRequest create(String fullAddress, String address) {
-		return new MemberTownRemoveRequest(fullAddress, address);
+	public static MemberTownRemoveRequest create(Long addressId) {
+		return new MemberTownRemoveRequest(addressId);
 	}
 }
