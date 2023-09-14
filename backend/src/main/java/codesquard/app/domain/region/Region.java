@@ -1,5 +1,8 @@
 package codesquard.app.domain.region;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,5 +31,12 @@ public class Region {
 	@Override
 	public String toString() {
 		return String.format("%s, %s(id=%d, name=%s)", "지역", this.getClass().getSimpleName(), id, name);
+	}
+
+	public String getShortAddress() {
+		final String space = " ";
+		return Arrays.stream(name.split(space))
+			.skip(2)
+			.collect(Collectors.joining(space));
 	}
 }

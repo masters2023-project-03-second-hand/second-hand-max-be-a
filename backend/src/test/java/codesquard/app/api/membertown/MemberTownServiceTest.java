@@ -19,6 +19,7 @@ import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.support.Principal;
+import codesquard.app.domain.region.Region;
 
 class MemberTownServiceTest extends IntegrationTestSupport {
 
@@ -28,7 +29,8 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 		// given
 		Member saveMember = memberRepository.save(OauthFixedFactory.createFixedMember());
 		Principal principal = Principal.from(saveMember);
-		MemberTownAddRequest request = MemberTownAddRequest.create("서울 송파구 가락동", "가락동");
+		Long addressId = getRegion("서울 송파구 가락동").getId();
+		MemberTownAddRequest request = MemberTownAddRequest.create(addressId);
 		// when
 		MemberAddRegionResponse response = memberTownService.addMemberTown(principal, request);
 		// then
@@ -45,7 +47,7 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 		// given
 		Member saveMember = memberRepository.save(OauthFixedFactory.createFixedMember());
 		Principal principal = Principal.from(saveMember);
-		MemberTownAddRequest request = MemberTownAddRequest.create("서울 없는구 가락동", "가락동");
+		MemberTownAddRequest request = MemberTownAddRequest.create(9999L);
 		// when & then
 		assertThatThrownBy(() -> memberTownService.addMemberTown(principal, request))
 			.isInstanceOf(RestApiException.class)
@@ -53,31 +55,19 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 			.isEqualTo("주소를 찾지 못하였습니다.");
 	}
 
-	@DisplayName("주소와 동주소가 서로 일치하지 않으면 회원 동네에 추가할 수 없다")
-	@Test
-	public void addMemberTownWithNotMatchAddressName() {
-		// given
-		Member saveMember = memberRepository.save(OauthFixedFactory.createFixedMember());
-		Principal principal = Principal.from(saveMember);
-		MemberTownAddRequest request = MemberTownAddRequest.create("서울 송파구 가락동", "부안동");
-		// when & then
-		assertThatThrownBy(() -> memberTownService.addMemberTown(principal, request))
-			.isInstanceOf(RestApiException.class)
-			.extracting("errorCode.message")
-			.isEqualTo("전체 주소와 동주소가 서로 일치하지 않습니다.");
-	}
-
 	@DisplayName("회원의 동네 추가시 동네 등록 최대개수를 초과하여서 회원의 동네를 추가할 수 없다")
 	@Test
 	public void addMemberTownWithOverTheMaximumMemberTownSize() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		List<MemberTown> memberTowns = MemberTown.create(List.of("가락동", "부안동"), member);
+		List<Region> regions = getRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동"));
+		List<MemberTown> memberTowns = MemberTown.create(regions, member);
 		Member saveMember = memberRepository.save(member);
 		memberTownRepository.saveAll(memberTowns);
 
 		Principal principal = Principal.from(saveMember);
-		MemberTownAddRequest request = MemberTownAddRequest.create("서울 종로구 청운동", "청운동");
+		Long addressId = getRegion("서울 종로구 청운동").getId();
+		MemberTownAddRequest request = MemberTownAddRequest.create(addressId);
 		// when
 		Throwable throwable = catchThrowable(() -> memberTownService.addMemberTown(principal, request));
 		// then
@@ -92,12 +82,12 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void addMemberTownWithDuplicateAddressName() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create("신교동", member);
+		MemberTown memberTown = MemberTown.create(getRegion("서울 종로구 신교동"), member);
 		Member saveMember = memberRepository.save(member);
 		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
-		MemberTownAddRequest request = MemberTownAddRequest.create("서울 종로구 신교동", "신교동");
+		MemberTownAddRequest request = MemberTownAddRequest.create(getRegion("서울 종로구 신교동").getId());
 		// when
 		Throwable throwable = catchThrowable(() -> memberTownService.addMemberTown(principal, request));
 		// then
@@ -112,60 +102,21 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void removeMemberTown() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		List<MemberTown> memberTowns = MemberTown.create(List.of("가락동", "부안동"), member);
+		List<Region> regions = getRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동"));
+		List<MemberTown> memberTowns = MemberTown.create(regions, member);
 		Member saveMember = memberRepository.save(member);
 		memberTownRepository.saveAll(memberTowns);
 
 		Principal principal = Principal.from(saveMember);
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 송파구 가락동", "가락동");
+		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(getRegion("서울 송파구 가락동").getId());
 		// when
 		MemberTownRemoveResponse response = memberTownService.removeMemberTown(principal, request);
 		// then
 		assertAll(() -> {
-			assertThat(response.getAddress()).isEqualTo("가락동");
+			assertThat(response.getAddress()).isEqualTo("서울 송파구 가락동");
 			assertThat(memberTownRepository.findMemberTownByMemberIdAndName(saveMember.getId(), "가락동")
 				.isEmpty()).isTrue();
 		});
-	}
-
-	@DisplayName("불일치한 주소 이름을 가지고 회원의 동네를 제거할 수 없다")
-	@Test
-	public void removeMemberTownWithNotMatchAddressName() {
-		// given
-		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create("가락동", member);
-		Member saveMember = memberRepository.save(member);
-		memberTownRepository.save(memberTown);
-
-		Principal principal = Principal.from(saveMember);
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 송파구 가락동", "부안동");
-		// when
-		Throwable throwable = catchThrowable(() -> memberTownService.removeMemberTown(principal, request));
-		// then
-		Assertions.assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
-			.extracting("errorCode.message")
-			.isEqualTo("전체 주소와 동주소가 서로 일치하지 않습니다.");
-	}
-
-	@DisplayName("존재하지 않은 전체 주소 이름를 가지고 회원의 동네를 제거할 수 없다")
-	@Test
-	public void removeMemberTownWithNotExistFullAddressName() {
-		// given
-		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create("가락동", member);
-		Member saveMember = memberRepository.save(member);
-		memberTownRepository.save(memberTown);
-
-		Principal principal = Principal.from(saveMember);
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 없는구 없동", "가락동");
-		// when
-		Throwable throwable = catchThrowable(() -> memberTownService.removeMemberTown(principal, request));
-		// then
-		Assertions.assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
-			.extracting("errorCode.message")
-			.isEqualTo("주소를 찾지 못하였습니다.");
 	}
 
 	@DisplayName("등록되지 않은 주소 이름을 가지고 회원의 동네를 제거할 수 없다")
@@ -173,12 +124,12 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void removeMemberTownWithNotRegisteredAddressName() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create("가락동", member);
+		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		Member saveMember = memberRepository.save(member);
 		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 종로구 효자동", "효자동");
+		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(getRegion("서울 종로구 효자동").getId());
 		// when
 		Throwable throwable = catchThrowable(() -> memberTownService.removeMemberTown(principal, request));
 		// then
@@ -193,12 +144,12 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void removeMemberTownWithMinimumMemberTownSize() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create("창성동", member);
+		MemberTown memberTown = MemberTown.create(getRegion("서울 종로구 창성동"), member);
 		Member saveMember = memberRepository.save(member);
 		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create("서울 종로구 창성동", "창성동");
+		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(getRegion("서울 종로구 창성동").getId());
 		// when
 		Throwable throwable = catchThrowable(() -> memberTownService.removeMemberTown(principal, request));
 		// then
