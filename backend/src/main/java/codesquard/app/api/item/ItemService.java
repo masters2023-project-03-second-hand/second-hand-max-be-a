@@ -66,11 +66,12 @@ public class ItemService {
 		List<String> deleteImageUrls = request.getDeleteImageUrls();
 
 		itemValidator.validateContainsImage(deleteImageUrls, itemId);
-		itemValidator.validateAuthorization(writer, itemId);
 
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		log.debug("상품 수정 서비스의 상품 조회 결과 : {}", item);
+
+		item.validateAuthorization(writer);
 
 		Category category = categoryRepository.findById(changeCategoryId)
 			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
