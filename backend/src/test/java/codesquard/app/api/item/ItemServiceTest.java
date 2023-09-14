@@ -107,7 +107,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 	public void modifyItem() throws IOException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		List<MemberTown> memberTowns = MemberTown.create(List.of("가락동"), member);
+		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(member, category, 0L);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
@@ -116,7 +116,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 		memberRepository.save(member);
 		Principal principal = Principal.from(member);
 
-		memberTownRepository.saveAll(memberTowns);
+		memberTownRepository.save(memberTown);
 		Item saveItem = itemRepository.save(item);
 		List<Image> saveImages = imageRepository.saveAll(images);
 
@@ -149,7 +149,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 	public void modifyItemWithNotExistDeleteUrls() throws IOException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		List<MemberTown> memberTowns = MemberTown.create(List.of("가락동"), member);
+		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(member, category, 0L);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
@@ -159,7 +159,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 		Member saveMember = memberRepository.save(member);
 		Principal principal = Principal.from(saveMember);
 
-		memberTownRepository.saveAll(memberTowns);
+		memberTownRepository.save(memberTown);
 		Item saveItem = itemRepository.save(item);
 		imageRepository.saveAll(images);
 
