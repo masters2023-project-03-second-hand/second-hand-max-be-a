@@ -1,7 +1,9 @@
 package codesquard.app.domain.membertown;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.region.Region;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,21 +32,34 @@ public class MemberTown {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	private MemberTown(String name, Member member) {
+	@ManyToOne
+	@JoinColumn(name = "region_id")
+	private Region region;
+
+	private MemberTown(String name, Member member, Region region) {
 		this.name = name;
 		this.member = member;
+		this.region = region;
 	}
 
-	public static MemberTown create(String name, Member member) {
-		return new MemberTown(name, member);
+	public static MemberTown create(String name, Member member, Region region) {
+		return new MemberTown(name, member, region);
 	}
 
-	public static List<MemberTown> create(List<String> names, Member member) {
+	public static List<MemberTown> create(List<Region> regions, Member member) {
 		List<MemberTown> memberTowns = new ArrayList<>();
-		for (String name : names) {
-			memberTowns.add(create(name, member));
+		for (Region region : regions) {
+			String name = convertShortAddressName(region.getName());
+			memberTowns.add(create(name, member, region));
 		}
 		return memberTowns;
+	}
+
+	private static String convertShortAddressName(String fullAddressName) {
+		final String space = " ";
+		return Arrays.stream(fullAddressName.split(space))
+			.skip(2)
+			.collect(Collectors.joining(space));
 	}
 
 	@Override
