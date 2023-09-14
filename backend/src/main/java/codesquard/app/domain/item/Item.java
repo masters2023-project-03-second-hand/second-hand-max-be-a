@@ -57,7 +57,8 @@ public class Item {
 
 	@Builder
 	public Item(String title, String content, Long price, ItemStatus status, String region, LocalDateTime createdAt,
-		String thumbnailUrl, LocalDateTime modifiedAt, Long wishCount, Long chatCount, Long viewCount, Member member) {
+		String thumbnailUrl, LocalDateTime modifiedAt, Long wishCount, Long chatCount, Long viewCount, Member member,
+		Category category) {
 		this.title = title;
 		this.content = content;
 		this.price = price;
@@ -70,6 +71,7 @@ public class Item {
 		this.chatCount = chatCount;
 		this.viewCount = viewCount;
 		this.member = member;
+		this.category = category;
 	}
 
 	public static Item create(String title, String content, Long price, ItemStatus status, String region,
@@ -90,6 +92,14 @@ public class Item {
 		this.category = category;
 	}
 
+	public void changeBy(Item changeItem) {
+		this.title = changeItem.title;
+		this.price = changeItem.price;
+		this.content = changeItem.content;
+		this.region = changeItem.region;
+		this.status = changeItem.status;
+	}
+
 	public void wishRegister() {
 		this.wishCount++;
 	}
@@ -103,4 +113,5 @@ public class Item {
 		return String.format("%s, %s(id=%d, title=%s, price=%d, status=%s, region=%s, viewCount=%d)",
 			"상품", this.getClass().getSimpleName(), id, title, price, status, region, viewCount);
 	}
+
 }

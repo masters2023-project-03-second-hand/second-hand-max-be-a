@@ -7,10 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import codesquard.app.api.errors.errorcode.CategoryErrorCode;
+import codesquard.app.api.errors.errorcode.ImageErrorCode;
+import codesquard.app.api.errors.errorcode.ItemErrorCode;
+import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageService;
 import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.api.response.ItemResponses;
+import codesquard.app.domain.category.Category;
+import codesquard.app.domain.category.CategoryRepository;
 import codesquard.app.domain.image.Image;
 import codesquard.app.domain.image.ImageRepository;
 import codesquard.app.domain.item.Item;
@@ -18,7 +24,9 @@ import codesquard.app.domain.item.ItemPaginationRepository;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.member.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemService {
@@ -27,6 +35,7 @@ public class ItemService {
 	private final ImageRepository imageRepository;
 	private final ImageService imageService;
 	private final ItemPaginationRepository itemPaginationRepository;
+	private final CategoryRepository categoryRepository;
 
 	@Transactional
 	public void register(ItemRegisterRequest request, List<MultipartFile> itemImage, Long memberId) {
@@ -55,7 +64,46 @@ public class ItemService {
 	}
 
 	@Transactional
-	public void modifyItem(ItemModifyRequest request) {
+	public void modifyItem(Long itemId, ItemModifyRequest request) {
+		log.info("상품 수정 서비스 요청 : itemId={}, request={}", itemId, request);
+		Long changeCategoryId = request.getCategoryId();
+		List<String> deleteImageUrls = request.getDeleteImageUrls();
 
+		Item item = itemRepository.findById(itemId)
+			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+		log.debug("상품 수정 서비스의 상품 조회 결과 : {}", item);
+
+		Category category = categoryRepository.findById(changeCategoryId)
+			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
+		log.debug("상품 수정 서비스의 카테고리 조회 결과 : {}", category);
+
+		int deleteImageSize = deleteImagesFromRepository(itemId, deleteImageUrls);
+		log.debug("이미지 테이블의 삭제 결과 : 삭제 개수={}", deleteImageSize);
+		deleteImagesFromS3(deleteImageUrls);
+
+		String thumbnailUrl = findThumbnailUrlBy(item);
+		Item changeItem = request.toEntity(thumbnailUrl);
+		item.changeCategory(category);
+		item.changeBy(changeItem);
+	}
+
+	private int deleteImagesFromRepository(Long itemId, List<String> deleteImageUrls) {
+		int currentImageSize = imageRepository.countImageByItemId(itemId);
+		if (currentImageSize <= deleteImageUrls.size()) {
+			throw new RestApiException(ImageErrorCode.NOT_REMOVE_IMAGES);
+		}
+		return imageRepository.deleteImagesByImageUrlIn(deleteImageUrls);
+	}
+
+	private String findThumbnailUrlBy(Item item) {
+		List<Image> images = imageRepository.findAllByItemId(item.getId());
+		if (images.isEmpty()) {
+			throw new RestApiException(ImageErrorCode.EMPTY_IMAGE);
+		}
+		return images.get(0).getImageUrl();
+	}
+
+	private void deleteImagesFromS3(List<String> deleteImageUrls) {
+		deleteImageUrls.forEach(imageService::deleteImage);
 	}
 }
