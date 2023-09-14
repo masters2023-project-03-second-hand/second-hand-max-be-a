@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
@@ -41,7 +40,6 @@ import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
-import codesquard.app.domain.region.Region;
 
 class OauthServiceTest extends IntegrationTestSupport {
 
@@ -208,7 +206,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode")
 			.extracting("name", "httpStatus", "message")
-			.containsExactlyInAnyOrder("WRONG_AUTHORIZATION_CODE", HttpStatus.UNAUTHORIZED, "잘못된 인가 코드입니다.");
+			.containsExactlyInAnyOrder("WRONG_AUTHORIZATION_CODE", HttpStatus.BAD_REQUEST, "잘못된 인가 코드입니다.");
 	}
 
 	@DisplayName("로그인 아이디가 중복되는 경우 회원가입을 할 수 없다")
@@ -217,7 +215,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// given
 		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
 		Member member = Member.create("avatarUrlValue", "23Yong1234@gmail.com", "23Yong");
-		MemberTown memberTown = MemberTown.create("가락 1동", member);
+		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		memberRepository.save(member);
 		memberTownRepository.save(memberTown);
 
@@ -228,12 +226,12 @@ class OauthServiceTest extends IntegrationTestSupport {
 		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
 		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
 
-		// mocking
-		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
-		when(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
-			.thenReturn(mockAccessTokenResponse);
-		when(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
-			.thenReturn(mockUserProfileResponse);
+		given(oauthClientRepository.findOneBy(anyString()))
+			.willReturn(oauthClient);
+		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
+			.willReturn(mockAccessTokenResponse);
+		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
+			.willReturn(mockUserProfileResponse);
 
 		// when
 		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
@@ -365,7 +363,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
-				.extracting("jwt.accessToken")
+				.extracting("accessToken")
 				.isEqualTo(createExpectedAccessTokenBy(jwtProvider, member, now));
 			softAssertions.assertAll();
 		});
@@ -396,12 +394,5 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("유효하지 않은 토큰입니다.");
-	}
-
-	private List<Long> getAddressIds(String fullAddress) {
-		List<Region> regions = regionRepository.findAllByNameIn(List.of(fullAddress));
-		return regions.stream()
-			.map(Region::getId)
-			.collect(Collectors.toUnmodifiableList());
 	}
 }

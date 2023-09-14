@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthRefreshResponse {
-	private OauthJwtResponse jwt;
+	private String accessToken;
 
 	public static OauthRefreshResponse create(Jwt jwt) {
-		return new OauthRefreshResponse(OauthJwtResponse.create(jwt));
+		return new OauthRefreshResponse(jwt.getAccessToken());
 	}
 
 	@Override
 	public String toString() {
 		return String.format("%s, %s(accessToken=%s)", "액세스 토큰 갱신 응답", this.getClass().getSimpleName(),
-			jwt.getAccessToken());
+			accessToken);
 	}
 }

@@ -167,7 +167,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(200)))
 			.andExpect(jsonPath("message").value(Matchers.equalTo("액세스 토큰 갱신에 성공하였습니다.")))
-			.andExpect(jsonPath("data.jwt.accessToken").isNotEmpty());
+			.andExpect(jsonPath("data.accessToken").isNotEmpty());
 	}
 
 	private static Stream<Arguments> provideInvalidLoginId() {

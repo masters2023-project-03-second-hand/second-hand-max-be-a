@@ -1,20 +1,31 @@
 package codesquard.app.api.oauth.response;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.membertown.MemberTown;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthLoginMemberResponse {
 	private String loginId;
 	private String profileUrl;
+	private List<MemberTownLoginResponse> addresses;
 
-	public static OauthLoginMemberResponse from(Member member) {
-		return new OauthLoginMemberResponse(member.getLoginId(), member.getAvatarUrl());
+	private OauthLoginMemberResponse(Member member, List<MemberTown> memberTowns) {
+		this.loginId = member.getLoginId();
+		this.profileUrl = member.getAvatarUrl();
+		this.addresses = memberTowns.stream()
+			.map(MemberTownLoginResponse::from)
+			.collect(Collectors.toUnmodifiableList());
+	}
+
+	public static OauthLoginMemberResponse from(Member member, List<MemberTown> memberTowns) {
+		return new OauthLoginMemberResponse(member, memberTowns);
 	}
 
 	@Override

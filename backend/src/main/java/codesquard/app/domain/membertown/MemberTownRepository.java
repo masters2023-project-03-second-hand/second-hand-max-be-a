@@ -12,5 +12,5 @@ public interface MemberTownRepository extends JpaRepository<MemberTown, Long> {
 
 	Optional<MemberTown> findMemberTownByMemberIdAndName(Long memberId, String name);
 
-	void deleteMemberTownByMemberIdAndName(Long memberId, String name);
+	void deleteMemberTownByMemberIdAndRegionId(Long memberId, Long regionId);
 }
