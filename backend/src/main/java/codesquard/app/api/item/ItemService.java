@@ -117,7 +117,7 @@ public class ItemService {
 		deleteImageUrls.forEach(imageService::deleteImage);
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public void findById(Long itemId, ItemStatus status) {
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
