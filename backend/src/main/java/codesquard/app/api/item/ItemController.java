@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.item.request.ItemModifyRequest;
+import codesquard.app.api.item.request.ItemRegisterRequest;
+import codesquard.app.api.item.request.ItemStatusModifyRequest;
 import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.api.response.ApiResponse;
 import codesquard.app.api.response.ItemResponses;
@@ -65,5 +69,11 @@ public class ItemController {
 		@AuthPrincipal Principal principal) {
 		itemService.modifyItem(itemId, request, addImages, principal);
 		return ApiResponse.ok("상품 수정을 완료하였습니다.", null);
+	}
+
+	@PutMapping("/{itemId}/status")
+	public ApiResponse<Void> modifyItemStatus(@PathVariable Long itemId, @RequestBody ItemStatusModifyRequest request) {
+		itemService.findById(itemId, request.getStatus());
+		return ApiResponse.ok("상품 상태 변경에 성공하였습니다.", null);
 	}
 }

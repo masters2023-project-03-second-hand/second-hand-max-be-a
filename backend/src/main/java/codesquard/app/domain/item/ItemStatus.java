@@ -2,6 +2,8 @@ package codesquard.app.domain.item;
 
 import java.util.Arrays;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import lombok.Getter;
@@ -17,6 +19,7 @@ public enum ItemStatus {
 
 	private final String status;
 
+	@JsonCreator
 	public static ItemStatus of(String status) {
 		return Arrays.stream(ItemStatus.values())
 			.filter(itemStatus -> itemStatus.getStatus().equals(status))

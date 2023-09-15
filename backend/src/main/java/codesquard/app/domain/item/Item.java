@@ -13,6 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.category.Category;
@@ -29,6 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@DynamicInsert
 public class Item {
 
 	@Id
@@ -43,9 +47,12 @@ public class Item {
 	private LocalDateTime createdAt;
 	private String thumbnailUrl;
 	private LocalDateTime modifiedAt;
-	private Long wishCount = 0L;
-	private Long chatCount = 0L;
-	private Long viewCount = 0L;
+	@ColumnDefault("0")
+	private Long wishCount;
+	@ColumnDefault("0")
+	private Long chatCount;
+	@ColumnDefault("0")
+	private Long viewCount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
@@ -102,6 +109,10 @@ public class Item {
 		this.content = changeItem.content;
 		this.region = changeItem.region;
 		this.status = changeItem.status;
+	}
+
+	public void changeStatus(ItemStatus status) {
+		this.status = status;
 	}
 
 	public void wishRegister() {

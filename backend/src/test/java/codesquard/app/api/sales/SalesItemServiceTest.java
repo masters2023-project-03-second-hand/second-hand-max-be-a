@@ -7,9 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import codesquard.app.IntegrationTestSupport;
-import codesquard.app.api.item.ItemRegisterRequest;
+import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.category.Category;
+import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.sales.SalesStatus;
 
@@ -72,11 +73,11 @@ class SalesItemServiceTest extends IntegrationTestSupport {
 	private void fixtureItemAndMember() {
 		Category category1 = supportRepository.save(Category.create("가전", "~~~~"));
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
-			"선풍기", 12000L, null, "구래동", "판매완료", category1.getId(), null);
+			"선풍기", 12000L, null, "구래동", ItemStatus.SOLD_OUT, category1.getId(), null);
 		ItemRegisterRequest request2 = new ItemRegisterRequest(
-			"전기밥솥", null, null, "구래동", "판매중", category1.getId(), null);
+			"전기밥솥", null, null, "구래동", ItemStatus.ON_SALE, category1.getId(), null);
 		ItemRegisterRequest request3 = new ItemRegisterRequest(
-			"노트북", null, null, "구래동", "예약중", category1.getId(), null);
+			"노트북", null, null, "구래동", ItemStatus.RESERVED, category1.getId(), null);
 		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "piepie"));
 		supportRepository.save(request1.toEntity(member, "thumbnail"));
 		supportRepository.save(request2.toEntity(member, "thumb"));

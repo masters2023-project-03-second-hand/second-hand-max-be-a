@@ -23,12 +23,14 @@ import codesquard.app.api.category.CategoryFixedFactory;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
+import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.image.Image;
 import codesquard.app.domain.item.Item;
+import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.support.Principal;
@@ -51,7 +53,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 
 		List<MultipartFile> multipartFiles = getMultipartFiles();
 		ItemRegisterRequest request = new ItemRegisterRequest(
-			"선풍기", 12000L, null, "가양 1동", "판매중", category.getId(), null);
+			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 
 		// when
 		itemService.register(request, multipartFiles, member.getId());
@@ -79,11 +81,11 @@ class ItemServiceTest extends IntegrationTestSupport {
 		// given
 		Category category = supportRepository.save(Category.create("식품", "~~~~"));
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
-			"선풍기", 12000L, null, "가양 1동", "판매중", category.getId(), null);
+			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 		ItemRegisterRequest request2 = new ItemRegisterRequest(
-			"전기밥솥", null, null, "가양 1동", "판매중", category.getId(), null);
+			"전기밥솥", null, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 		ItemRegisterRequest request3 = new ItemRegisterRequest(
-			"노트북", null, null, "가양 1동", "판매중", category.getId(), null);
+			"노트북", null, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 
 		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
 		supportRepository.save(request1.toEntity(member, "thumbnail"));
@@ -173,5 +175,23 @@ class ItemServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("해당 이미지 URL이 존재하지 안습니다.");
+	}
+
+	@Test
+	@DisplayName("등록된 상품의 상태를 변경하는데 성공한다.")
+	void modifyItemStatusTest() {
+		// given
+		Category category = supportRepository.save(Category.create("식품", "~~~~"));
+		ItemRegisterRequest request1 = new ItemRegisterRequest(
+			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
+		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
+		Item item = supportRepository.save(request1.toEntity(member, "thumbnail"));
+
+		// when
+		Item updateItem = supportRepository.findById(item.getId(), Item.class);
+		updateItem.changeStatus(ItemStatus.RESERVED);
+
+		// then
+		assertThat(updateItem.getStatus()).isEqualTo(ItemStatus.RESERVED);
 	}
 }
