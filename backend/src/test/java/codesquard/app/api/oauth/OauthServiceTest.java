@@ -7,7 +7,6 @@ import static org.mockito.BDDMockito.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -34,6 +32,7 @@ import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
+import codesquard.app.api.redis.RedisService;
 import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
@@ -50,13 +49,13 @@ class OauthServiceTest extends IntegrationTestSupport {
 	private OauthClient oauthClient;
 
 	@Autowired
-	private RedisTemplate<String, Object> redisTemplate;
-
-	@Autowired
 	private JwtProvider jwtProvider;
 
 	@MockBean
 	private ImageService imageService;
+
+	@Autowired
+	private RedisService redisService;
 
 	@DisplayName("로그인 아이디와 소셜 로그인을 하여 회원가입을 한다")
 	@Test
@@ -294,7 +293,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(redisTemplate.opsForValue().get(jwt.getAccessToken())).isEqualTo("logout");
+			softAssertions.assertThat(redisService.get(jwt.getAccessToken())).isEqualTo("logout");
 			softAssertions.assertAll();
 		});
 	}
@@ -313,7 +312,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(redisTemplate.opsForValue().get(jwt.getAccessToken())).isNull();
+			softAssertions.assertThat(redisService.get(jwt.getAccessToken())).isNull();
 			softAssertions.assertAll();
 		});
 	}
@@ -327,15 +326,13 @@ class OauthServiceTest extends IntegrationTestSupport {
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 		OauthLogoutRequest request = OauthLogoutRequest.create(jwt.getAccessToken(), jwt.getRefreshToken());
 
-		redisTemplate.opsForValue()
-			.set(member.createRedisKey(), jwt.getRefreshToken(),
-				jwt.getExpireDateRefreshToken().getTime(), TimeUnit.MILLISECONDS);
+		redisService.saveRefreshToken(member, jwt);
 		// when
 		oauthService.logout(request);
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(redisTemplate.opsForValue().get(member.createRedisKey())).isNull();
+			softAssertions.assertThat(redisService.get(member.createRedisKey())).isNull();
 			softAssertions.assertAll();
 		});
 	}
@@ -349,10 +346,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 
-		redisTemplate.opsForValue().set(member.createRedisKey(),
-			jwt.getRefreshToken(),
-			jwt.convertExpireDateRefreshTokenTimeWithLong(),
-			TimeUnit.MILLISECONDS);
+		redisService.saveRefreshToken(member, jwt);
 		memberRepository.save(member);
 
 		OauthRefreshRequest request = OauthRefreshRequest.create(jwt.getRefreshToken());
@@ -378,10 +372,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 
-		redisTemplate.opsForValue().set(member.createRedisKey(),
-			jwt.getRefreshToken(),
-			jwt.convertExpireDateRefreshTokenTimeWithLong(),
-			TimeUnit.MILLISECONDS);
+		redisService.saveRefreshToken(member, jwt);
 		memberRepository.save(member);
 
 		OauthRefreshRequest request = OauthRefreshRequest.create("invalidRefreshTokenValue");

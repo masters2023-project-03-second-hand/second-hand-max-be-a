@@ -54,8 +54,8 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		mockMvc = MockMvcBuilders.standaloneSetup(new OauthRestController(oauthService))
 			.setControllerAdvice(new GlobalExceptionHandler())
 			.addFilters(
-				new JwtAuthorizationFilter(jwtProvider, authenticationContext, objectMapper, redisTemplate),
-				new LogoutFilter(redisTemplate, objectMapper)
+				new JwtAuthorizationFilter(jwtProvider, authenticationContext, objectMapper, redisService),
+				new LogoutFilter(redisService, objectMapper)
 			)
 			.addMappedInterceptors(new String[] {"/api/auth/logout"}, new LogoutInterceptor())
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
@@ -133,8 +133,6 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		Map<String, String> map = new HashMap<>();
 		map.put("refreshToken", "refreshTokenValue");
 
-		given(redisTemplate.opsForValue()).willReturn(valueOperations);
-		given(valueOperations.get(anyString())).willReturn(null);
 		// when & then
 		mockMvc.perform(post("/api/auth/logout")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer accessTokenValue")

@@ -20,10 +20,12 @@ public class ItemFixedFactory {
 	private static final String REGION = "가락 1동";
 	private static final LocalDateTime CREATED_AT = LocalDateTime.of(2023, 1, 1, 0, 0);
 
-	public static Item createFixedItem(Member member, Category category, Long viewCount) {
-		Item item = Item.create(TITLE, CONTENT, PRICE, STATUS, REGION, CREATED_AT, viewCount, member);
-		item.changeCategory(category);
-		return item;
+	public static Item createFixedItem(Member member, Category category) {
+		long wishCount = 0;
+		long viewCount = 0;
+		long chatCount = 0;
+		return Item.create(TITLE, CONTENT, PRICE, STATUS, REGION, CREATED_AT, wishCount, viewCount, chatCount,
+			member, category);
 	}
 
 	public static ItemModifyRequest createFixedItemModifyRequest(Category category, List<Image> images) {

@@ -111,7 +111,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 		Member member = OauthFixedFactory.createFixedMember();
 		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(member, category, 0L);
+		Item item = ItemFixedFactory.createFixedItem(member, category);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
 
 		categoryRepository.save(category);
@@ -153,7 +153,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 		Member member = OauthFixedFactory.createFixedMember();
 		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		Category category = CategoryFixedFactory.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(member, category, 0L);
+		Item item = ItemFixedFactory.createFixedItem(member, category);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
 		List<MultipartFile> addImages = ImageFixedFactory.createFixedMultipartFile();
 
@@ -174,7 +174,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 		assertThat(throwable)
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
-			.isEqualTo("해당 이미지 URL이 존재하지 안습니다.");
+			.isEqualTo("해당 이미지 URL이 존재하지 않습니다.");
 	}
 
 	@Test

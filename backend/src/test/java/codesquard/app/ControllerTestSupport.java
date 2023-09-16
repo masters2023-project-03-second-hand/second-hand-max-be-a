@@ -16,6 +16,7 @@ import codesquard.app.api.membertown.MemberTownRestController;
 import codesquard.app.api.membertown.MemberTownService;
 import codesquard.app.api.oauth.OauthRestController;
 import codesquard.app.api.oauth.OauthService;
+import codesquard.app.api.redis.RedisService;
 import codesquard.app.api.region.RegionQueryService;
 import codesquard.app.api.region.RegionRestController;
 import codesquard.app.domain.jwt.JwtProvider;
@@ -38,6 +39,9 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected RedisTemplate<String, Object> redisTemplate;
+
+	@MockBean
+	protected RedisService redisService;
 
 	@MockBean
 	protected OauthService oauthService;

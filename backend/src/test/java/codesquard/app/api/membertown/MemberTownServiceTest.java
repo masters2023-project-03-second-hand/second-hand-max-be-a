@@ -60,8 +60,8 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void addMemberTownWithOverTheMaximumMemberTownSize() {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		List<Region> regions = getRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동"));
-		List<MemberTown> memberTowns = MemberTown.create(regions, member);
+		List<Region> regions = getRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동", "서울 종로구 효자동"));
+		List<MemberTown> memberTowns = MemberTown.createMemberTowns(regions, member);
 		Member saveMember = memberRepository.save(member);
 		memberTownRepository.saveAll(memberTowns);
 
@@ -103,7 +103,7 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		List<Region> regions = getRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동"));
-		List<MemberTown> memberTowns = MemberTown.create(regions, member);
+		List<MemberTown> memberTowns = MemberTown.createMemberTowns(regions, member);
 		Member saveMember = memberRepository.save(member);
 		memberTownRepository.saveAll(memberTowns);
 

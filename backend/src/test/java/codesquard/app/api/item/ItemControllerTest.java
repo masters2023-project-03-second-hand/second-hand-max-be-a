@@ -58,11 +58,11 @@ class ItemControllerTest extends ControllerTestSupport {
 		long itemId = 1L;
 		Member seller = OauthFixedFactory.createFixedMember();
 		Category category = CategoryFixedFactory.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(seller, category, 0L);
+		Item item = ItemFixedFactory.createFixedItem(seller, category);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
 		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
 
-		ItemDetailResponse response = ItemDetailResponse.create(item, seller, seller.getId(), imageUrls, 0, 0);
+		ItemDetailResponse response = ItemDetailResponse.create(item, seller, seller.getId(), imageUrls);
 		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))
@@ -90,10 +90,10 @@ class ItemControllerTest extends ControllerTestSupport {
 		long itemId = 1L;
 		Member seller = OauthFixedFactory.createFixedMember();
 		Category category = CategoryFixedFactory.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(seller, category, 0L);
+		Item item = ItemFixedFactory.createFixedItem(seller, category);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
 		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
-		ItemDetailResponse response = ItemDetailResponse.create(item, seller, 9999L, imageUrls, 0, 0);
+		ItemDetailResponse response = ItemDetailResponse.create(item, seller, 9999L, imageUrls);
 		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))
