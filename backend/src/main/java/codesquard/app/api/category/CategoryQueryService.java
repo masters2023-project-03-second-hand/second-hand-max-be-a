@@ -1,13 +1,11 @@
 package codesquard.app.api.category;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.api.category.request.CategorySelectedRequest;
-import codesquard.app.api.category.response.CategoryItemResponse;
 import codesquard.app.api.category.response.CategoryListResponse;
 import codesquard.app.api.errors.errorcode.CategoryErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
@@ -24,10 +22,7 @@ public class CategoryQueryService {
 
 	public CategoryListResponse findAll() {
 		List<Category> categories = categoryRepository.findAll();
-		List<CategoryItemResponse> categoryItemResponses = categories.stream()
-			.map(CategoryItemResponse::from)
-			.collect(Collectors.toUnmodifiableList());
-		return CategoryListResponse.create(categoryItemResponses);
+		return new CategoryListResponse(categories);
 	}
 
 	public void validateCategoryId(CategorySelectedRequest request) {
