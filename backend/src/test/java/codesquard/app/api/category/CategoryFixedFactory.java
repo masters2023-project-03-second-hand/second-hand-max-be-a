@@ -1,11 +1,8 @@
 package codesquard.app.api.category;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import codesquard.app.api.category.request.CategorySelectedRequest;
-import codesquard.app.api.category.response.CategoryItemResponse;
-import codesquard.app.api.category.response.CategoryListResponse;
 import codesquard.app.domain.category.Category;
 
 public class CategoryFixedFactory {
@@ -19,13 +16,6 @@ public class CategoryFixedFactory {
 
 	public static Category createdFixedCategory() {
 		return Category.create("가구/인테리어", "https://i.ibb.co/cyYH5V8/furniture.png");
-	}
-
-	public static CategoryListResponse createFixedCategoryListResponse() {
-		List<CategoryItemResponse> categoryItemResponses = createFixedCategories().stream()
-			.map(CategoryItemResponse::from)
-			.collect(Collectors.toUnmodifiableList());
-		return CategoryListResponse.create(categoryItemResponses);
 	}
 
 	public static CategorySelectedRequest createFixedCategorySelectedRequest(Long categoryId) {

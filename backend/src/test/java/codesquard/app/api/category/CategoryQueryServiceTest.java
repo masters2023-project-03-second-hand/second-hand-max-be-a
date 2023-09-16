@@ -1,7 +1,6 @@
 package codesquard.app.api.category;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,10 +19,7 @@ class CategoryQueryServiceTest extends IntegrationTestSupport {
 		// when
 		CategoryListResponse response = categoryQueryService.findAll();
 		// then
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(response.getCategories()).hasSize(3);
-			softAssertions.assertAll();
-		});
+		Assertions.assertThat(response.getCategories()).hasSize(3);
 	}
 
 	@DisplayName("카테고리 아이디가 존재하지 않아 예외가 발생한다")
