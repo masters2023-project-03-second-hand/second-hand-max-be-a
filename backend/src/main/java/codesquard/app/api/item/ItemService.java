@@ -50,7 +50,7 @@ public class ItemService {
 		Item item = request.toEntity(writer, thumbnailUrl);
 		Item saveItem = itemRepository.save(item);
 
-		List<Image> images = Image.create(serverFileUrls, saveItem);
+		List<Image> images = Image.createImages(serverFileUrls, saveItem);
 		imageRepository.saveAll(images);
 	}
 
@@ -82,9 +82,9 @@ public class ItemService {
 		List<String> addImageUrls = imageService.uploadImages(addImages);
 		log.debug("상품 수정 서비스의 S3 이미지 추가 결과 : {}", addImageUrls);
 
-		List<Image> images = Image.create(addImageUrls, item);
-		List<Image> saveImages = imageRepository.saveAll(images);
-		log.debug("상품 수정 서비스의 이미지 테이블 저장 결과 : {}", saveImages);
+		List<Image> images = Image.createImages(addImageUrls, item);
+		imageRepository.saveAll(images);
+		log.debug("상품 수정 서비스의 이미지 테이블 저장 결과 : {}", images);
 
 		int deleteImageSize = deleteImagesFromRepository(itemId, deleteImageUrls);
 		log.debug("이미지 테이블의 삭제 결과 : 삭제 개수={}", deleteImageSize);
@@ -93,8 +93,7 @@ public class ItemService {
 
 		String thumbnailUrl = findThumbnailUrlBy(item);
 		Item changeItem = request.toEntity(thumbnailUrl);
-		item.changeCategory(category);
-		item.changeBy(changeItem);
+		item.changeBy(category, changeItem);
 	}
 
 	private int deleteImagesFromRepository(Long itemId, List<String> deleteImageUrls) {

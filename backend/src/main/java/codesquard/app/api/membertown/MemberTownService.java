@@ -31,7 +31,7 @@ public class MemberTownService {
 	private final MemberRepository memberRepository;
 	private final MemberTownRepository memberTownRepository;
 	private final RegionRepository regionRepository;
-	private final MemberTownValidator validator;
+	private final MemberTownValidator memberTownValidator;
 
 	public MemberAddRegionResponse addMemberTown(Principal principal, MemberTownAddRequest request) {
 		log.info("회원 동네 추가 서비스 요청 : 회원아이디={}, 추가할 동네 등록번호={}", principal.getLoginId(), request.getAddressId());
@@ -39,7 +39,7 @@ public class MemberTownService {
 		Member member = findMemberBy(principal);
 		List<MemberTown> memberTowns = memberTownRepository.findAllByMemberId(principal.getMemberId());
 		Region region = getAddressIdBy(request.getAddressId());
-		validator.validateAddMemberTown(memberTowns, region);
+		memberTownValidator.validateAddMemberTown(memberTowns, region);
 
 		MemberTown town = MemberTown.create(region, member);
 		memberTownRepository.save(town);
@@ -52,7 +52,7 @@ public class MemberTownService {
 
 		List<MemberTown> memberTowns = memberTownRepository.findAllByMemberId(principal.getMemberId());
 		Region region = getAddressIdBy(request.getAddressId());
-		validator.validateRemoveMemberTown(memberTowns, region);
+		memberTownValidator.validateRemoveMemberTown(memberTowns, region);
 
 		Member member = findMemberBy(principal);
 		memberTownRepository.deleteMemberTownByMemberIdAndRegionId(member.getId(), region.getId());

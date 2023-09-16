@@ -10,7 +10,6 @@ import codesquard.app.api.errors.errorcode.ImageErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.image.Image;
 import codesquard.app.domain.image.ImageRepository;
-import codesquard.app.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -18,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 public class ItemValidator {
 
 	private final ImageRepository imageRepository;
-	private final ItemRepository itemRepository;
 
 	public void validateContainsImage(List<String> imageUrls, Long itemId) {
 		List<String> findImageUrls = imageRepository.findAllByItemId(itemId).stream()

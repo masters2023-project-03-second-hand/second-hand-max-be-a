@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -15,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.api.converter.SalesRequestConverter;
 import codesquard.app.api.converter.WishRequestConverter;
+import codesquard.app.api.redis.RedisService;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.AuthenticationContext;
@@ -30,8 +30,7 @@ public class WebConfig implements WebMvcConfigurer {
 	private final AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
 	private final JwtProvider jwtProvider;
 	private final AuthenticationContext authenticationContext;
-	private final WishRequestConverter wishRequestConverter;
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final RedisService redisService;
 	private final ObjectMapper objectMapper;
 
 	@Override
@@ -51,7 +50,7 @@ public class WebConfig implements WebMvcConfigurer {
 	public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilter() {
 		FilterRegistrationBean<JwtAuthorizationFilter> filterFilterRegistrationBean = new FilterRegistrationBean<>();
 		filterFilterRegistrationBean.setFilter(
-			new JwtAuthorizationFilter(jwtProvider, authenticationContext, objectMapper, redisTemplate));
+			new JwtAuthorizationFilter(jwtProvider, authenticationContext, objectMapper, redisService));
 		filterFilterRegistrationBean.addUrlPatterns("/api/*");
 		return filterFilterRegistrationBean;
 	}
@@ -65,7 +64,7 @@ public class WebConfig implements WebMvcConfigurer {
 	@Bean
 	public FilterRegistrationBean<LogoutFilter> logoutFiler() {
 		FilterRegistrationBean<LogoutFilter> logoutFilerBean = new FilterRegistrationBean<>();
-		logoutFilerBean.setFilter(new LogoutFilter(redisTemplate, objectMapper));
+		logoutFilerBean.setFilter(new LogoutFilter(redisService, objectMapper));
 		logoutFilerBean.addUrlPatterns("/api/auth/logout");
 		return logoutFilerBean;
 	}

@@ -2,17 +2,12 @@ package codesquard.app.api.oauth;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
@@ -27,6 +22,7 @@ import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
+import codesquard.app.api.redis.RedisService;
 import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
@@ -52,7 +48,7 @@ public class OauthService {
 	private final RegionRepository regionRepository;
 	private final ImageService imageService;
 	private final JwtProvider jwtProvider;
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final RedisService redisService;
 
 	public OauthSignUpResponse signUp(MultipartFile profile, OauthSignUpRequest request, String provider,
 		String authorizationCode) {
@@ -75,7 +71,7 @@ public class OauthService {
 		log.debug("회원 엔티티 저장 결과 : {}", saveMember);
 
 		List<Region> regions = regionRepository.findAllById(request.getAddressIds());
-		List<MemberTown> memberTowns = MemberTown.create(regions, member);
+		List<MemberTown> memberTowns = MemberTown.createMemberTowns(regions, member);
 		memberTownRepository.saveAll(memberTowns);
 		log.debug("회원 동네 저장 결과 : {}", memberTowns);
 
@@ -121,11 +117,7 @@ public class OauthService {
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 		log.debug("로그인 서비스 요청 중 jwt 객체 생성 : {}", jwt);
 
-		// key: "RT:" + email, value : 리프레쉬 토큰값
-		redisTemplate.opsForValue().set(member.createRedisKey(),
-			jwt.getRefreshToken(),
-			jwt.convertExpireDateRefreshTokenTimeWithLong(),
-			TimeUnit.MILLISECONDS);
+		redisService.saveRefreshToken(member, jwt);
 
 		return OauthLoginResponse.create(jwt, OauthLoginMemberResponse.from(member, memberTowns));
 	}
@@ -143,21 +135,23 @@ public class OauthService {
 		String refreshToken = request.getRefreshToken();
 
 		deleteRefreshTokenBy(refreshToken);
-		registerAccessTokenToBlackList(accessToken);
+		banAccessToken(accessToken);
 	}
 
 	private void deleteRefreshTokenBy(String refreshToken) {
-		String email = findEmailByRefreshToken(refreshToken);
-		redisTemplate.delete(String.format("RT:%s", email));
+		String email = redisService.findEmailByRefreshTokenValue(refreshToken);
+		boolean result = redisService.delete(String.format("RT:%s", email));
+		log.debug("리프레쉬 토큰 삭제 결과 : {}", result);
 	}
 
-	private void registerAccessTokenToBlackList(String accessToken) {
+	private void banAccessToken(String accessToken) {
 		try {
 			long expiration = ((Integer)jwtProvider.getClaims(accessToken).get("exp")).longValue();
-			redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+			redisService.banAccessToken(accessToken, expiration);
 		} catch (RestApiException e) {
-			log.error("액세스 토큰 에러 : {}", e.getMessage());
+			log.error("토큰 에러 : {}", accessToken);
 		}
+
 	}
 
 	public OauthRefreshResponse refreshAccessToken(OauthRefreshRequest request, LocalDateTime now) {
@@ -166,7 +160,7 @@ public class OauthService {
 		jwtProvider.validateToken(refreshToken);
 		log.debug("refreshToken is valid token : {}", refreshToken);
 
-		String email = findEmailByRefreshToken(refreshToken);
+		String email = redisService.findEmailByRefreshTokenValue(refreshToken);
 		log.debug("findEmailByRefreshToken 결과 : email={}", email);
 		Member member = memberRepository.findMemberByEmail(email)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
@@ -177,15 +171,4 @@ public class OauthService {
 		return OauthRefreshResponse.create(jwt);
 	}
 
-	private String findEmailByRefreshToken(String refreshToken) {
-		Set<String> keys = redisTemplate.keys("RT:*");
-		if (keys == null) {
-			throw new RestApiException(JwtTokenErrorCode.EMPTY_TOKEN);
-		}
-		return keys.stream()
-			.filter(key -> Objects.equals(redisTemplate.opsForValue().get(key), refreshToken))
-			.findAny()
-			.map(email -> email.replace("RT:", ""))
-			.orElse(null);
-	}
 }

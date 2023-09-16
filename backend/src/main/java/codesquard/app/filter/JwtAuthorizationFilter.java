@@ -10,7 +10,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsUtils;
@@ -20,8 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.api.errors.errorcode.ErrorCode;
 import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
-import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.redis.RedisService;
 import codesquard.app.api.response.ApiResponse;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.oauth.support.AuthenticationContext;
@@ -44,7 +43,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	private final JwtProvider jwtProvider;
 	private final AuthenticationContext authenticationContext;
 	private final ObjectMapper objectMapper;
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final RedisService redisService;
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -70,7 +69,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		try {
 			String token = extractJwt(request).orElseThrow(() -> new RestApiException(JwtTokenErrorCode.EMPTY_TOKEN));
 			jwtProvider.validateToken(token);
-			validateAlreadyLogout(token);
+			redisService.validateAlreadyLogout(token);
 			authenticationContext.setPrincipal(jwtProvider.extractPrincipal(token));
 		} catch (RestApiException e) {
 			setErrorResponse(response, e.getErrorCode());
@@ -88,12 +87,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		}
 
 		return Optional.of(header.split(" ")[1]);
-	}
-
-	private void validateAlreadyLogout(String token) {
-		if (Objects.equals(redisTemplate.opsForValue().get(token), "logout")) {
-			throw new RestApiException(OauthErrorCode.NOT_LOGIN_STATE);
-		}
 	}
 
 	private void setErrorResponse(HttpServletResponse httpServletResponse, ErrorCode errorCode) throws IOException {

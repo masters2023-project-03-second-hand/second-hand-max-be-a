@@ -40,7 +40,7 @@ public class Image {
 		return new Image(imageUrl, item);
 	}
 
-	public static List<Image> create(List<String> imageUrls, Item item) {
+	public static List<Image> createImages(List<String> imageUrls, Item item) {
 		List<Image> images = new ArrayList<>();
 		for (String imageUrl : imageUrls) {
 			images.add(create(imageUrl, item));

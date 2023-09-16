@@ -44,7 +44,7 @@ public class MemberTown {
 		return new MemberTown(name, member, region);
 	}
 
-	public static List<MemberTown> create(List<Region> regions, Member member) {
+	public static List<MemberTown> createMemberTowns(List<Region> regions, Member member) {
 		List<MemberTown> memberTowns = new ArrayList<>();
 		for (Region region : regions) {
 			memberTowns.add(create(region, member));
