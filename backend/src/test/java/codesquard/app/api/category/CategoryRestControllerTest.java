@@ -1,11 +1,10 @@
 package codesquard.app.api.category;
 
+import static codesquard.app.api.category.CategoryTestSupport.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.List;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import codesquard.app.ControllerTestSupport;
 import codesquard.app.api.category.response.CategoryListResponse;
 import codesquard.app.api.errors.handler.GlobalExceptionHandler;
-import codesquard.app.domain.category.Category;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 
 class CategoryRestControllerTest extends ControllerTestSupport {
@@ -48,7 +46,7 @@ class CategoryRestControllerTest extends ControllerTestSupport {
 	@Test
 	public void findAll() throws Exception {
 		// given
-		CategoryListResponse response = new CategoryListResponse(List.of(Category.sport()));
+		CategoryListResponse response = new CategoryListResponse(getCategories());
 		given(categoryQueryService.findAll()).willReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/categories"))
