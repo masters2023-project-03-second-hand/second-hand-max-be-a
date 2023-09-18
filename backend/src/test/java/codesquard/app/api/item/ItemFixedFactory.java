@@ -1,12 +1,8 @@
 package codesquard.app.api.item;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.domain.category.Category;
-import codesquard.app.domain.image.Image;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
@@ -26,11 +22,5 @@ public class ItemFixedFactory {
 		long chatCount = 0;
 		return Item.create(TITLE, CONTENT, PRICE, STATUS, REGION, CREATED_AT, wishCount, viewCount, chatCount,
 			member, category);
-	}
-
-	public static ItemModifyRequest createFixedItemModifyRequest(Category category, List<Image> images) {
-		List<String> deleteImageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
-		return ItemModifyRequest.create("빈티지 롤러 스케이트", 169000L, "내용", "가락동", ItemStatus.ON_SALE, category.getId(),
-			category.getName(), deleteImageUrls);
 	}
 }
