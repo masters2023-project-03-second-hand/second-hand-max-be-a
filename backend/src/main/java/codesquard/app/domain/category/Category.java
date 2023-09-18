@@ -32,8 +32,4 @@ public class Category {
 	public static Category create(String name, String imageUrl) {
 		return new Category(name, imageUrl);
 	}
-
-	public static Category sport() {
-		return new Category("스포츠/레저", "https://i.ibb.co/hXVgTyd/sports.png");
-	}
 }
