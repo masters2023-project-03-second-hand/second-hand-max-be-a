@@ -19,4 +19,9 @@ public class CategoryListResponse {
 			.map(CategoryItemResponse::from)
 			.collect(Collectors.toUnmodifiableList());
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(카테고리 개수=%d)", "카테고리 목록 응답", this.getClass().getSimpleName(), categories.size());
+	}
 }
