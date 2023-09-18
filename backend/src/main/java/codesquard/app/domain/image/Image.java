@@ -31,7 +31,7 @@ public class Image {
 	@JoinColumn(name = "item_id")
 	private Item item;
 
-	private Image(String imageUrl, Item item) {
+	public Image(String imageUrl, Item item) {
 		this.imageUrl = imageUrl;
 		this.item = item;
 	}

@@ -1,6 +1,8 @@
 package codesquard.app.domain.item;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -19,6 +21,7 @@ import org.hibernate.annotations.DynamicInsert;
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.category.Category;
+import codesquard.app.domain.image.Image;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.AllArgsConstructor;
@@ -129,9 +132,17 @@ public class Item {
 			"상품", this.getClass().getSimpleName(), id, title, price, status, region, viewCount);
 	}
 
-	public void validateAuthorization(Principal writer) {
+	public void validateIsSeller(Principal writer) {
 		if (!Objects.equals(member.getId(), writer.getMemberId())) {
 			throw new RestApiException(ItemErrorCode.ITEM_FORBIDDEN);
 		}
+	}
+
+	public List<Image> createImages(List<String> imageUrls) {
+		List<Image> images = new ArrayList<>();
+		for (String url : imageUrls) {
+			images.add(new Image(url, this));
+		}
+		return images;
 	}
 }
