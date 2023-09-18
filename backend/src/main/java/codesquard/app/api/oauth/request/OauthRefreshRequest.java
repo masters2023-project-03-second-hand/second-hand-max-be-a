@@ -3,21 +3,15 @@ package codesquard.app.api.oauth.request;
 import javax.validation.constraints.NotBlank;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthRefreshRequest {
 
 	@NotBlank(message = "리프레쉬 토큰은 필수 정보입니다.")
 	private String refreshToken;
-
-	public static OauthRefreshRequest create(String refreshToken) {
-		return new OauthRefreshRequest(refreshToken);
-	}
 
 	@Override
 	public String toString() {

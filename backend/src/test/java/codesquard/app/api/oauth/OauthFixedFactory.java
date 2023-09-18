@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
@@ -14,11 +13,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
-import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
-import codesquard.app.api.oauth.response.OauthSignUpResponse;
-import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
 
@@ -30,30 +25,6 @@ public class OauthFixedFactory {
 	private static final String TOKEN_TYPE = "Bearer";
 	private static final String EMAIL = "23Yong@naver.com";
 	private static final String AVATAR_URL = "avatarUrlValue";
-
-	public static OauthSignUpRequest createFixedOauthSignUpRequest(List<Long> addressIds) {
-		return OauthSignUpRequest.create(LOGIN_ID, addressIds);
-	}
-
-	public static OauthSignUpRequest createOauthSignUpRequest(String loginId, List<Long> addressIds) {
-		return OauthSignUpRequest.create(loginId, addressIds);
-	}
-
-	public static OauthSignUpRequest createFixedOauthSignUpRequest(String loginId, List<Long> addressIds) {
-		return OauthSignUpRequest.create(loginId, addressIds);
-	}
-
-	public static OauthAccessTokenResponse createFixedOauthAccessTokenResponse() {
-		return OauthAccessTokenResponse.create(ACCESS_TOKEN, SCOPE, TOKEN_TYPE);
-	}
-
-	public static OauthUserProfileResponse createOauthUserProfileResponse() {
-		return OauthUserProfileResponse.create(EMAIL, null);
-	}
-
-	public static OauthSignUpResponse createdFixedOauthSignUpResponse() {
-		return OauthSignUpResponse.create(1L, AVATAR_URL, EMAIL, LOGIN_ID);
-	}
 
 	public static MockMultipartFile createFixedProfile() throws IOException {
 		File catFile = new ClassPathResource("cat.png").getFile();
@@ -70,10 +41,6 @@ public class OauthFixedFactory {
 		String requestJson = objectMapper.writeValueAsString(request);
 		return new MockMultipartFile("signupData", "signupData", "application/json",
 			requestJson.getBytes(StandardCharsets.UTF_8));
-	}
-
-	public static OauthLoginRequest createFixedOauthLoginRequest() {
-		return OauthLoginRequest.create("23Yong");
 	}
 
 	public static LocalDateTime createNow() {

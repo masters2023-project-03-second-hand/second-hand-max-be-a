@@ -17,7 +17,6 @@ import codesquard.app.api.oauth.request.OauthLogoutRequest;
 import codesquard.app.api.oauth.request.OauthRefreshRequest;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
-import codesquard.app.api.oauth.response.OauthLoginMemberResponse;
 import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
@@ -119,7 +118,7 @@ public class OauthService {
 
 		redisService.saveRefreshToken(member, jwt);
 
-		return OauthLoginResponse.create(jwt, OauthLoginMemberResponse.from(member, memberTowns));
+		return OauthLoginResponse.of(jwt, member, memberTowns);
 	}
 
 	private Member getLoginMember(OauthLoginRequest request, OauthUserProfileResponse userProfileResponse) {
@@ -129,9 +128,8 @@ public class OauthService {
 			.orElseThrow(() -> new RestApiException(OauthErrorCode.FAIL_LOGIN));
 	}
 
-	public void logout(OauthLogoutRequest request) {
-		log.info("로그아웃 서비스 요청 : {}", request);
-		String accessToken = request.getAccessToken();
+	public void logout(String accessToken, OauthLogoutRequest request) {
+		log.info("로그아웃 서비스 요청 : accessToken={}, request={}", accessToken, request);
 		String refreshToken = request.getRefreshToken();
 
 		deleteRefreshTokenBy(refreshToken);
@@ -168,7 +166,7 @@ public class OauthService {
 
 		Jwt jwt = jwtProvider.createJwtWithRefreshTokenBasedOnMember(member, refreshToken, now);
 
-		return OauthRefreshResponse.create(jwt);
+		return OauthRefreshResponse.from(jwt);
 	}
 
 }

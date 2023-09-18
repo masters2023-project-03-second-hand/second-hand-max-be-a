@@ -62,7 +62,7 @@ class ItemControllerTest extends ControllerTestSupport {
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
 		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
 
-		ItemDetailResponse response = ItemDetailResponse.create(item, seller, seller.getId(), imageUrls);
+		ItemDetailResponse response = ItemDetailResponse.of(item, seller, seller.getId(), imageUrls);
 		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))
@@ -93,7 +93,7 @@ class ItemControllerTest extends ControllerTestSupport {
 		Item item = ItemFixedFactory.createFixedItem(seller, category);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
 		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
-		ItemDetailResponse response = ItemDetailResponse.create(item, seller, 9999L, imageUrls);
+		ItemDetailResponse response = ItemDetailResponse.of(item, seller, 9999L, imageUrls);
 		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))

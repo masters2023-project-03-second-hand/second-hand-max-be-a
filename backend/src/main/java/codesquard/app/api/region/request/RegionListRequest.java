@@ -7,14 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class RegionListRequest {
 
 	private Long lastRegionId;
 	private int size;
 	private String region;
-
-	public static RegionListRequest create(Long lastRegionId, int size, String region) {
-		return new RegionListRequest(lastRegionId, size, region);
-	}
 }

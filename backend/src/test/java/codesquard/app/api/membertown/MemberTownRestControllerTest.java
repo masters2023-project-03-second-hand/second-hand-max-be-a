@@ -6,10 +6,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,15 +34,19 @@ import codesquard.app.domain.region.Region;
 
 class MemberTownRestControllerTest extends ControllerTestSupport {
 
+	@Autowired
 	private MockMvc mockMvc;
-
+	@Autowired
+	private GlobalExceptionHandler globalExceptionHandler;
+	@Autowired
+	private MemberTownRestController memberTownRestController;
 	@MockBean
 	private AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
 
 	@BeforeEach
 	public void setup() {
-		mockMvc = MockMvcBuilders.standaloneSetup(new MemberTownRestController(memberTownService))
-			.setControllerAdvice(new GlobalExceptionHandler())
+		mockMvc = MockMvcBuilders.standaloneSetup(memberTownRestController)
+			.setControllerAdvice(globalExceptionHandler)
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
 			.alwaysDo(print())
 			.build();
@@ -48,18 +56,21 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 	@Test
 	public void addMemberTown() throws Exception {
 		// given
-		MemberTownAddRequest request = MemberTownAddRequest.create(1L);
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("addressId", 1L);
+
 		Member member = OauthFixedFactory.createFixedMember();
 		MemberTown memberTown = MemberTown.create(Region.create("서울 송파구 가락동"), member);
-		MemberAddRegionResponse response = MemberAddRegionResponse.create(memberTown);
+		MemberAddRegionResponse response = MemberAddRegionResponse.from(memberTown);
+
 		given(memberTownService.addMemberTown(
 			ArgumentMatchers.any(Principal.class),
 			ArgumentMatchers.any(MemberTownAddRequest.class)))
 			.willReturn(response);
 
-		// when & null
+		// when & then
 		mockMvc.perform(post("/api/regions")
-				.content(objectMapper.writeValueAsString(request))
+				.content(objectMapper.writeValueAsString(requestBody))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("statusCode").value(equalTo(201)))
@@ -71,7 +82,8 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 	@Test
 	public void removeMemberTown() throws Exception {
 		// given
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(1L);
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("addressId", 1L);
 		MemberTownRemoveResponse response = MemberTownRemoveResponse.create("서울 송파구 가락동");
 		given(memberTownService.removeMemberTown(
 			ArgumentMatchers.any(Principal.class),
@@ -80,7 +92,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(delete("/api/regions")
-				.content(objectMapper.writeValueAsString(request))
+				.content(objectMapper.writeValueAsString(requestBody))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("statusCode").value(equalTo(200)))
@@ -92,10 +104,11 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 	@Test
 	public void removeMemberTownWithAddressIsNull() throws Exception {
 		// given
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(null);
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("addressId", null);
 		// when & then
 		mockMvc.perform(delete("/api/regions")
-				.content(objectMapper.writeValueAsString(request))
+				.content(objectMapper.writeValueAsString(requestBody))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("statusCode").value(equalTo(400)))

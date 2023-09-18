@@ -24,10 +24,6 @@ public class OauthSignUpResponse {
 			member.getLoginId());
 	}
 
-	public static OauthSignUpResponse create(Long id, String avatarUrl, String email, String loginId) {
-		return new OauthSignUpResponse(id, avatarUrl, email, loginId);
-	}
-
 	@Override
 	public String toString() {
 		return String.format("%s, %s(loginId=%s)", "회원가입 응답", this.getClass().getSimpleName(), loginId);

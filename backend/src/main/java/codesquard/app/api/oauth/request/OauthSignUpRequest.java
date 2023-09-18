@@ -6,13 +6,11 @@ import codesquard.app.annotation.Addresses;
 import codesquard.app.annotation.LoginId;
 import codesquard.app.domain.member.Member;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthSignUpRequest {
 
 	@LoginId
@@ -20,10 +18,6 @@ public class OauthSignUpRequest {
 
 	@Addresses
 	private List<Long> addressIds;
-
-	public static OauthSignUpRequest create(String loginId, List<Long> addressIds) {
-		return new OauthSignUpRequest(loginId, addressIds);
-	}
 
 	public Member toEntity(String avatarUrl, String email) {
 		return Member.create(avatarUrl, email, loginId);

@@ -32,7 +32,7 @@ public class ItemQueryService {
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		List<String> imageUrls = mapToImageUrls(item);
 		Member seller = item.getMember();
-		return ItemDetailResponse.create(item, seller, loginMemberId, imageUrls);
+		return ItemDetailResponse.of(item, seller, loginMemberId, imageUrls);
 	}
 
 	private List<String> mapToImageUrls(Item item) {

@@ -44,7 +44,7 @@ public class MemberTownService {
 		MemberTown town = MemberTown.create(region, member);
 		memberTownRepository.save(town);
 
-		return MemberAddRegionResponse.create(town);
+		return MemberAddRegionResponse.from(town);
 	}
 
 	public MemberTownRemoveResponse removeMemberTown(Principal principal, MemberTownRemoveRequest request) {

@@ -1,6 +1,10 @@
 package codesquard.app.api.oauth.response;
 
+import java.util.List;
+
 import codesquard.app.domain.jwt.Jwt;
+import codesquard.app.domain.member.Member;
+import codesquard.app.domain.membertown.MemberTown;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +18,8 @@ public class OauthLoginResponse {
 	private Jwt jwt;
 	private OauthLoginMemberResponse user;
 
-	public static OauthLoginResponse create(Jwt jwt, OauthLoginMemberResponse user) {
+	public static OauthLoginResponse of(Jwt jwt, Member member, List<MemberTown> memberTowns) {
+		OauthLoginMemberResponse user = OauthLoginMemberResponse.of(member, memberTowns);
 		return new OauthLoginResponse(jwt, user);
 	}
 

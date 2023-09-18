@@ -6,7 +6,9 @@ import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
@@ -17,6 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
@@ -57,17 +62,34 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Autowired
 	private RedisService redisService;
 
+	@Autowired
+	private ObjectMapper objectMapper;
+
 	@DisplayName("로그인 아이디와 소셜 로그인을 하여 회원가입을 한다")
 	@Test
 	public void signUp() throws IOException {
 		// given
-		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createFixedOauthSignUpRequest(addressIds);
-		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
-		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("loginId", "23Yong");
+		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthSignUpRequest.class);
+
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("accessToken", "accessTokenValue");
+		responseBody.put("scope", "scopeValue");
+		responseBody.put("tokenType", "Bearer");
+		OauthAccessTokenResponse mockAccessTokenResponse =
+			objectMapper.readValue(objectMapper.writeValueAsString(responseBody), OauthAccessTokenResponse.class);
+
+		Map<String, Object> userProfileResponseBody = new HashMap<>();
+		userProfileResponseBody.put("email", "23Yong@gmail.com");
+		userProfileResponseBody.put("profileImage", "profileImageValue");
+		OauthUserProfileResponse mockUserProfileResponse = objectMapper.readValue(
+			objectMapper.writeValueAsString(userProfileResponseBody), OauthUserProfileResponse.class);
 
 		// mocking
 		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
@@ -88,10 +110,10 @@ class OauthServiceTest extends IntegrationTestSupport {
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
 				.extracting("email", "loginId", "avatarUrl")
-				.contains("23Yong@naver.com", "23Yong", "avatarUrlValue");
+				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertThat(findMember)
 				.extracting("email", "loginId", "avatarUrl")
-				.contains("23Yong@naver.com", "23Yong", "avatarUrlValue");
+				.contains("23Yong@gmail.com", "23Yong", "avatarUrlValue");
 			softAssertions.assertThat(memberTowns).hasSize(1);
 			softAssertions.assertAll();
 		});
@@ -101,13 +123,16 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signupWithDuplicateLoginId() throws IOException {
 		// given
-		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
-
 		memberRepository.save(createFixedMember());
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createFixedOauthSignUpRequest(addressIds);
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("loginId", "23Yong");
+		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthSignUpRequest.class);
 
 		// when
 		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
@@ -126,15 +151,30 @@ class OauthServiceTest extends IntegrationTestSupport {
 		imageRepository.deleteAllInBatch();
 		itemRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
-		memberRepository.save(createFixedMember());
-		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
+		memberRepository.save(new Member("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createOauthSignUpRequest("bruni2", addressIds);
-		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
-		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("loginId", "bruni2");
+		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthSignUpRequest.class);
+
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("accessToken", "accessTokenValue");
+		responseBody.put("scope", "scopeValue");
+		responseBody.put("tokenType", "Bearer");
+		OauthAccessTokenResponse mockAccessTokenResponse =
+			objectMapper.readValue(objectMapper.writeValueAsString(responseBody), OauthAccessTokenResponse.class);
+
+		Map<String, Object> userProfileResponseBody = new HashMap<>();
+		userProfileResponseBody.put("email", "23Yong@gmail.com");
+		userProfileResponseBody.put("profileImage", "profileImageValue");
+		OauthUserProfileResponse mockUserProfileResponse = objectMapper.readValue(
+			objectMapper.writeValueAsString(userProfileResponseBody), OauthUserProfileResponse.class);
 
 		given(oauthClientRepository.findOneBy(anyString())).willReturn(oauthClient);
 		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
@@ -157,12 +197,15 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signUpWithInvalidProvider() throws IOException {
 		// given
-		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
-
 		String provider = "github";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createFixedOauthSignUpRequest(addressIds);
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("loginId", "23Yong");
+		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthSignUpRequest.class);
 
 		// mocking
 		when(oauthClientRepository.findOneBy(anyString())).thenThrow(
@@ -182,13 +225,22 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signUpWithInvalidCode() throws IOException {
 		// given
-		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
-
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createFixedOauthSignUpRequest(addressIds);
-		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("loginId", "23Yong");
+		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthSignUpRequest.class);
+
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("accessToken", "accessTokenValue");
+		responseBody.put("scope", "scopeValue");
+		responseBody.put("tokenType", "Bearer");
+		OauthAccessTokenResponse mockAccessTokenResponse =
+			objectMapper.readValue(objectMapper.writeValueAsString(responseBody), OauthAccessTokenResponse.class);
 
 		// mocking
 		when(oauthClientRepository.findOneBy(anyString())).thenReturn(oauthClient);
@@ -212,7 +264,6 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signUpWhenDuplicateLoginId() throws IOException {
 		// given
-		List<Long> addressIds = getAddressIds("서울 송파구 가락동");
 		Member member = Member.create("avatarUrlValue", "23Yong1234@gmail.com", "23Yong");
 		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		memberRepository.save(member);
@@ -221,9 +272,25 @@ class OauthServiceTest extends IntegrationTestSupport {
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
-		OauthSignUpRequest request = createFixedOauthSignUpRequest(addressIds);
-		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
-		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("loginId", "23Yong");
+		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthSignUpRequest.class);
+
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("accessToken", "accessTokenValue");
+		responseBody.put("scope", "scopeValue");
+		responseBody.put("tokenType", "Bearer");
+		OauthAccessTokenResponse mockAccessTokenResponse =
+			objectMapper.readValue(objectMapper.writeValueAsString(responseBody), OauthAccessTokenResponse.class);
+
+		Map<String, Object> userProfileResponseBody = new HashMap<>();
+		userProfileResponseBody.put("email", "23Yong@gmail.com");
+		userProfileResponseBody.put("profileImage", "profileImageValue");
+		OauthUserProfileResponse mockUserProfileResponse = objectMapper.readValue(
+			objectMapper.writeValueAsString(userProfileResponseBody), OauthUserProfileResponse.class);
 
 		given(oauthClientRepository.findOneBy(anyString()))
 			.willReturn(oauthClient);
@@ -244,16 +311,30 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("로그인 아이디와 인가코드를 가지고 소셜 로그인을 한다")
 	@Test
-	public void login() {
+	public void login() throws JsonProcessingException {
 		// given
-		Member member = createFixedMember();
+		Member member = new Member("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
 
-		OauthLoginRequest request = createFixedOauthLoginRequest();
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("loginId", "23Yong");
+		OauthLoginRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthLoginRequest.class);
 		String provider = "naver";
 		String code = "1234";
-		OauthAccessTokenResponse mockAccessTokenResponse = createFixedOauthAccessTokenResponse();
-		OauthUserProfileResponse mockUserProfileResponse = createOauthUserProfileResponse();
+
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("accessToken", "accessTokenValue");
+		responseBody.put("scope", "scopeValue");
+		responseBody.put("tokenType", "Bearer");
+		OauthAccessTokenResponse mockAccessTokenResponse =
+			objectMapper.readValue(objectMapper.writeValueAsString(responseBody), OauthAccessTokenResponse.class);
+
+		Map<String, Object> userProfileResponseBody = new HashMap<>();
+		userProfileResponseBody.put("email", "23Yong@gmail.com");
+		userProfileResponseBody.put("profileImage", "profileImageValue");
+		OauthUserProfileResponse mockUserProfileResponse = objectMapper.readValue(
+			objectMapper.writeValueAsString(userProfileResponseBody), OauthUserProfileResponse.class);
 
 		LocalDateTime now = createNow();
 		// mocking
@@ -281,15 +362,19 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("로그아웃을 수행한다")
 	@Test
-	public void logout() {
+	public void logout() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		LocalDateTime now = createNow();
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
-		OauthLogoutRequest request = OauthLogoutRequest.create(jwt.getAccessToken(), jwt.getRefreshToken());
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("refreshToken", jwt.getRefreshToken());
+		OauthLogoutRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthLogoutRequest.class);
 
 		// when
-		oauthService.logout(request);
+		oauthService.logout(jwt.getAccessToken(), request);
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
@@ -300,15 +385,19 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("만료된 액세스 토큰을 가지고 로그아웃을 요청하면 블랙리스트에 추가하지 않는다")
 	@Test
-	public void logoutWithExpireAccessToken() {
+	public void logoutWithExpireAccessToken() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		LocalDateTime now = LocalDateTime.now().minusMinutes(5);
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
-		OauthLogoutRequest request = OauthLogoutRequest.create(jwt.getAccessToken(), jwt.getRefreshToken());
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("refreshToken", jwt.getRefreshToken());
+		OauthLogoutRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthLogoutRequest.class);
 
 		// when
-		oauthService.logout(request);
+		oauthService.logout(jwt.getAccessToken(), request);
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
@@ -319,16 +408,20 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("만료된 리프레쉬 토큰을 가지고 로그아웃을 요청하면 이미 만료되어 아무 처리도 하지 않는다")
 	@Test
-	public void logoutWithExpireRefreshToken() {
+	public void logoutWithExpireRefreshToken() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		LocalDateTime now = createNow().minusHours(10);
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
-		OauthLogoutRequest request = OauthLogoutRequest.create(jwt.getAccessToken(), jwt.getRefreshToken());
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("refreshToken", jwt.getRefreshToken());
+		OauthLogoutRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthLogoutRequest.class);
 
 		redisService.saveRefreshToken(member, jwt);
 		// when
-		oauthService.logout(request);
+		oauthService.logout(jwt.getAccessToken(), request);
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
@@ -339,7 +432,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("리프레쉬 토큰을 가지고 액세스 토큰을 갱신한다")
 	@Test
-	public void refreshAccessToken() {
+	public void refreshAccessToken() throws JsonProcessingException {
 		// given
 		Member member = createFixedMember();
 		LocalDateTime now = createNow();
@@ -349,7 +442,11 @@ class OauthServiceTest extends IntegrationTestSupport {
 		redisService.saveRefreshToken(member, jwt);
 		memberRepository.save(member);
 
-		OauthRefreshRequest request = OauthRefreshRequest.create(jwt.getRefreshToken());
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("refreshToken", jwt.getRefreshToken());
+
+		OauthRefreshRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthRefreshRequest.class);
 
 		// when
 		OauthRefreshResponse response = oauthService.refreshAccessToken(request, now);
@@ -365,7 +462,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("유효하지 않은 토큰으로는 액세스 토큰을 갱신할 수 없다")
 	@Test
-	public void refreshAccessTokenWithInvalidRefreshToken() {
+	public void refreshAccessTokenWithInvalidRefreshToken() throws JsonProcessingException {
 		// given
 		Member member = createFixedMember();
 		LocalDateTime now = createNow();
@@ -375,7 +472,11 @@ class OauthServiceTest extends IntegrationTestSupport {
 		redisService.saveRefreshToken(member, jwt);
 		memberRepository.save(member);
 
-		OauthRefreshRequest request = OauthRefreshRequest.create("invalidRefreshTokenValue");
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("refreshToken", "invalidRefreshTokenValue");
+
+		OauthRefreshRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			OauthRefreshRequest.class);
 
 		// when
 		Throwable throwable = catchThrowable(() -> oauthService.refreshAccessToken(request, now));
