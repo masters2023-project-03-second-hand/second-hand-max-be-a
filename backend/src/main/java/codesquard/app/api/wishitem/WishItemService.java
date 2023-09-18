@@ -37,7 +37,7 @@ public class WishItemService {
 		item.wishRegister();
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
-		wishRepository.save(Wish.create(member, item, LocalDateTime.now()));
+		wishRepository.save(new Wish(member, item, LocalDateTime.now()));
 	}
 
 	@Transactional
