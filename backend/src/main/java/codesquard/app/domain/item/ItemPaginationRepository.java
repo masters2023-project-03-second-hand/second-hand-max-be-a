@@ -11,14 +11,14 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import codesquard.app.api.response.ItemResponse;
-import codesquard.app.domain.pagination.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Repository
-public class ItemPaginationRepository extends PaginationUtils {
+public class ItemPaginationRepository {
 
 	private final JPAQueryFactory queryFactory;
+	private final ItemRepository itemRepository;
 
 	public Slice<ItemResponse> findByIdAndRegion(Long itemId, String region, int size, Long categoryId) {
 		List<ItemResponse> itemResponses = queryFactory.select(Projections.fields(ItemResponse.class,
@@ -32,13 +32,13 @@ public class ItemPaginationRepository extends PaginationUtils {
 				item.wishCount,
 				item.chatCount))
 			.from(item)
-			.where(lessThanItemId(itemId),
-				equalCategoryId(categoryId),
-				equalTradingRegion(region)
+			.where(itemRepository.lessThanItemId(itemId),
+				itemRepository.equalCategoryId(categoryId),
+				itemRepository.equalTradingRegion(region)
 			)
 			.orderBy(item.createdAt.desc())
 			.limit(size + 1)
 			.fetch();
-		return checkLastPage(size, itemResponses);
+		return itemRepository.checkLastPage(size, itemResponses);
 	}
 }

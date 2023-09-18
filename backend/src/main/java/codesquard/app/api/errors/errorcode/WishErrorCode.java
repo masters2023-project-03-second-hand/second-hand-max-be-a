@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 public enum WishErrorCode implements ErrorCode {
 
-	INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.");
+	INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+	DUPLICATED_REQUEST(HttpStatus.BAD_REQUEST, "이미 처리된 요청입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
