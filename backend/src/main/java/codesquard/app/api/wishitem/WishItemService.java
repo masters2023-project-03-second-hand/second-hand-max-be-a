@@ -43,10 +43,9 @@ public class WishItemService {
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		if (wishRepository.existsByMemberIdAndItemId(memberId, itemId)) {
 			throw new RestApiException(WishErrorCode.DUPLICATED_REQUEST);
-		} else {
-			item.wishRegister();
-			wishRepository.save(Wish.create(new Member(memberId), item, LocalDateTime.now()));
 		}
+		item.wishRegister();
+		wishRepository.save(Wish.create(new Member(memberId), item, LocalDateTime.now()));
 	}
 
 	private void cancel(Long itemId) {
