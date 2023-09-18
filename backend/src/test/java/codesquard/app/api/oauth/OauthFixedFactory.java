@@ -24,7 +24,6 @@ import codesquard.app.domain.member.Member;
 
 public class OauthFixedFactory {
 	private static final String LOGIN_ID = "23Yong";
-	private static final List<String> ADDRESS_NAMES = List.of("가락 1동");
 	private static final String ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJsb2dpbklkIjoiMjNZb25nIiwiZW1haWwiOiIyM1lvbm"
 		+ "dAZ21haWwuY29tIiwibWVtYmVySWQiOjEsImV4cCI6MTY3MjQ5OTEwMH0.7w2MKSLPVEr6wo7B-C6drNA3eETikpnYi2M1V8c9erY";
 	private static final String SCOPE = "scopeValue";
@@ -83,6 +82,10 @@ public class OauthFixedFactory {
 
 	public static Member createFixedMember() {
 		return Member.create(AVATAR_URL, EMAIL, LOGIN_ID);
+	}
+
+	public static Member createMember(String avatarUrl, String email, String loginId) {
+		return new Member(avatarUrl, email, loginId);
 	}
 
 	public static String createExpectedAccessTokenBy(JwtProvider jwtProvider, Member member,

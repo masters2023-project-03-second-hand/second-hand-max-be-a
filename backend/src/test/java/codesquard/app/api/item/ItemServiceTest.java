@@ -19,7 +19,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.IntegrationTestSupport;
-import codesquard.app.api.category.CategoryFixedFactory;
+import codesquard.app.api.category.CategoryTestSupport;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
@@ -110,7 +110,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
-		Category category = CategoryFixedFactory.createdFixedCategory();
+		Category category = CategoryTestSupport.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(member, category);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
 
@@ -152,7 +152,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
-		Category category = CategoryFixedFactory.createdFixedCategory();
+		Category category = CategoryTestSupport.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(member, category);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
 		List<MultipartFile> addImages = ImageFixedFactory.createFixedMultipartFile();

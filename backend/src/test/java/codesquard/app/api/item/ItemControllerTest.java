@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
-import codesquard.app.api.category.CategoryFixedFactory;
+import codesquard.app.api.category.CategoryTestSupport;
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.errors.handler.GlobalExceptionHandler;
@@ -57,7 +57,7 @@ class ItemControllerTest extends ControllerTestSupport {
 		// given
 		long itemId = 1L;
 		Member seller = OauthFixedFactory.createFixedMember();
-		Category category = CategoryFixedFactory.createdFixedCategory();
+		Category category = CategoryTestSupport.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(seller, category);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
 		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
@@ -89,7 +89,7 @@ class ItemControllerTest extends ControllerTestSupport {
 		// given
 		long itemId = 1L;
 		Member seller = OauthFixedFactory.createFixedMember();
-		Category category = CategoryFixedFactory.createdFixedCategory();
+		Category category = CategoryTestSupport.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(seller, category);
 		List<Image> images = ImageFixedFactory.createFixedImages(item);
 		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
