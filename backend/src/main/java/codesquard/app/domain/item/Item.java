@@ -105,7 +105,7 @@ public class Item {
 			.build();
 	}
 
-	public void changeBy(Category category, Item changeItem) {
+	public void change(Category category, Item changeItem) {
 		this.title = changeItem.title;
 		this.price = changeItem.price;
 		this.content = changeItem.content;

@@ -27,7 +27,7 @@ public class ItemRegisterRequest {
 	private String categoryName;
 
 	public Item toEntity(Member member, String thumbnailUrl) {
-		Item item = Item.builder()
+		return Item.builder()
 			.title(title)
 			.content(content)
 			.price(price)
@@ -41,6 +41,5 @@ public class ItemRegisterRequest {
 			.member(member)
 			.category(new Category(categoryId))
 			.build();
-		return item;
 	}
 }

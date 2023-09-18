@@ -12,13 +12,11 @@ import codesquard.app.api.converter.ItemRequestConverter;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemStatus;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemModifyRequest {
 	@NotBlank(message = "제목은 필수 정보입니다.")
 	private String title;
@@ -34,11 +32,6 @@ public class ItemModifyRequest {
 	@NotBlank(message = "카테고리명은 필수 정보입니다.")
 	private String categoryName;
 	private List<String> deleteImageUrls;
-
-	public static ItemModifyRequest create(String title, Long price, String content, String region, ItemStatus status,
-		Long categoryId, String categoryName, List<String> deleteImageUrls) {
-		return new ItemModifyRequest(title, price, content, region, status, categoryId, categoryName, deleteImageUrls);
-	}
 
 	public Item toEntity(String thumbnailUrl) {
 		return Item.builder()

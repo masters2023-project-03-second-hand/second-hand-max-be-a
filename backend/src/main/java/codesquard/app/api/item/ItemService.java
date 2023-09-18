@@ -89,7 +89,7 @@ public class ItemService {
 
 		String thumbnailUrl = findThumbnailUrlBy(item);
 		Item changeItem = request.toEntity(thumbnailUrl);
-		item.changeBy(category, changeItem);
+		item.change(category, changeItem);
 	}
 
 	private int deleteImagesFromRepository(Long itemId, List<String> deleteImageUrls) {
