@@ -1,16 +1,13 @@
 package codesquard.app.api.category;
 
+import static codesquard.app.CategoryTestSupport.*;
 import static org.assertj.core.api.Assertions.*;
-
-import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import codesquard.app.CategoryTestSupport;
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.category.response.CategoryListResponse;
-import codesquard.app.domain.category.Category;
 
 class CategoryQueryServiceTest extends IntegrationTestSupport {
 
@@ -19,11 +16,11 @@ class CategoryQueryServiceTest extends IntegrationTestSupport {
 	public void findAll() {
 		// given
 		categoryRepository.deleteAllInBatch();
+		categoryRepository.saveAll(getCategories());
 
-		List<Category> categories = CategoryTestSupport.getCategories();
-		categoryRepository.saveAll(categories);
 		// when
 		CategoryListResponse response = categoryQueryService.findAll();
+
 		// then
 		assertThat(response.getCategories()).hasSize(23);
 	}
