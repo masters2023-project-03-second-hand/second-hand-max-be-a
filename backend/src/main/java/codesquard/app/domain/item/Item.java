@@ -1,7 +1,6 @@
 package codesquard.app.domain.item;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -20,7 +19,6 @@ import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.oauth.support.Principal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -130,8 +128,8 @@ public class Item {
 			"상품", this.getClass().getSimpleName(), id, title, price, status, region, viewCount);
 	}
 
-	public void validateIsSeller(Principal writer) {
-		if (!Objects.equals(member.getId(), writer.getMemberId())) {
+	public void validateSeller(Long memberId) {
+		if (!member.getId().equals(memberId)) {
 			throw new RestApiException(ItemErrorCode.ITEM_FORBIDDEN);
 		}
 	}

@@ -68,7 +68,7 @@ public class ItemService {
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		log.debug("상품 수정 서비스의 상품 조회 결과 : {}", item);
-		item.validateIsSeller(writer);
+		item.validateSeller(writer.getMemberId());
 
 		List<String> addImageUrls = imageService.uploadImages(addImages);
 		log.debug("상품 수정 서비스의 S3 이미지 추가 결과 : {}", addImageUrls);
