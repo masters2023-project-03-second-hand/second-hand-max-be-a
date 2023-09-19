@@ -7,4 +7,6 @@ public interface WishRepository extends JpaRepository<Wish, Long> {
 	void deleteByItemId(Long itemId);
 
 	int countWishByItemId(Long itemId);
+
+	boolean existsByMemberIdAndItemId(Long memberId, Long itemId);
 }
