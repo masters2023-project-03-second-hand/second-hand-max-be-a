@@ -30,7 +30,7 @@ public class RedisService {
 			.filter(key -> Objects.equals(redisTemplate.opsForValue().get(key), refreshToken))
 			.findAny()
 			.map(email -> email.replace("RT:", ""))
-			.orElse(null);
+			.orElseThrow(() -> new RestApiException(JwtTokenErrorCode.INVALID_TOKEN));
 	}
 
 	public void banAccessToken(String accessToken, long expiration) {

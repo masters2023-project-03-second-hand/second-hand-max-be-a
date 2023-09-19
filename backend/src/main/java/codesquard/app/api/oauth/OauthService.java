@@ -135,9 +135,13 @@ public class OauthService {
 	}
 
 	private void deleteRefreshTokenBy(String refreshToken) {
-		String email = redisService.findEmailByRefreshTokenValue(refreshToken);
-		boolean result = redisService.delete(String.format("RT:%s", email));
-		log.debug("리프레쉬 토큰 삭제 결과 : {}", result);
+		try {
+			String email = redisService.findEmailByRefreshTokenValue(refreshToken);
+			boolean result = redisService.delete(String.format("RT:%s", email));
+			log.debug("리프레쉬 토큰 삭제 결과 : {}", result);
+		} catch (RestApiException e) {
+			log.error("리프레시 토큰에 따른 이메일 없음 : {}", e.getErrorCode().getMessage());
+		}
 	}
 
 	private void banAccessToken(String accessToken) {
