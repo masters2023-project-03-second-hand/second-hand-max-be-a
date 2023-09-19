@@ -68,7 +68,7 @@ class ItemControllerTest extends ControllerTestSupport {
 			.collect(Collectors.toUnmodifiableList());
 
 		ItemDetailResponse response = ItemDetailResponse.of(item, seller, seller.getId(), imageUrls);
-		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
+		when(itemService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))
 			.andExpect(status().isOk())
@@ -102,9 +102,9 @@ class ItemControllerTest extends ControllerTestSupport {
 		List<String> imageUrls = images.stream()
 			.map(Image::getImageUrl)
 			.collect(Collectors.toUnmodifiableList());
-		
+
 		ItemDetailResponse response = ItemDetailResponse.of(item, seller, 9999L, imageUrls);
-		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
+		when(itemService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))
 			.andExpect(status().isOk())
@@ -129,7 +129,7 @@ class ItemControllerTest extends ControllerTestSupport {
 	public void findDetailItemWithNotExistItem() throws Exception {
 		// given
 		long itemId = 9999L;
-		when(itemQueryService.findDetailItemBy(any(), any()))
+		when(itemService.findDetailItemBy(any(), any()))
 			.thenThrow(new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))

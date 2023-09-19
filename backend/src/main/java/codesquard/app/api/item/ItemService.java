@@ -1,6 +1,7 @@
 package codesquard.app.api.item;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageService;
 import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.api.item.request.ItemRegisterRequest;
+import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.api.item.response.ItemResponse;
 import codesquard.app.api.item.response.ItemResponses;
 import codesquard.app.domain.category.Category;
@@ -54,11 +56,32 @@ public class ItemService {
 		imageRepository.saveAll(images);
 	}
 
-	@Transactional(readOnly = true)
 	public ItemResponses findAll(String region, int size, Long cursor, Long categoryId) {
 		Slice<ItemResponse> itemResponses = itemPaginationRepository.findByIdAndRegion(cursor, region, size,
 			categoryId);
 		return PaginationUtils.getItemResponses(itemResponses);
+	}
+
+	public void findById(Long itemId, ItemStatus status) {
+		Item item = itemRepository.findById(itemId)
+			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+		item.changeStatus(status);
+	}
+	
+	public ItemDetailResponse findDetailItemBy(Long itemId, Long loginMemberId) {
+		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
+		Item item = itemRepository.findById(itemId)
+			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+		List<String> imageUrls = mapToImageUrls(item);
+		Member seller = item.getMember();
+		return ItemDetailResponse.of(item, seller, loginMemberId, imageUrls);
+	}
+
+	private List<String> mapToImageUrls(Item item) {
+		List<Image> images = imageRepository.findAllByItemId(item.getId());
+		return images.stream()
+			.map(Image::getImageUrl)
+			.collect(Collectors.toUnmodifiableList());
 	}
 
 	@Transactional
@@ -110,12 +133,5 @@ public class ItemService {
 
 	private void deleteImagesFromS3(List<String> deleteImageUrls) {
 		deleteImageUrls.forEach(imageService::deleteImage);
-	}
-
-	@Transactional(readOnly = true)
-	public void findById(Long itemId, ItemStatus status) {
-		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
-		item.changeStatus(status);
 	}
 }

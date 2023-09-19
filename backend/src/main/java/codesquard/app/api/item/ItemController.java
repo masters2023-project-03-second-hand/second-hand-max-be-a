@@ -34,7 +34,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ItemController {
 
-	private final ItemQueryService itemQueryService;
 	private final ItemService itemService;
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -58,7 +57,7 @@ public class ItemController {
 	public ApiResponse<ItemDetailResponse> findDetailItem(@PathVariable Long itemId,
 		@AuthPrincipal Principal principal) {
 		Long memberId = principal.getMemberId();
-		ItemDetailResponse response = itemQueryService.findDetailItemBy(itemId, memberId);
+		ItemDetailResponse response = itemService.findDetailItemBy(itemId, memberId);
 		return ApiResponse.ok("상품 상세 조회에 성공하였습니다.", response);
 	}
 

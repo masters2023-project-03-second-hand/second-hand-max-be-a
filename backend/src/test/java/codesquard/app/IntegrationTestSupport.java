@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import codesquard.app.api.category.CategoryQueryService;
-import codesquard.app.api.item.ItemQueryService;
 import codesquard.app.api.item.ItemService;
 import codesquard.app.api.member.MemberService;
 import codesquard.app.api.membertown.MemberTownService;
@@ -48,9 +47,6 @@ public abstract class IntegrationTestSupport {
 
 	@Autowired
 	protected ItemRepository itemRepository;
-
-	@Autowired
-	protected ItemQueryService itemQueryService;
 
 	@Autowired
 	protected ImageRepository imageRepository;
