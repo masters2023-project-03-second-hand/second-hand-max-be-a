@@ -100,7 +100,7 @@ class ItemQueryServiceTest {
 		wishRepository.save(wish);
 
 		// when
-		ItemDetailResponse response = itemQueryService.findDetailItemBy(item.getId(), member.getId());
+		ItemDetailResponse response = itemService.findDetailItemBy(item.getId(), member.getId());
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)
@@ -122,7 +122,7 @@ class ItemQueryServiceTest {
 		Long itemId = 9999L;
 		// when
 		Throwable throwable = Assertions.catchThrowable(
-			() -> itemQueryService.findDetailItemBy(itemId, member.getId()));
+			() -> itemService.findDetailItemBy(itemId, member.getId()));
 		// then
 		Assertions.assertThat(throwable)
 			.isInstanceOf(RestApiException.class)

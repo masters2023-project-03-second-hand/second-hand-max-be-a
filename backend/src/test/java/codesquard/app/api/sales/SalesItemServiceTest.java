@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.request.ItemRegisterRequest;
-import codesquard.app.api.response.ItemResponses;
+import codesquard.app.api.item.response.ItemResponses;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
