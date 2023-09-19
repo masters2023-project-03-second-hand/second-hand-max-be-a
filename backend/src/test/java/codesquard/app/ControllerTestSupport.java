@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import codesquard.app.api.category.CategoryQueryService;
 import codesquard.app.api.category.CategoryRestController;
 import codesquard.app.api.item.ItemController;
-import codesquard.app.api.item.ItemQueryService;
 import codesquard.app.api.item.ItemService;
 import codesquard.app.api.membertown.MemberTownRestController;
 import codesquard.app.api.membertown.MemberTownService;
@@ -51,9 +50,6 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected CategoryQueryService categoryQueryService;
-
-	@MockBean
-	protected ItemQueryService itemQueryService;
 
 	@MockBean
 	protected ItemService itemService;

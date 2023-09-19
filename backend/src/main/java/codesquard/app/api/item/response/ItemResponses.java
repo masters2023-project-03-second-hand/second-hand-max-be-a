@@ -1,4 +1,4 @@
-package codesquard.app.api.response;
+package codesquard.app.api.item.response;
 
 import java.util.List;
 

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import codesquard.app.api.response.ItemResponse;
+import codesquard.app.api.item.response.ItemResponse;
 import codesquard.app.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
 

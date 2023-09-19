@@ -4,8 +4,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import codesquard.app.api.response.ItemResponse;
-import codesquard.app.api.response.ItemResponses;
+import codesquard.app.api.item.response.ItemResponse;
+import codesquard.app.api.item.response.ItemResponses;
 import codesquard.app.domain.pagination.PaginationUtils;
 import codesquard.app.domain.sales.SalesPaginationRepository;
 import codesquard.app.domain.sales.SalesStatus;

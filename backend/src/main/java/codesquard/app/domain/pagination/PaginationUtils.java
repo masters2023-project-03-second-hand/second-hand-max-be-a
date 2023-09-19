@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Slice;
 
-import codesquard.app.api.response.ItemResponse;
-import codesquard.app.api.response.ItemResponses;
+import codesquard.app.api.item.response.ItemResponse;
+import codesquard.app.api.item.response.ItemResponses;
 
 public class PaginationUtils {
 
