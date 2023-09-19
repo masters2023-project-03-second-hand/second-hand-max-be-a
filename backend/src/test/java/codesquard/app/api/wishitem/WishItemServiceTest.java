@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.request.ItemRegisterRequest;
@@ -22,7 +21,6 @@ import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.wish.WishStatus;
 
-@SpringBootTest
 class WishItemServiceTest extends IntegrationTestSupport {
 
 	@Autowired
