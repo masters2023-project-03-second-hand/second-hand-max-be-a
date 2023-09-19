@@ -60,7 +60,8 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 		requestBody.put("addressId", 1L);
 
 		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create(Region.create("서울 송파구 가락동"), member);
+		Region region = Region.create("서울 송파구 가락동");
+		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		MemberAddRegionResponse response = MemberAddRegionResponse.from(memberTown);
 
 		given(memberTownService.addMemberTown(

@@ -39,6 +39,7 @@ import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.support.Principal;
+import codesquard.app.domain.region.Region;
 import codesquard.support.SupportRepository;
 
 class ItemServiceTest extends IntegrationTestSupport {
@@ -123,7 +124,8 @@ class ItemServiceTest extends IntegrationTestSupport {
 		Member member = OauthFixedFactory.createFixedMember();
 		memberRepository.save(member);
 
-		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
+		Region region = getRegion("서울 송파구 가락동");
+		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		memberTownRepository.save(memberTown);
 
 		Item item = Item.builder()

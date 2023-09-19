@@ -34,7 +34,7 @@ public class MemberTown {
 	@JoinColumn(name = "region_id")
 	private Region region;
 
-	private MemberTown(String name, Member member, Region region) {
+	public MemberTown(String name, Member member, Region region) {
 		this.name = name;
 		this.member = member;
 		this.region = region;

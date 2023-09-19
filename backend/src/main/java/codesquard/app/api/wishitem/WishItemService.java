@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
+import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.WishErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.response.ItemResponse;
@@ -14,6 +15,7 @@ import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.pagination.PaginationUtils;
 import codesquard.app.domain.wish.Wish;
 import codesquard.app.domain.wish.WishPaginationRepository;
@@ -28,6 +30,7 @@ public class WishItemService {
 	private final ItemRepository itemRepository;
 	private final WishRepository wishRepository;
 	private final WishPaginationRepository wishPaginationRepository;
+	private final MemberRepository memberRepository;
 
 	@Transactional
 	public void changeWishStatus(Long itemId, Long memberId, WishStatus status) {

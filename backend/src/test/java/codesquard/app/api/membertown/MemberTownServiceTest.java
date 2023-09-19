@@ -102,8 +102,10 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void addMemberTownWithDuplicateAddressName() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create(getRegion("서울 종로구 신교동"), member);
 		Member saveMember = memberRepository.save(member);
+
+		Region region = getRegion("서울 종로구 신교동");
+		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
@@ -152,7 +154,8 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void removeMemberTownWithNotRegisteredAddressName() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
+		Region region = getRegion("서울 송파구 가락동");
+		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		Member saveMember = memberRepository.save(member);
 		memberTownRepository.save(memberTown);
 
@@ -176,8 +179,10 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	public void removeMemberTownWithMinimumMemberTownSize() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create(getRegion("서울 종로구 창성동"), member);
 		Member saveMember = memberRepository.save(member);
+
+		Region region = getRegion("서울 종로구 창성동");
+		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);

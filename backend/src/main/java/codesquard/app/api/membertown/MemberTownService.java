@@ -41,7 +41,7 @@ public class MemberTownService {
 		Region region = getAddressIdBy(request.getAddressId());
 		memberTownValidator.validateAddMemberTown(memberTowns, region);
 
-		MemberTown town = MemberTown.create(region, member);
+		MemberTown town = new MemberTown(region.getShortAddress(), member, region);
 		memberTownRepository.save(town);
 
 		return MemberAddRegionResponse.from(town);

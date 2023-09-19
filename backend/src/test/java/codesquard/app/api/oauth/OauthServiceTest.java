@@ -44,6 +44,7 @@ import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
+import codesquard.app.domain.region.Region;
 
 class OauthServiceTest extends IntegrationTestSupport {
 
@@ -265,8 +266,10 @@ class OauthServiceTest extends IntegrationTestSupport {
 	public void signUpWhenDuplicateLoginId() throws IOException {
 		// given
 		Member member = Member.create("avatarUrlValue", "23Yong1234@gmail.com", "23Yong");
-		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		memberRepository.save(member);
+
+		Region region = getRegion("서울 송파구 가락동");
+		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		memberTownRepository.save(memberTown);
 
 		String provider = "naver";
