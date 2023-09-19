@@ -1,6 +1,6 @@
 package codesquard.app.api.category;
 
-import static codesquard.app.api.category.CategoryTestSupport.*;
+import static codesquard.app.CategoryTestSupport.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;

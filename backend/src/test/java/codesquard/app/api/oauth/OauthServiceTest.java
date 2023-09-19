@@ -1,5 +1,6 @@
 package codesquard.app.api.oauth;
 
+import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.api.oauth.OauthFixedFactory.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -124,7 +125,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signupWithDuplicateLoginId() throws IOException {
 		// given
-		memberRepository.save(createFixedMember());
+		memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 		String provider = "naver";
 		String code = "1234";
 		MockMultipartFile profile = createFixedProfile();
@@ -367,7 +368,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void logout() throws JsonProcessingException {
 		// given
-		Member member = OauthFixedFactory.createFixedMember();
+		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		LocalDateTime now = createNow();
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 
@@ -390,7 +391,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void logoutWithExpireAccessToken() throws JsonProcessingException {
 		// given
-		Member member = OauthFixedFactory.createFixedMember();
+		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		LocalDateTime now = LocalDateTime.now().minusMinutes(5);
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 
@@ -413,7 +414,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void logoutWithExpireRefreshToken() throws JsonProcessingException {
 		// given
-		Member member = OauthFixedFactory.createFixedMember();
+		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		LocalDateTime now = createNow().minusHours(10);
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 
@@ -437,7 +438,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void refreshAccessToken() throws JsonProcessingException {
 		// given
-		Member member = createFixedMember();
+		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		LocalDateTime now = createNow();
 
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
@@ -467,7 +468,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void refreshAccessTokenWithInvalidRefreshToken() throws JsonProcessingException {
 		// given
-		Member member = createFixedMember();
+		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		LocalDateTime now = createNow();
 
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);

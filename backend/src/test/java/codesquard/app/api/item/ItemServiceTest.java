@@ -1,5 +1,6 @@
 package codesquard.app.api.item;
 
+import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
 import static java.time.LocalDateTime.*;
 import static org.assertj.core.api.Assertions.*;
@@ -24,12 +25,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import codesquard.app.CategoryTestSupport;
 import codesquard.app.IntegrationTestSupport;
-import codesquard.app.api.category.CategoryTestSupport;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.api.item.request.ItemRegisterRequest;
-import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.category.Category;
@@ -121,7 +121,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 		Category category = CategoryTestSupport.createdFixedCategory();
 		categoryRepository.save(category);
 
-		Member member = OauthFixedFactory.createFixedMember();
+		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
 
 		Region region = getRegion("서울 송파구 가락동");

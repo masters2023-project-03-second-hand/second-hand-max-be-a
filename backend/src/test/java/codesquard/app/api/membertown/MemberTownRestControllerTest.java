@@ -1,5 +1,6 @@
 package codesquard.app.api.membertown;
 
+import static codesquard.app.MemberTestSupport.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -25,7 +26,6 @@ import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
 import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
-import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
@@ -59,7 +59,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("addressId", 1L);
 
-		Member member = OauthFixedFactory.createFixedMember();
+		Member member = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
 		Region region = Region.create("서울 송파구 가락동");
 		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		MemberAddRegionResponse response = MemberAddRegionResponse.from(memberTown);

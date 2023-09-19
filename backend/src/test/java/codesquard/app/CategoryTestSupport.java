@@ -1,4 +1,4 @@
-package codesquard.app.api.category;
+package codesquard.app;
 
 import java.util.ArrayList;
 import java.util.List;

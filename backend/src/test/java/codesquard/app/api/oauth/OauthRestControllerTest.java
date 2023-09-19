@@ -34,6 +34,7 @@ import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.domain.jwt.Jwt;
+import codesquard.app.domain.member.Member;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.filter.JwtAuthorizationFilter;
@@ -83,7 +84,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		responseBody.put("loginId", "23Yong");
 		OauthSignUpResponse response = objectMapper.readValue(objectMapper.writeValueAsString(responseBody),
 			OauthSignUpResponse.class);
-		
+
 		when(oauthService.signUp(any(), any(OauthSignUpRequest.class), anyString(), anyString()))
 			.thenReturn(response);
 
@@ -172,16 +173,18 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@Test
 	public void refreshAccessToken() throws Exception {
 		// given
-		Principal principal = Principal.from(createFixedMember());
-		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("refreshToken", "refreshTokenValue");
+		given(authPrincipalArgumentResolver.supportsParameter(any())).willReturn(true);
+
+		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
+		Principal principal = Principal.from(member);
+		given(authPrincipalArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(principal);
 
 		OauthRefreshResponse response = OauthRefreshResponse.from(
 			Jwt.create("accessTokenValue", "refreshTokenValue", null, null));
-
-		given(authPrincipalArgumentResolver.supportsParameter(any())).willReturn(true);
-		given(authPrincipalArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(principal);
 		given(oauthService.refreshAccessToken(any(), any())).willReturn(response);
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("refreshToken", "refreshTokenValue");
 		// when & then
 		mockMvc.perform(post("/api/auth/token")
 				.content(objectMapper.writeValueAsString(requestBody))
@@ -208,5 +211,9 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			Arguments.of(List.of(0L)),
 			Arguments.of(List.of(1L, 2L, 3L))
 		);
+	}
+
+	private Member createMember(String avatarUrl, String email, String loginId) {
+		return new Member(avatarUrl, email, loginId);
 	}
 }

@@ -1,7 +1,7 @@
 package codesquard.app.api.item;
 
-import static codesquard.app.api.category.CategoryTestSupport.*;
-import static codesquard.app.api.oauth.OauthFixedFactory.*;
+import static codesquard.app.CategoryTestSupport.*;
+import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
 import static java.time.LocalDateTime.*;
 
@@ -13,8 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import codesquard.app.CategoryTestSupport;
 import codesquard.app.IntegrationTestSupport;
-import codesquard.app.api.category.CategoryTestSupport;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.domain.category.Category;
@@ -29,9 +29,7 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 
 	@BeforeEach
 	void setup() {
-		member = createMember("https://nid.naver.com/user2/api/route?m=routePcProfileModification",
-			"23Yong@gmail.com",
-			"23Yong");
+		member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
 
 		List<Category> categories = getCategories();
@@ -85,7 +83,7 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 	@Test
 	public void findDetailItemWithNotExistItem() {
 		// given
-		Member member = createFixedMember();
+		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		Long itemId = 9999L;
 		// when
 		Throwable throwable = Assertions.catchThrowable(

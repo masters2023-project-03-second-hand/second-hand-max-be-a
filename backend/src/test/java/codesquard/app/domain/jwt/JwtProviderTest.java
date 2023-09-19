@@ -1,5 +1,7 @@
 package codesquard.app.domain.jwt;
 
+import static codesquard.app.MemberTestSupport.*;
+
 import java.time.LocalDateTime;
 
 import org.assertj.core.api.SoftAssertions;
@@ -21,9 +23,8 @@ class JwtProviderTest extends IntegrationTestSupport {
 	public void createJwtBasedOnAuthenticateMember() {
 		// given
 		JwtProvider jwtProvider = new JwtProvider(jwtProperties);
-		Member member = OauthFixedFactory.createFixedMember();
+		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		Member saveMember = memberRepository.save(member);
-
 		LocalDateTime now = OauthFixedFactory.createNow();
 
 		// when
