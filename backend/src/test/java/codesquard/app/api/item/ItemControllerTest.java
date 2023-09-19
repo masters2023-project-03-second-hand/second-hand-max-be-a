@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
-import codesquard.app.api.category.CategoryFixedFactory;
+import codesquard.app.api.category.CategoryTestSupport;
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.errors.handler.GlobalExceptionHandler;
@@ -57,12 +57,17 @@ class ItemControllerTest extends ControllerTestSupport {
 		// given
 		long itemId = 1L;
 		Member seller = OauthFixedFactory.createFixedMember();
-		Category category = CategoryFixedFactory.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(seller, category, 0L);
-		List<Image> images = ImageFixedFactory.createFixedImages(item);
-		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
+		Category category = CategoryTestSupport.createdFixedCategory();
+		Item item = ItemFixedFactory.createFixedItem(seller, category);
 
-		ItemDetailResponse response = ItemDetailResponse.create(item, seller, seller.getId(), imageUrls, 0, 0);
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", new Item(item.getId())),
+			new Image("imageUrlValue2", new Item(item.getId())));
+		List<String> imageUrls = images.stream()
+			.map(Image::getImageUrl)
+			.collect(Collectors.toUnmodifiableList());
+
+		ItemDetailResponse response = ItemDetailResponse.of(item, seller, seller.getId(), imageUrls);
 		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))
@@ -89,11 +94,16 @@ class ItemControllerTest extends ControllerTestSupport {
 		// given
 		long itemId = 1L;
 		Member seller = OauthFixedFactory.createFixedMember();
-		Category category = CategoryFixedFactory.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(seller, category, 0L);
-		List<Image> images = ImageFixedFactory.createFixedImages(item);
-		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
-		ItemDetailResponse response = ItemDetailResponse.create(item, seller, 9999L, imageUrls, 0, 0);
+		Category category = CategoryTestSupport.createdFixedCategory();
+		Item item = ItemFixedFactory.createFixedItem(seller, category);
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", new Item(item.getId())),
+			new Image("imageUrlValue2", new Item(item.getId())));
+		List<String> imageUrls = images.stream()
+			.map(Image::getImageUrl)
+			.collect(Collectors.toUnmodifiableList());
+		
+		ItemDetailResponse response = ItemDetailResponse.of(item, seller, 9999L, imageUrls);
 		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/" + itemId))

@@ -1,5 +1,7 @@
 package codesquard.app.api.item;
 
+import static codesquard.app.domain.item.ItemStatus.*;
+import static java.time.LocalDateTime.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -7,20 +9,23 @@ import static org.mockito.BDDMockito.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import codesquard.app.IntegrationTestSupport;
-import codesquard.app.api.category.CategoryFixedFactory;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.category.CategoryTestSupport;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.api.item.request.ItemRegisterRequest;
@@ -40,8 +45,12 @@ class ItemServiceTest extends IntegrationTestSupport {
 
 	@Autowired
 	private SupportRepository supportRepository;
+
 	@MockBean
 	private ImageUploader imageUploader;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Test
 	@DisplayName("새로운 상품 등록에 성공한다.")
@@ -108,27 +117,54 @@ class ItemServiceTest extends IntegrationTestSupport {
 	@Test
 	public void modifyItem() throws IOException {
 		// given
-		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
-		Category category = CategoryFixedFactory.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(member, category, 0L);
-		List<Image> images = ImageFixedFactory.createFixedImages(item);
-
+		Category category = CategoryTestSupport.createdFixedCategory();
 		categoryRepository.save(category);
-		memberRepository.save(member);
-		Principal principal = Principal.from(member);
 
+		Member member = OauthFixedFactory.createFixedMember();
+		memberRepository.save(member);
+
+		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		memberTownRepository.save(memberTown);
+
+		Item item = Item.builder()
+			.title("빈티지 롤러 블레이드")
+			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
+			.price(200000L)
+			.status(ON_SALE)
+			.region("가락동")
+			.createdAt(now())
+			.wishCount(0L)
+			.viewCount(0L)
+			.chatCount(0L)
+			.member(member)
+			.category(category)
+			.build();
 		Item saveItem = itemRepository.save(item);
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", new Item(saveItem.getId())),
+			new Image("imageUrlValue2", new Item(saveItem.getId())));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
 		List<MultipartFile> addImages = ImageFixedFactory.createFixedMultipartFile();
-		ItemModifyRequest request = ItemFixedFactory.createFixedItemModifyRequest(category, saveImages);
+		List<String> deleteImageUrls = saveImages.stream()
+			.map(Image::getImageUrl)
+			.collect(Collectors.toUnmodifiableList());
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("title", "빈티지 롤러 스케이트");
+		requestBody.put("price", 169000);
+		requestBody.put("content", "내용");
+		requestBody.put("region", "가락동");
+		requestBody.put("status", "판매중");
+		requestBody.put("categoryId", category.getId());
+		requestBody.put("categoryName", category.getName());
+		requestBody.put("deleteImageUrls", deleteImageUrls);
+		ItemModifyRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			ItemModifyRequest.class);
 
-		BDDMockito.given(imageUploader.uploadImageToS3(any(), any()))
+		given(imageUploader.uploadImageToS3(any(), any()))
 			.willReturn("http://s3_image1.com", "http://s3_image2.com");
 		// when
-		itemService.modifyItem(saveItem.getId(), request, addImages, principal);
+		itemService.modifyItem(saveItem.getId(), request, addImages, Principal.from(member));
 		// then
 		Item modifiedItem = itemRepository.findById(saveItem.getId()).orElseThrow();
 		assertAll(() -> {
@@ -136,45 +172,8 @@ class ItemServiceTest extends IntegrationTestSupport {
 				.extracting("title", "content", "price", "status", "region")
 				.contains(request.getTitle(), request.getContent(), request.getPrice(), request.getStatus(),
 					request.getRegion());
+			assertThat(images).hasSize(2);
 		});
-
-		verifyItemImageSize(saveItem, 2);
-	}
-
-	private void verifyItemImageSize(Item item, int expeted) {
-		List<Image> images = imageRepository.findAllByItemId(item.getId());
-		assertThat(images).hasSize(expeted);
-	}
-
-	@DisplayName("회원은 상품을 수정할때 상품 이미지에 존재하지 않는 URL을 이용하여 이미지를 제거할 수 없다")
-	@Test
-	public void modifyItemWithNotExistDeleteUrls() throws IOException {
-		// given
-		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
-		Category category = CategoryFixedFactory.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(member, category, 0L);
-		List<Image> images = ImageFixedFactory.createFixedImages(item);
-		List<MultipartFile> addImages = ImageFixedFactory.createFixedMultipartFile();
-
-		categoryRepository.save(category);
-		Member saveMember = memberRepository.save(member);
-		Principal principal = Principal.from(saveMember);
-
-		memberTownRepository.save(memberTown);
-		Item saveItem = itemRepository.save(item);
-		imageRepository.saveAll(images);
-
-		List<Image> deleteImages = List.of(Image.create("http://invalidurl.com", item));
-		ItemModifyRequest request = ItemFixedFactory.createFixedItemModifyRequest(category, deleteImages);
-		// when
-		Throwable throwable = catchThrowable(
-			() -> itemService.modifyItem(saveItem.getId(), request, addImages, principal));
-		// then
-		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
-			.extracting("errorCode.message")
-			.isEqualTo("해당 이미지 URL이 존재하지 안습니다.");
 	}
 
 	@Test

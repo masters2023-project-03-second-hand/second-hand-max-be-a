@@ -25,14 +25,14 @@ public class ItemDetailResponse {
 	private String categoryName;
 	private LocalDateTime createdAt;
 	private String content;
-	private int chatCount;
-	private int wishCount;
+	private Long chatCount;
+	private Long wishCount;
 	private Long viewCount;
 	private Long price;
 
 	@Builder(access = AccessLevel.PRIVATE)
 	private ItemDetailResponse(boolean isSeller, List<String> imageUrls, String seller, String status, String title,
-		String categoryName, LocalDateTime createdAt, String content, int chatCount, int wishCount, Long viewCount,
+		String categoryName, LocalDateTime createdAt, String content, Long chatCount, Long wishCount, Long viewCount,
 		Long price) {
 		this.isSeller = isSeller;
 		this.imageUrls = imageUrls;
@@ -48,8 +48,7 @@ public class ItemDetailResponse {
 		this.price = price;
 	}
 
-	public static ItemDetailResponse create(Item item, Member seller, Long loginMemberId, List<String> imageUrls,
-		int chatCount, int wishCount) {
+	public static ItemDetailResponse of(Item item, Member seller, Long loginMemberId, List<String> imageUrls) {
 		boolean isSeller = seller.equalId(loginMemberId);
 		return ItemDetailResponse.builder()
 			.isSeller(isSeller)
@@ -60,8 +59,8 @@ public class ItemDetailResponse {
 			.categoryName(item.getCategory().getName())
 			.createdAt(item.getCreatedAt())
 			.content(item.getContent())
-			.chatCount(chatCount)
-			.wishCount(wishCount)
+			.chatCount(item.getChatCount())
+			.wishCount(item.getWishCount())
 			.viewCount(item.getViewCount())
 			.price(item.getPrice())
 			.build();

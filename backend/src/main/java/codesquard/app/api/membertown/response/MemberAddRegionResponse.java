@@ -13,7 +13,7 @@ public class MemberAddRegionResponse {
 	private Long id;
 	private String name;
 
-	public static MemberAddRegionResponse create(MemberTown town) {
+	public static MemberAddRegionResponse from(MemberTown town) {
 		return new MemberAddRegionResponse(town.getId(), town.getName());
 	}
 }

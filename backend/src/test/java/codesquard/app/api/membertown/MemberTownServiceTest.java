@@ -3,11 +3,17 @@ package codesquard.app.api.membertown;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.exception.RestApiException;
@@ -23,14 +29,21 @@ import codesquard.app.domain.region.Region;
 
 class MemberTownServiceTest extends IntegrationTestSupport {
 
+	@Autowired
+	private ObjectMapper objectMapper;
+
 	@DisplayName("선택한 동네를 회원 동네에 추가한다")
 	@Test
-	public void addMemberTown() {
+	public void addMemberTown() throws JsonProcessingException {
 		// given
 		Member saveMember = memberRepository.save(OauthFixedFactory.createFixedMember());
 		Principal principal = Principal.from(saveMember);
 		Long addressId = getRegion("서울 송파구 가락동").getId();
-		MemberTownAddRequest request = MemberTownAddRequest.create(addressId);
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("addressId", addressId);
+		MemberTownAddRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			MemberTownAddRequest.class);
 		// when
 		MemberAddRegionResponse response = memberTownService.addMemberTown(principal, request);
 		// then
@@ -43,11 +56,15 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("주소에 없는 동네를 회원 동네에 추가할 수 없다")
 	@Test
-	public void addMemberTownWithNotExistFullAddressName() {
+	public void addMemberTownWithNotExistFullAddressName() throws JsonProcessingException {
 		// given
 		Member saveMember = memberRepository.save(OauthFixedFactory.createFixedMember());
 		Principal principal = Principal.from(saveMember);
-		MemberTownAddRequest request = MemberTownAddRequest.create(9999L);
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("addressId", 9999L);
+		MemberTownAddRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			MemberTownAddRequest.class);
 		// when & then
 		assertThatThrownBy(() -> memberTownService.addMemberTown(principal, request))
 			.isInstanceOf(RestApiException.class)
@@ -57,17 +74,20 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("회원의 동네 추가시 동네 등록 최대개수를 초과하여서 회원의 동네를 추가할 수 없다")
 	@Test
-	public void addMemberTownWithOverTheMaximumMemberTownSize() {
+	public void addMemberTownWithOverTheMaximumMemberTownSize() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
-		List<Region> regions = getRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동"));
-		List<MemberTown> memberTowns = MemberTown.create(regions, member);
+		List<Region> regions = getRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동", "서울 종로구 효자동"));
+		List<MemberTown> memberTowns = MemberTown.createMemberTowns(regions, member);
 		Member saveMember = memberRepository.save(member);
 		memberTownRepository.saveAll(memberTowns);
 
 		Principal principal = Principal.from(saveMember);
 		Long addressId = getRegion("서울 종로구 청운동").getId();
-		MemberTownAddRequest request = MemberTownAddRequest.create(addressId);
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("addressId", addressId);
+		MemberTownAddRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			MemberTownAddRequest.class);
 		// when
 		Throwable throwable = catchThrowable(() -> memberTownService.addMemberTown(principal, request));
 		// then
@@ -79,7 +99,7 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("회원의 동네 추가시 이미 등록된 동네는 중복으로 추가할 수 없다")
 	@Test
-	public void addMemberTownWithDuplicateAddressName() {
+	public void addMemberTownWithDuplicateAddressName() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		MemberTown memberTown = MemberTown.create(getRegion("서울 종로구 신교동"), member);
@@ -87,7 +107,11 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
-		MemberTownAddRequest request = MemberTownAddRequest.create(getRegion("서울 종로구 신교동").getId());
+		Long addressId = getRegion("서울 종로구 신교동").getId();
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("addressId", addressId);
+		MemberTownAddRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			MemberTownAddRequest.class);
 		// when
 		Throwable throwable = catchThrowable(() -> memberTownService.addMemberTown(principal, request));
 		// then
@@ -99,16 +123,20 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("주소를 가지고 회원의 등록된 동네를 제거한다")
 	@Test
-	public void removeMemberTown() {
+	public void removeMemberTown() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		List<Region> regions = getRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동"));
-		List<MemberTown> memberTowns = MemberTown.create(regions, member);
+		List<MemberTown> memberTowns = MemberTown.createMemberTowns(regions, member);
 		Member saveMember = memberRepository.save(member);
 		memberTownRepository.saveAll(memberTowns);
 
 		Principal principal = Principal.from(saveMember);
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(getRegion("서울 송파구 가락동").getId());
+		Long addressId = getRegion("서울 송파구 가락동").getId();
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("addressId", addressId);
+		MemberTownRemoveRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			MemberTownRemoveRequest.class);
 		// when
 		MemberTownRemoveResponse response = memberTownService.removeMemberTown(principal, request);
 		// then
@@ -121,7 +149,7 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("등록되지 않은 주소 이름을 가지고 회원의 동네를 제거할 수 없다")
 	@Test
-	public void removeMemberTownWithNotRegisteredAddressName() {
+	public void removeMemberTownWithNotRegisteredAddressName() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
@@ -129,7 +157,11 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(getRegion("서울 종로구 효자동").getId());
+		Long addressId = getRegion("서울 종로구 효자동").getId();
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("addressId", addressId);
+		MemberTownRemoveRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			MemberTownRemoveRequest.class);
 		// when
 		Throwable throwable = catchThrowable(() -> memberTownService.removeMemberTown(principal, request));
 		// then
@@ -141,7 +173,7 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 
 	@DisplayName("회원의 동네가 1개인 상태에서 회원의 동네를 제거할 수 없다")
 	@Test
-	public void removeMemberTownWithMinimumMemberTownSize() {
+	public void removeMemberTownWithMinimumMemberTownSize() throws JsonProcessingException {
 		// given
 		Member member = OauthFixedFactory.createFixedMember();
 		MemberTown memberTown = MemberTown.create(getRegion("서울 종로구 창성동"), member);
@@ -149,7 +181,11 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 		memberTownRepository.save(memberTown);
 
 		Principal principal = Principal.from(saveMember);
-		MemberTownRemoveRequest request = MemberTownRemoveRequest.create(getRegion("서울 종로구 창성동").getId());
+		Long addressId = getRegion("서울 종로구 창성동").getId();
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("addressId", addressId);
+		MemberTownRemoveRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			MemberTownRemoveRequest.class);
 		// when
 		Throwable throwable = catchThrowable(() -> memberTownService.removeMemberTown(principal, request));
 		// then

@@ -20,6 +20,6 @@ public class NaverOauthClient extends OauthClient {
 		Map<String, Object> responseMap = (Map<String, Object>)attributes.get("response");
 		String email = (String)responseMap.get("email");
 		String profileImage = (String)responseMap.get("profile_image");
-		return OauthUserProfileResponse.create(email, profileImage);
+		return new OauthUserProfileResponse(email, profileImage);
 	}
 }

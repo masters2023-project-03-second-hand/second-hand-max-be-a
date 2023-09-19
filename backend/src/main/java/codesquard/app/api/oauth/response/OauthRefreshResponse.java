@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class OauthRefreshResponse {
 	private String accessToken;
 
-	public static OauthRefreshResponse create(Jwt jwt) {
+	public static OauthRefreshResponse from(Jwt jwt) {
 		return new OauthRefreshResponse(jwt.getAccessToken());
 	}
 

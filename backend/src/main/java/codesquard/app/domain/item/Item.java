@@ -86,7 +86,7 @@ public class Item {
 	}
 
 	public static Item create(String title, String content, Long price, ItemStatus status, String region,
-		LocalDateTime createdAt, Long viewCount, Member member) {
+		LocalDateTime createdAt, Long wishCount, Long viewCount, Long chatCount, Member member, Category category) {
 		return Item.builder()
 			.title(title)
 			.content(content)
@@ -94,21 +94,22 @@ public class Item {
 			.status(status)
 			.region(region)
 			.createdAt(createdAt)
+			.wishCount(wishCount)
 			.viewCount(viewCount)
+			.chatCount(chatCount)
 			.member(member)
+			.category(category)
 			.build();
 	}
 
-	public void changeCategory(Category category) {
+	public void change(Category category, Item changeItem, String thumbnailUrl) {
 		this.category = category;
-	}
-
-	public void changeBy(Item changeItem) {
 		this.title = changeItem.title;
 		this.price = changeItem.price;
 		this.content = changeItem.content;
 		this.region = changeItem.region;
 		this.status = changeItem.status;
+		this.thumbnailUrl = thumbnailUrl;
 	}
 
 	public void changeStatus(ItemStatus status) {
@@ -129,7 +130,7 @@ public class Item {
 			"상품", this.getClass().getSimpleName(), id, title, price, status, region, viewCount);
 	}
 
-	public void validateAuthorization(Principal writer) {
+	public void validateIsSeller(Principal writer) {
 		if (!Objects.equals(member.getId(), writer.getMemberId())) {
 			throw new RestApiException(ItemErrorCode.ITEM_FORBIDDEN);
 		}

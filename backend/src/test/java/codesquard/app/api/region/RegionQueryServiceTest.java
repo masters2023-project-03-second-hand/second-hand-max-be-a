@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import codesquard.app.IntegrationTestSupport;
-import codesquard.app.api.region.request.RegionListRequest;
 import codesquard.app.api.region.response.RegionListResponse;
 import codesquard.app.domain.region.RegionFixedFactory;
 
@@ -16,9 +15,13 @@ class RegionQueryServiceTest extends IntegrationTestSupport {
 	public void findAllByRegionName() {
 		// given
 		regionRepository.saveAll(RegionFixedFactory.createFixedRegions());
-		RegionListRequest request = RegionListRequest.create(null, 10, null);
+		int size = 10;
+		Long cursor = null;
+		String region = null;
+
 		// when
-		RegionListResponse response = regionQueryService.searchBySlice(request);
+		RegionListResponse response = regionQueryService.searchBySlice(size, cursor, region);
+
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response.getContents()).hasSize(10);

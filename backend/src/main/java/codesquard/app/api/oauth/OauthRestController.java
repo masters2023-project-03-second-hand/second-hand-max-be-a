@@ -65,9 +65,8 @@ public class OauthRestController {
 	@PostMapping(value = "/logout")
 	public ApiResponse<Void> logout(@RequestAttribute String accessToken,
 		@RequestBody OauthLogoutRequest request) {
-		request = OauthLogoutRequest.create(accessToken, request.getRefreshToken());
-		log.info("로그아웃 요청 입력 : request={}", request);
-		oauthService.logout(request);
+		log.info("로그아웃 요청 입력 : acessToken={}, request={}", accessToken, request);
+		oauthService.logout(accessToken, request);
 		return ApiResponse.ok("로그아웃에 성공하였습니다.", null);
 	}
 

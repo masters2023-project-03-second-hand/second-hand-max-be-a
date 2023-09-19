@@ -7,15 +7,11 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class OauthUserProfileResponse {
 
 	private String email;
 	private String profileImage;
-
-	public static OauthUserProfileResponse create(String email, String profileImage) {
-		return new OauthUserProfileResponse(email, profileImage);
-	}
 
 	@Override
 	public String toString() {

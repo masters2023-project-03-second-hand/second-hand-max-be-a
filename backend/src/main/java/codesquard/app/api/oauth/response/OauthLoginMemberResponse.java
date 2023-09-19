@@ -24,7 +24,7 @@ public class OauthLoginMemberResponse {
 			.collect(Collectors.toUnmodifiableList());
 	}
 
-	public static OauthLoginMemberResponse from(Member member, List<MemberTown> memberTowns) {
+	public static OauthLoginMemberResponse of(Member member, List<MemberTown> memberTowns) {
 		return new OauthLoginMemberResponse(member, memberTowns);
 	}
 

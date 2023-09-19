@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
-import codesquard.app.api.errors.errorcode.RegionErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.region.Region;
@@ -31,18 +30,6 @@ public class MemberTownValidator {
 		validateMinimumMemberTownSize(memberTowns);
 	}
 
-	private void validateExistFullAddress(String fullAddressName) {
-		if (!regionRepository.existsRegionByName(fullAddressName)) {
-			throw new RestApiException(RegionErrorCode.NOT_FOUND_REGION);
-		}
-	}
-
-	private void validateContainsAddress(String fullAddressName, String addressName) {
-		if (!fullAddressName.contains(addressName)) {
-			throw new RestApiException(RegionErrorCode.NOT_MATCH_ADDRESS);
-		}
-	}
-
 	private void validateDuplicateAddress(List<MemberTown> memberTowns, Region region) {
 		boolean match = memberTowns.stream()
 			.map(MemberTown::getRegion)
@@ -64,7 +51,7 @@ public class MemberTownValidator {
 	}
 
 	private void validateMaximumMemberTownSize(List<MemberTown> memberTowns) {
-		if (memberTowns.size() >= MAXIMUM_MEMBER_TOWN_SIZE) {
+		if (memberTowns.size() > MAXIMUM_MEMBER_TOWN_SIZE) {
 			throw new RestApiException(MemberTownErrorCode.MAXIMUM_MEMBER_TOWN_SIZE);
 		}
 	}

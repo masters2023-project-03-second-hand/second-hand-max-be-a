@@ -35,7 +35,7 @@ public class Member {
 		this.id = id;
 	}
 
-	private Member(String avatarUrl, String email, String loginId) {
+	public Member(String avatarUrl, String email, String loginId) {
 		this.avatarUrl = avatarUrl;
 		this.email = email;
 		this.loginId = loginId;

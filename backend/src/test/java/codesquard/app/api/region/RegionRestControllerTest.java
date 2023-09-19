@@ -11,13 +11,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
 import codesquard.app.api.errors.handler.GlobalExceptionHandler;
-import codesquard.app.api.region.request.RegionListRequest;
 import codesquard.app.api.region.response.RegionItemResponse;
 import codesquard.app.api.region.response.RegionListResponse;
 import codesquard.app.domain.region.Region;
@@ -41,9 +39,9 @@ class RegionRestControllerTest extends ControllerTestSupport {
 		RegionItemResponse region1 = createRegionItemResponse("경기 부천시 괴안동");
 		RegionItemResponse region2 = createRegionItemResponse("경기 부천시 범박동");
 		RegionItemResponse region3 = createRegionItemResponse("경기 부천시 범박동");
-		RegionListResponse response = RegionListResponse.create(List.of(region1, region2, region3), true, 3L);
+		RegionListResponse response = new RegionListResponse(List.of(region1, region2, region3), true, 3L);
 
-		given(regionQueryService.searchBySlice(ArgumentMatchers.any(RegionListRequest.class)))
+		given(regionQueryService.searchBySlice(anyInt(), anyLong(), anyString()))
 			.willReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/regions")
