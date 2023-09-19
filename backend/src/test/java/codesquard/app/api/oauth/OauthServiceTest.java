@@ -1,7 +1,6 @@
 package codesquard.app.api.oauth;
 
 import static codesquard.app.MemberTestSupport.*;
-import static codesquard.app.api.oauth.OauthFixedFactory.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;

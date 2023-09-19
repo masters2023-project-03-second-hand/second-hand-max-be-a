@@ -1,5 +1,6 @@
 package codesquard.app.api.item;
 
+import static codesquard.app.ImageTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
 import static java.time.LocalDateTime.*;
@@ -26,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.CategoryTestSupport;
-import codesquard.app.ImageTestSupport;
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
@@ -144,7 +144,8 @@ class ItemServiceTest extends IntegrationTestSupport {
 			new Image("imageUrlValue2", new Item(saveItem.getId())));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
-		List<MultipartFile> addImages = ImageTestSupport.createFixedMultipartFile();
+		List<MultipartFile> addImages = List.of(createMultipartFile("cat.png"),
+			createMultipartFile("roller_blade.jpeg"));
 		List<String> deleteImageUrls = saveImages.stream()
 			.map(Image::getImageUrl)
 			.collect(Collectors.toUnmodifiableList());

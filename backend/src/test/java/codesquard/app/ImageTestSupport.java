@@ -5,7 +5,6 @@ import static java.nio.file.Files.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
@@ -13,11 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class ImageTestSupport {
 
-	public static List<MultipartFile> createFixedMultipartFile() throws IOException {
-		return List.of(createMultipartFile("cat.png"), createMultipartFile("roller_blade.jpeg"));
-	}
-
-	private static MultipartFile createMultipartFile(String path) throws IOException {
+	public static MultipartFile createMultipartFile(String path) throws IOException {
 		File file = new ClassPathResource(path).getFile();
 		String filename = file.getName().split("\\.")[0];
 		String originalFilename = file.getName();
