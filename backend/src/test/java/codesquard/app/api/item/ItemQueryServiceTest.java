@@ -56,13 +56,16 @@ class ItemQueryServiceTest extends IntegrationTestSupport {
 			.member(member)
 			.category(category)
 			.build();
+		Item saveItem = itemRepository.save(item);
+
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", new Item(saveItem.getId())),
+			new Image("imageUrlValue2", new Item(saveItem.getId())));
+		imageRepository.saveAll(images);
 
 		Wish wish = new Wish(member, item, now());
-
-		List<Image> images = ImageFixedFactory.createFixedImages(item);
-		itemRepository.save(item);
 		wishRepository.save(wish);
-		imageRepository.saveAll(images);
+
 		// when
 		ItemDetailResponse response = itemQueryService.findDetailItemBy(item.getId(), member.getId());
 		// then

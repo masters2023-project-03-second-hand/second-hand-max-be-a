@@ -59,8 +59,13 @@ class ItemControllerTest extends ControllerTestSupport {
 		Member seller = OauthFixedFactory.createFixedMember();
 		Category category = CategoryTestSupport.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(seller, category);
-		List<Image> images = ImageFixedFactory.createFixedImages(item);
-		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
+
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", new Item(item.getId())),
+			new Image("imageUrlValue2", new Item(item.getId())));
+		List<String> imageUrls = images.stream()
+			.map(Image::getImageUrl)
+			.collect(Collectors.toUnmodifiableList());
 
 		ItemDetailResponse response = ItemDetailResponse.of(item, seller, seller.getId(), imageUrls);
 		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
@@ -91,8 +96,13 @@ class ItemControllerTest extends ControllerTestSupport {
 		Member seller = OauthFixedFactory.createFixedMember();
 		Category category = CategoryTestSupport.createdFixedCategory();
 		Item item = ItemFixedFactory.createFixedItem(seller, category);
-		List<Image> images = ImageFixedFactory.createFixedImages(item);
-		List<String> imageUrls = images.stream().map(Image::getImageUrl).collect(Collectors.toUnmodifiableList());
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", new Item(item.getId())),
+			new Image("imageUrlValue2", new Item(item.getId())));
+		List<String> imageUrls = images.stream()
+			.map(Image::getImageUrl)
+			.collect(Collectors.toUnmodifiableList());
+		
 		ItemDetailResponse response = ItemDetailResponse.of(item, seller, 9999L, imageUrls);
 		when(itemQueryService.findDetailItemBy(any(), any())).thenReturn(response);
 		// when & then

@@ -1,5 +1,7 @@
 package codesquard.app.api.item;
 
+import static codesquard.app.domain.item.ItemStatus.*;
+import static java.time.LocalDateTime.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -115,18 +117,32 @@ class ItemServiceTest extends IntegrationTestSupport {
 	@Test
 	public void modifyItem() throws IOException {
 		// given
-		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		Category category = CategoryTestSupport.createdFixedCategory();
-		Item item = ItemFixedFactory.createFixedItem(member, category);
-		List<Image> images = ImageFixedFactory.createFixedImages(item);
-
 		categoryRepository.save(category);
-		memberRepository.save(member);
-		Principal principal = Principal.from(member);
 
+		Member member = OauthFixedFactory.createFixedMember();
+		memberRepository.save(member);
+
+		MemberTown memberTown = MemberTown.create(getRegion("서울 송파구 가락동"), member);
 		memberTownRepository.save(memberTown);
+
+		Item item = Item.builder()
+			.title("빈티지 롤러 블레이드")
+			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
+			.price(200000L)
+			.status(ON_SALE)
+			.region("가락동")
+			.createdAt(now())
+			.wishCount(0L)
+			.viewCount(0L)
+			.chatCount(0L)
+			.member(member)
+			.category(category)
+			.build();
 		Item saveItem = itemRepository.save(item);
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", new Item(saveItem.getId())),
+			new Image("imageUrlValue2", new Item(saveItem.getId())));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
 		List<MultipartFile> addImages = ImageFixedFactory.createFixedMultipartFile();
@@ -148,7 +164,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 		given(imageUploader.uploadImageToS3(any(), any()))
 			.willReturn("http://s3_image1.com", "http://s3_image2.com");
 		// when
-		itemService.modifyItem(saveItem.getId(), request, addImages, principal);
+		itemService.modifyItem(saveItem.getId(), request, addImages, Principal.from(member));
 		// then
 		Item modifiedItem = itemRepository.findById(saveItem.getId()).orElseThrow();
 		assertAll(() -> {
