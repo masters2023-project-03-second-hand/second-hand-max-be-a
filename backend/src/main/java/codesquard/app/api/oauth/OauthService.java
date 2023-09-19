@@ -137,6 +137,7 @@ public class OauthService {
 	private void deleteRefreshTokenBy(String refreshToken) {
 		try {
 			String email = redisService.findEmailByRefreshTokenValue(refreshToken);
+			log.debug("리프레시 토큰 값에 따른 이메일 조회 결과 : email={}", email);
 			boolean result = redisService.delete(String.format("RT:%s", email));
 			log.debug("리프레쉬 토큰 삭제 결과 : {}", result);
 		} catch (RestApiException e) {
