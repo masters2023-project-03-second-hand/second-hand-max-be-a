@@ -2,6 +2,7 @@ package codesquard.app.api.item;
 
 import static codesquard.app.ImageTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
+import static codesquard.app.RegionTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
 import static java.time.LocalDateTime.*;
 import static org.assertj.core.api.Assertions.*;
@@ -16,9 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -27,32 +30,68 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.CategoryTestSupport;
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.response.ItemResponse;
 import codesquard.app.api.response.ItemResponses;
 import codesquard.app.domain.category.Category;
+import codesquard.app.domain.category.CategoryRepository;
 import codesquard.app.domain.image.Image;
+import codesquard.app.domain.image.ImageRepository;
 import codesquard.app.domain.item.Item;
+import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTown;
+import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.domain.region.Region;
+import codesquard.app.domain.region.RegionRepository;
 import codesquard.support.SupportRepository;
 
-class ItemServiceTest extends IntegrationTestSupport {
+@SpringBootTest
+class ItemServiceTest {
+
+	@Autowired
+	private ItemService itemService;
 
 	@Autowired
 	private SupportRepository supportRepository;
+
+	@Autowired
+	private MemberRepository memberRepository;
+
+	@Autowired
+	private MemberTownRepository memberTownRepository;
+
+	@Autowired
+	private CategoryRepository categoryRepository;
+
+	@Autowired
+	private RegionRepository regionRepository;
+
+	@Autowired
+	private ItemRepository itemRepository;
+
+	@Autowired
+	private ImageRepository imageRepository;
 
 	@MockBean
 	private ImageUploader imageUploader;
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@AfterEach
+	void tearDown() {
+		imageRepository.deleteAllInBatch();
+		itemRepository.deleteAllInBatch();
+		categoryRepository.deleteAllInBatch();
+		memberTownRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
+	}
 
 	@Test
 	@DisplayName("새로운 상품 등록에 성공한다.")
@@ -122,7 +161,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 		Category category = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
-		Region region = getRegion("서울 송파구 가락동");
+		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
 		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region));
 
 		Item item = Item.builder()

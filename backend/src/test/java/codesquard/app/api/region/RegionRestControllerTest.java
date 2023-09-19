@@ -13,14 +13,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
-import codesquard.app.api.errors.handler.GlobalExceptionHandler;
 import codesquard.app.api.region.response.RegionItemResponse;
 import codesquard.app.api.region.response.RegionListResponse;
 
+@WebMvcTest(controllers = RegionRestController.class)
 class RegionRestControllerTest extends ControllerTestSupport {
 
 	private MockMvc mockMvc;
@@ -28,8 +30,8 @@ class RegionRestControllerTest extends ControllerTestSupport {
 	@Autowired
 	private RegionRestController regionRestController;
 
-	@Autowired
-	private GlobalExceptionHandler globalExceptionHandler;
+	@MockBean
+	private RegionQueryService regionQueryService;
 
 	@BeforeEach
 	public void setup() {

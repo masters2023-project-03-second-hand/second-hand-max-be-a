@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -24,26 +25,25 @@ import codesquard.app.CategoryTestSupport;
 import codesquard.app.ControllerTestSupport;
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
-import codesquard.app.api.errors.handler.GlobalExceptionHandler;
 import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.Principal;
 
+@WebMvcTest(controllers = ItemController.class)
 class ItemControllerTest extends ControllerTestSupport {
 
 	private MockMvc mockMvc;
 
-	@MockBean
-	private AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
-
 	@Autowired
 	private ItemController itemController;
 
-	@Autowired
-	private GlobalExceptionHandler globalExceptionHandler;
+	@MockBean
+	private ItemQueryService itemQueryService;
+
+	@MockBean
+	private ItemService itemService;
 
 	@BeforeEach
 	public void setup() {

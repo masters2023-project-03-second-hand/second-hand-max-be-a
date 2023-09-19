@@ -107,10 +107,6 @@ public abstract class IntegrationTestSupport {
 			.collect(Collectors.toUnmodifiableList());
 	}
 
-	protected List<Region> getRegions(List<String> names) {
-		return regionRepository.findAllByNameIn(names);
-	}
-
 	protected Region getRegion(String name) {
 		return regionRepository.findAllByNameIn(List.of(name))
 			.stream()

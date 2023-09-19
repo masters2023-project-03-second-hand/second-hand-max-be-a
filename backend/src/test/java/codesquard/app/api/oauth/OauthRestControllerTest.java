@@ -21,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -28,30 +29,26 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
-import codesquard.app.api.errors.handler.GlobalExceptionHandler;
 import codesquard.app.api.oauth.request.OauthSignUpRequest;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.member.Member;
-import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.filter.JwtAuthorizationFilter;
 import codesquard.app.filter.LogoutFilter;
 import codesquard.app.interceptor.LogoutInterceptor;
 
+@WebMvcTest(controllers = OauthRestController.class)
 class OauthRestControllerTest extends ControllerTestSupport {
 
 	private MockMvc mockMvc;
 
-	@MockBean
-	private AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
-
 	@Autowired
 	private OauthRestController oauthRestController;
 
-	@Autowired
-	private GlobalExceptionHandler globalExceptionHandler;
+	@MockBean
+	private OauthService oauthService;
 
 	@BeforeEach
 	public void setup() {

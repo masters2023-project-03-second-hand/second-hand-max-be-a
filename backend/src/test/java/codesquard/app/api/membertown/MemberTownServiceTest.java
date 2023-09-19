@@ -1,6 +1,7 @@
 package codesquard.app.api.membertown;
 
 import static codesquard.app.MemberTestSupport.*;
+import static codesquard.app.RegionTestSupport.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,22 +12,38 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
 import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTown;
+import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.domain.region.Region;
+import codesquard.app.domain.region.RegionRepository;
 
-class MemberTownServiceTest extends IntegrationTestSupport {
+@SpringBootTest
+class MemberTownServiceTest {
+
+	@Autowired
+	private MemberRepository memberRepository;
+
+	@Autowired
+	private MemberTownRepository memberTownRepository;
+
+	@Autowired
+	private RegionRepository regionRepository;
+
+	@Autowired
+	private MemberTownService memberTownService;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -35,8 +52,10 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 	@Test
 	public void addMemberTown() throws JsonProcessingException {
 		// given
+		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
+
 		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("addressId", getRegion("서울 송파구 가락동").getId());
+		requestBody.put("addressId", region.getId());
 		MemberTownAddRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			MemberTownAddRequest.class);
 
@@ -84,12 +103,14 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		Member saveMember = memberRepository.save(member);
 
-		List<Region> regions = getRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동", "서울 종로구 효자동"));
+		List<Region> regions = regionRepository.saveAll(
+			createRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동", "서울 종로구 효자동")));
 		List<MemberTown> memberTowns = MemberTown.createMemberTowns(regions, member);
 		memberTownRepository.saveAll(memberTowns);
 
+		Region region = regionRepository.save(createRegion("서울 종로구 청운동"));
 		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("addressId", getRegion("서울 종로구 청운동").getId());
+		requestBody.put("addressId", region.getId());
 		MemberTownAddRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			MemberTownAddRequest.class);
 

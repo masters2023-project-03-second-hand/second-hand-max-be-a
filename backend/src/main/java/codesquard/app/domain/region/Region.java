@@ -20,7 +20,7 @@ public class Region {
 	private Long id;
 	private String name;
 
-	private Region(String name) {
+	public Region(String name) {
 		this.name = name;
 	}
 

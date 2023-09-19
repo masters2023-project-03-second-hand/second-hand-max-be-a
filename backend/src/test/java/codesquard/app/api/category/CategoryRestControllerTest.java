@@ -11,27 +11,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
 import codesquard.app.api.category.response.CategoryListResponse;
-import codesquard.app.api.errors.handler.GlobalExceptionHandler;
-import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 
+@WebMvcTest(controllers = CategoryRestController.class)
 class CategoryRestControllerTest extends ControllerTestSupport {
 
 	private MockMvc mockMvc;
 
 	@MockBean
-	private AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
+	private CategoryQueryService categoryQueryService;
 
 	@Autowired
 	private CategoryRestController categoryRestController;
-
-	@Autowired
-	private GlobalExceptionHandler globalExceptionHandler;
 
 	@BeforeEach
 	public void setup() {

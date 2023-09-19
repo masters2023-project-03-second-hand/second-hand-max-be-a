@@ -2,6 +2,7 @@ package codesquard.app;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import codesquard.app.api.region.response.RegionItemResponse;
 import codesquard.app.domain.region.Region;
@@ -34,5 +35,15 @@ public class RegionTestSupport {
 
 	public static RegionItemResponse createRegionItemResponse(String name) {
 		return RegionItemResponse.from(Region.create(name));
+	}
+
+	public static Region createRegion(String name) {
+		return new Region(name);
+	}
+
+	public static List<Region> createRegions(List<String> regions) {
+		return regions.stream()
+			.map(Region::new)
+			.collect(Collectors.toUnmodifiableList());
 	}
 }
