@@ -40,7 +40,7 @@ class ItemControllerTest extends ControllerTestSupport {
 
 	@BeforeEach
 	public void setup() {
-		mockMvc = MockMvcBuilders.standaloneSetup(new ItemController(itemQueryService, itemService))
+		mockMvc = MockMvcBuilders.standaloneSetup(new ItemController(itemService))
 			.setControllerAdvice(new GlobalExceptionHandler())
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
 			.alwaysDo(print())
