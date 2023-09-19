@@ -105,13 +105,14 @@ public class Item {
 			.build();
 	}
 
-	public void change(Category category, Item changeItem) {
+	public void change(Category category, Item changeItem, String thumbnailUrl) {
+		this.category = category;
 		this.title = changeItem.title;
 		this.price = changeItem.price;
 		this.content = changeItem.content;
 		this.region = changeItem.region;
 		this.status = changeItem.status;
-		this.category = category;
+		this.thumbnailUrl = thumbnailUrl;
 	}
 
 	public void changeStatus(ItemStatus status) {

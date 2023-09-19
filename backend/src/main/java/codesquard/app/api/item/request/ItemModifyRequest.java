@@ -33,14 +33,13 @@ public class ItemModifyRequest {
 	private String categoryName;
 	private List<String> deleteImageUrls;
 
-	public Item toEntity(String thumbnailUrl) {
+	public Item toEntity() {
 		return Item.builder()
 			.title(title)
 			.price(price)
 			.content(content)
 			.region(region)
 			.status(status)
-			.thumbnailUrl(thumbnailUrl)
 			.build();
 	}
 
