@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,12 @@ class MemberTownServiceTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@AfterEach
+	void tearDown() {
+		memberTownRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
+	}
 
 	@DisplayName("선택한 동네를 회원 동네에 추가한다")
 	@Test
@@ -130,20 +137,17 @@ class MemberTownServiceTest {
 	public void addMemberTownWithDuplicateAddressName() throws JsonProcessingException {
 		// given
 		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("addressId", getRegion("서울 종로구 신교동").getId());
+		Region region = regionRepository.save(createRegion("서울 종로구 신교동"));
+		requestBody.put("addressId", region.getId());
 		MemberTownAddRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			MemberTownAddRequest.class);
 
-		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
-		Member saveMember = memberRepository.save(member);
-
-		Region region = getRegion("서울 종로구 신교동");
-		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
-		memberTownRepository.save(memberTown);
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region));
 
 		// when
 		Throwable throwable = catchThrowable(
-			() -> memberTownService.addMemberTown(Principal.from(saveMember), request));
+			() -> memberTownService.addMemberTown(Principal.from(member), request));
 
 		// then
 		assertThat(throwable)
@@ -159,12 +163,16 @@ class MemberTownServiceTest {
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		Member saveMember = memberRepository.save(member);
 
-		List<Region> regions = getRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동"));
+		List<Region> regions = regionRepository.saveAll(createRegions(List.of("서울 송파구 가락동", "서울 종로구 궁정동")));
 		List<MemberTown> memberTowns = MemberTown.createMemberTowns(regions, member);
 		memberTownRepository.saveAll(memberTowns);
 
+		Region requestRegion = regions.stream()
+			.filter(region -> region.getName().equals("서울 송파구 가락동"))
+			.findAny()
+			.orElseThrow();
 		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("addressId", getRegion("서울 송파구 가락동").getId());
+		requestBody.put("addressId", requestRegion.getId());
 		MemberTownRemoveRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			MemberTownRemoveRequest.class);
 
@@ -183,16 +191,18 @@ class MemberTownServiceTest {
 	@Test
 	public void removeMemberTownWithNotRegisteredAddressName() throws JsonProcessingException {
 		// given
+		Region region = regionRepository.save(createRegion("서울 종로구 효자동"));
+
 		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("addressId", getRegion("서울 종로구 효자동").getId());
+		requestBody.put("addressId", region.getId());
 		MemberTownRemoveRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			MemberTownRemoveRequest.class);
 
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
 
-		Region region = getRegion("서울 송파구 가락동");
-		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
+		Region newRegion = regionRepository.save(createRegion("서울 송파구 가락동"));
+		MemberTown memberTown = new MemberTown(newRegion.getShortAddress(), member, newRegion);
 		memberTownRepository.save(memberTown);
 
 		// when
@@ -212,7 +222,7 @@ class MemberTownServiceTest {
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		Member saveMember = memberRepository.save(member);
 
-		Region region = getRegion("서울 종로구 창성동");
+		Region region = regionRepository.save(createRegion("서울 종로구 창성동"));
 		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		memberTownRepository.save(memberTown);
 

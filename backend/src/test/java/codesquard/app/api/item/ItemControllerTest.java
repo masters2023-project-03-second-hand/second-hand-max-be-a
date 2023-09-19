@@ -40,9 +40,6 @@ class ItemControllerTest extends ControllerTestSupport {
 	private ItemController itemController;
 
 	@MockBean
-	private ItemQueryService itemQueryService;
-
-	@MockBean
 	private ItemService itemService;
 
 	@BeforeEach
@@ -81,7 +78,7 @@ class ItemControllerTest extends ControllerTestSupport {
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 
 		ItemDetailResponse response = ItemDetailResponse.of(item, seller, seller.getId(), imageUrls);
-		given(itemQueryService.findDetailItemBy(any(), any())).willReturn(response);
+		given(itemService.findDetailItemBy(any(), any())).willReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/1"))
 			.andExpect(status().isOk())
@@ -124,7 +121,7 @@ class ItemControllerTest extends ControllerTestSupport {
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 
 		ItemDetailResponse response = ItemDetailResponse.of(item, seller, loginMemberId, imageUrls);
-		given(itemQueryService.findDetailItemBy(any(), any())).willReturn(response);
+		given(itemService.findDetailItemBy(any(), any())).willReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/1"))
 			.andExpect(status().isOk())
@@ -148,7 +145,7 @@ class ItemControllerTest extends ControllerTestSupport {
 	@Test
 	public void findDetailItemWithNotExistItem() throws Exception {
 		// given
-		given(itemQueryService.findDetailItemBy(any(), any()))
+		given(itemService.findDetailItemBy(any(), any()))
 			.willThrow(new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 
 		// when & then
