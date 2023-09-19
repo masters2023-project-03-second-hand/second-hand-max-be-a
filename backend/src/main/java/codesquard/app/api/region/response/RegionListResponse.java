@@ -1,6 +1,6 @@
 package codesquard.app.api.region.response;
 
-import static codesquard.app.api.response.ItemResponses.*;
+import static codesquard.app.api.item.response.ItemResponses.*;
 
 import java.util.List;
 

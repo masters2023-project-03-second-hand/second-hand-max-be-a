@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.request.ItemRegisterRequest;
-import codesquard.app.api.response.ItemResponse;
-import codesquard.app.api.response.ItemResponses;
+import codesquard.app.api.item.response.ItemResponse;
+import codesquard.app.api.item.response.ItemResponses;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemStatus;

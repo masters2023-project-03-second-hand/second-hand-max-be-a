@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 
-import codesquard.app.api.response.ItemResponse;
+import codesquard.app.api.item.response.ItemResponse;
 import codesquard.app.domain.sales.SalesStatus;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
