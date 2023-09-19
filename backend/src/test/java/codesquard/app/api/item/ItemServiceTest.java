@@ -108,8 +108,8 @@ class ItemServiceTest {
 	void registerTest() {
 		// given
 		given(imageUploader.uploadImageToS3(any(), anyString())).willReturn("url");
-		Category category = supportRepository.save(Category.create("식품", "~~~~"));
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
+		Category category = supportRepository.save(new Category("식품", "~~~~"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "pieeeeeee"));
 
 		List<MultipartFile> multipartFiles = getMultipartFiles();
 		ItemRegisterRequest request = new ItemRegisterRequest(
@@ -139,7 +139,7 @@ class ItemServiceTest {
 	@DisplayName("상품 목록 조회에 성공한다.")
 	void findAll() {
 		// given
-		Category category = supportRepository.save(Category.create("식품", "~~~~"));
+		Category category = supportRepository.save(new Category("식품", "~~~~"));
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 		ItemRegisterRequest request2 = new ItemRegisterRequest(
@@ -147,7 +147,7 @@ class ItemServiceTest {
 		ItemRegisterRequest request3 = new ItemRegisterRequest(
 			"노트북", null, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "pieeeeeee"));
 		supportRepository.save(request1.toEntity(member, "thumbnail"));
 		Item item = supportRepository.save(request2.toEntity(member, "thumbnail"));
 		supportRepository.save(request3.toEntity(member, "thumbnail"));
@@ -229,10 +229,10 @@ class ItemServiceTest {
 	@DisplayName("등록된 상품의 상태를 변경하는데 성공한다.")
 	void modifyItemStatusTest() {
 		// given
-		Category category = supportRepository.save(Category.create("식품", "~~~~"));
+		Category category = supportRepository.save(new Category("식품", "~~~~"));
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "pieeeeeee"));
 		Item item = supportRepository.save(request1.toEntity(member, "thumbnail"));
 
 		// when

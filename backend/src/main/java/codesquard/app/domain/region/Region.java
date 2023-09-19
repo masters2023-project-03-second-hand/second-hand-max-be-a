@@ -24,8 +24,11 @@ public class Region {
 		this.name = name;
 	}
 
-	public static Region create(String name) {
-		return new Region(name);
+	public String getShortAddress() {
+		final String space = " ";
+		return Arrays.stream(name.split(space))
+			.skip(2)
+			.collect(Collectors.joining(space));
 	}
 
 	@Override
@@ -33,10 +36,4 @@ public class Region {
 		return String.format("%s, %s(id=%d, name=%s)", "지역", this.getClass().getSimpleName(), id, name);
 	}
 
-	public String getShortAddress() {
-		final String space = " ";
-		return Arrays.stream(name.split(space))
-			.skip(2)
-			.collect(Collectors.joining(space));
-	}
 }

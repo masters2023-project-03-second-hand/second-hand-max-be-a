@@ -11,7 +11,7 @@ class AuthenticateMemberTest {
 	@Test
 	public void from() {
 		// given
-		Member member = Member.create("avatarUrlValue", "23Yong1234@gmail.com", "23Yong");
+		Member member = new Member("avatarUrlValue", "23Yong1234@gmail.com", "23Yong");
 
 		// when
 		AuthenticateMember authMember = AuthenticateMember.from(member);

@@ -174,7 +174,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			.willReturn(Principal.from(member));
 
 		OauthRefreshResponse response = OauthRefreshResponse.from(
-			Jwt.create("accessTokenValue", "refreshTokenValue", null, null));
+			new Jwt("accessTokenValue", "refreshTokenValue", null, null));
 		given(oauthService.refreshAccessToken(any(), any())).willReturn(response);
 
 		Map<String, Object> requestBody = new HashMap<>();

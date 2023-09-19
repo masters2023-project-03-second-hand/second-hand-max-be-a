@@ -45,7 +45,7 @@ public class JwtProvider {
 	private Jwt createJwt(Map<String, Object> claims, Date expireDateAccessToken, Date expireDateRefreshToken) {
 		String accessToken = createToken(claims, expireDateAccessToken);
 		String refreshToken = createToken(new HashMap<>(), expireDateRefreshToken);
-		return Jwt.create(accessToken, refreshToken, expireDateAccessToken, expireDateRefreshToken);
+		return new Jwt(accessToken, refreshToken, expireDateAccessToken, expireDateRefreshToken);
 	}
 
 	private String createToken(Map<String, Object> claims, Date expireDate) {

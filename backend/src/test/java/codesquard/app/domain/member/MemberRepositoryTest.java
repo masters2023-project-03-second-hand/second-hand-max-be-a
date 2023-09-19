@@ -27,7 +27,7 @@ class MemberRepositoryTest {
 	@Test
 	public void findMemberByLoginId() {
 		// given
-		Member member = Member.create("avatarUrl", "23Yong@gmail.com", "23Yong");
+		Member member = new Member("avatarUrl", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
 		String loginId = "23Yong";
 
@@ -57,7 +57,7 @@ class MemberRepositoryTest {
 	@Test
 	public void existsMemberByLoginId() {
 		// given
-		Member member = Member.create("avatarUrl", "23Yong@gmail.com", "23Yong");
+		Member member = new Member("avatarUrl", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
 		String loginId = "23Yong";
 
@@ -74,7 +74,7 @@ class MemberRepositoryTest {
 		// given
 		String loginId = "23Yong";
 		String email = "23Yong1234@gmail.com";
-		Member member = Member.create(null, email, loginId);
+		Member member = new Member(null, email, loginId);
 		memberRepository.save(member);
 
 		// when
@@ -108,7 +108,7 @@ class MemberRepositoryTest {
 		// given
 		String email = "23Yong@gmail.com";
 		String loginId = "23Yong";
-		Member member = Member.create(null, email, loginId);
+		Member member = new Member(null, email, loginId);
 		memberRepository.save(member);
 
 		// when

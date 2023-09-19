@@ -54,11 +54,11 @@ class WishItemServiceTest {
 	void wishRegisterTest() {
 
 		// given
-		Category category = supportRepository.save(Category.create("식품", "!!"));
+		Category category = supportRepository.save(new Category("식품", "!!"));
 		ItemRegisterRequest request = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "pieeeeeee"));
 		Item item1 = supportRepository.save(request.toEntity(member, "thumbnail"));
 
 		// when
@@ -74,10 +74,10 @@ class WishItemServiceTest {
 	void wishCancelTest() {
 
 		// given
-		Category category = supportRepository.save(Category.create("식품", "!!"));
+		Category category = supportRepository.save(new Category("식품", "!!"));
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "piepie"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "piepie"));
 		Item saveItem = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		wishItemService.changeWishStatus(saveItem.getId(), member.getId(), WishStatus.YES);
 
@@ -94,15 +94,15 @@ class WishItemServiceTest {
 	void wishListFindAll() {
 
 		// given
-		Category category1 = supportRepository.save(Category.create("가전", "~~~~"));
-		Category category2 = supportRepository.save(Category.create("식품", "~~~~!"));
+		Category category1 = supportRepository.save(new Category("가전", "~~~~"));
+		Category category2 = supportRepository.save(new Category("식품", "~~~~!"));
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "구래동", ItemStatus.ON_SALE, category1.getId(), null);
 		ItemRegisterRequest request2 = new ItemRegisterRequest(
 			"전기밥솥", null, null, "화곡동", ItemStatus.ON_SALE, category2.getId(), null);
 		ItemRegisterRequest request3 = new ItemRegisterRequest(
 			"노트북", null, null, "구래동", ItemStatus.ON_SALE, category1.getId(), null);
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "piepie"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "piepie"));
 		Item item1 = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		Item item2 = supportRepository.save(request2.toEntity(member, "thumb"));
 		Item item3 = supportRepository.save(request3.toEntity(member, "nail"));
@@ -130,8 +130,8 @@ class WishItemServiceTest {
 	void wishListByCategoryTest() {
 
 		// given
-		Category category1 = supportRepository.save(Category.create("가전", "~~~~"));
-		Category category2 = supportRepository.save(Category.create("식품", "~~~~!"));
+		Category category1 = supportRepository.save(new Category("가전", "~~~~"));
+		Category category2 = supportRepository.save(new Category("식품", "~~~~!"));
 
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "구래동", ItemStatus.ON_SALE, category1.getId(), null);
@@ -139,7 +139,7 @@ class WishItemServiceTest {
 			"전기밥솥", null, null, "화곡동", ItemStatus.ON_SALE, category2.getId(), null);
 		ItemRegisterRequest request3 = new ItemRegisterRequest(
 			"노트북", null, null, "구래동", ItemStatus.ON_SALE, category1.getId(), null);
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "piepie"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "piepie"));
 		Item item1 = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		Item item2 = supportRepository.save(request2.toEntity(member, "thumb"));
 		Item item3 = supportRepository.save(request3.toEntity(member, "nail"));

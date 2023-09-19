@@ -40,7 +40,7 @@ class MemberServiceTest {
 		// given
 		given(imageUploader.uploadImageToS3(any(), anyString())).willReturn("url");
 		willDoNothing().given(imageUploader).deleteImage(anyString());
-		repository.save(Member.create("url", "email", "pie"));
+		repository.save(new Member("url", "email", "pie"));
 
 		LocalDateTime now = LocalDateTime.now();
 		var request = given().log().all()
