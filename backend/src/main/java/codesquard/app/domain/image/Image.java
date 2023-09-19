@@ -36,14 +36,10 @@ public class Image {
 		this.item = item;
 	}
 
-	public static Image create(String imageUrl, Item item) {
-		return new Image(imageUrl, item);
-	}
-
 	public static List<Image> createImages(List<String> imageUrls, Item item) {
 		List<Image> images = new ArrayList<>();
 		for (String imageUrl : imageUrls) {
-			images.add(create(imageUrl, item));
+			images.add(new Image(imageUrl, item));
 		}
 		return images;
 	}

@@ -73,7 +73,7 @@ public class ItemService {
 		List<String> addImageUrls = imageService.uploadImages(addImages);
 		log.debug("상품 수정 서비스의 S3 이미지 추가 결과 : {}", addImageUrls);
 
-		List<Image> images = item.createImages(addImageUrls);
+		List<Image> images = Image.createImages(addImageUrls, new Item(itemId));
 		imageRepository.saveAll(images);
 		log.debug("상품 수정 서비스의 이미지 테이블 저장 결과 : {}", images);
 
