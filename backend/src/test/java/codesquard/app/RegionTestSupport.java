@@ -1,9 +1,10 @@
-package codesquard.app.domain.region;
+package codesquard.app;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import codesquard.app.api.region.response.RegionItemResponse;
+import codesquard.app.domain.region.Region;
 
 public class RegionTestSupport {
 	public static List<Region> createFixedRegions() {

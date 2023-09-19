@@ -1,21 +1,20 @@
 package codesquard.app.domain.region;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.List;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import codesquard.app.IntegrationTestSupport;
+import codesquard.app.RegionTestSupport;
 
 class RegionPaginationRepositoryTest extends IntegrationTestSupport {
-
-	private static final Logger log = LoggerFactory.getLogger(RegionPaginationRepositoryTest.class);
 
 	@DisplayName("아무 조건없이 모든 동네중 10개를 조회한다")
 	@Test
@@ -27,13 +26,14 @@ class RegionPaginationRepositoryTest extends IntegrationTestSupport {
 		Long lastRegionId = null;
 		Pageable pageable = PageRequest.ofSize(10);
 		String regionName = null;
+
 		// when
 		Slice<Region> regionSlice = regionPaginationRepository.searchBySlice(lastRegionId, regionName, pageable);
+
 		// then
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(regionSlice.getContent()).hasSize(10);
-			softAssertions.assertThat(regionSlice.hasNext()).isTrue();
-			softAssertions.assertAll();
+		assertAll(() -> {
+			assertThat(regionSlice.getContent()).hasSize(10);
+			assertThat(regionSlice.hasNext()).isTrue();
 		});
 	}
 
@@ -51,13 +51,14 @@ class RegionPaginationRepositoryTest extends IntegrationTestSupport {
 
 		lastRegionId = getNextCursor(firstSlice);
 		pageable = PageRequest.ofSize(5);
+
 		// when
 		Slice<Region> regionSlice = regionPaginationRepository.searchBySlice(lastRegionId, regionName, pageable);
+
 		// then
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(regionSlice.getContent()).hasSize(5);
-			softAssertions.assertThat(regionSlice.hasNext()).isTrue();
-			softAssertions.assertAll();
+		assertAll(() -> {
+			assertThat(regionSlice.getContent()).hasSize(5);
+			assertThat(regionSlice.hasNext()).isTrue();
 		});
 	}
 
@@ -75,13 +76,14 @@ class RegionPaginationRepositoryTest extends IntegrationTestSupport {
 
 		lastRegionId = getNextCursor(firstSlice);
 		pageable = PageRequest.ofSize(5);
+
 		// when
 		Slice<Region> regionSlice = regionPaginationRepository.searchBySlice(lastRegionId, regionName, pageable);
+
 		// then
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(regionSlice.getContent()).hasSize(5);
-			softAssertions.assertThat(regionSlice.hasNext()).isTrue();
-			softAssertions.assertAll();
+		assertAll(() -> {
+			assertThat(regionSlice.getContent()).hasSize(5);
+			assertThat(regionSlice.hasNext()).isTrue();
 		});
 	}
 

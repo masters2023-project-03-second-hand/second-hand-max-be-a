@@ -1,6 +1,6 @@
 package codesquard.app.api.region;
 
-import static codesquard.app.domain.region.RegionTestSupport.*;
+import static codesquard.app.RegionTestSupport.*;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 
