@@ -1,8 +1,8 @@
 package codesquard.app.api.member;
 
-import org.springframework.http.HttpStatus;
+import java.util.Map;
+
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,9 +21,9 @@ public class MemberController {
 	private final MemberService memberService;
 
 	@PutMapping(value = "/{loginId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ApiResponse<Void>> modifyProfileImage(@RequestPart MultipartFile updateImageFile,
+	public ApiResponse<Map<String, String>> modifyProfileImage(@RequestPart MultipartFile updateImageFile,
 		@PathVariable String loginId) {
-		memberService.modifyProfileImage(loginId, updateImageFile);
-		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.ok("프로필 사진이 수정되었습니다.", null));
+		return ApiResponse.ok("프로필 사진이 수정되었습니다.",
+			Map.of("profileImageUrl", memberService.modifyProfileImage(loginId, updateImageFile)));
 	}
 }

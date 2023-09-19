@@ -19,10 +19,12 @@ public class MemberService {
 	private final ImageService imageService;
 
 	@Transactional
-	public void modifyProfileImage(String loginId, MultipartFile updateImageFile) {
+	public String modifyProfileImage(String loginId, MultipartFile updateImageFile) {
 		Member member = memberRepository.findMemberByLoginId(loginId)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
 		imageService.deleteImage(member.getAvatarUrl());
-		member.changeAvatarUrl(imageService.uploadImage(updateImageFile));
+		String avatarUrl = imageService.uploadImage(updateImageFile);
+		member.changeAvatarUrl(avatarUrl);
+		return avatarUrl;
 	}
 }
