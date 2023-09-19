@@ -100,8 +100,8 @@ public abstract class IntegrationTestSupport {
 		memberRepository.deleteAllInBatch();
 	}
 
-	protected List<Long> getAddressIds(String name) {
-		List<Region> regions = regionRepository.findAllByNameIn(List.of(name));
+	protected List<Long> getAddressIds(List<String> names) {
+		List<Region> regions = regionRepository.findAllByNameIn(names);
 		return regions.stream()
 			.map(Region::getId)
 			.collect(Collectors.toUnmodifiableList());

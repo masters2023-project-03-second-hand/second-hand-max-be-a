@@ -73,7 +73,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 		String code = "1234";
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
@@ -126,7 +126,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
@@ -155,7 +155,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "bruni2");
-		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
@@ -199,7 +199,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
@@ -227,7 +227,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
@@ -272,7 +272,7 @@ class OauthServiceTest extends IntegrationTestSupport {
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", getAddressIds("서울 송파구 가락동"));
+		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
