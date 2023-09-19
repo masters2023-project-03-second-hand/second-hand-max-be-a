@@ -21,7 +21,7 @@ class RegionPaginationRepositoryTest extends IntegrationTestSupport {
 	@Test
 	public void searchBySlice() {
 		// given
-		List<Region> regions = RegionFixedFactory.createFixedRegions();
+		List<Region> regions = RegionTestSupport.createFixedRegions();
 		regionRepository.saveAll(regions);
 
 		Long lastRegionId = null;
@@ -41,7 +41,7 @@ class RegionPaginationRepositoryTest extends IntegrationTestSupport {
 	@Test
 	public void searchBySliceWithScrollToNextPage() {
 		// given
-		List<Region> regions = RegionFixedFactory.createFixedRegions();
+		List<Region> regions = RegionTestSupport.createFixedRegions();
 		regionRepository.saveAll(regions);
 
 		Long lastRegionId = null;
@@ -65,7 +65,7 @@ class RegionPaginationRepositoryTest extends IntegrationTestSupport {
 	@Test
 	public void searchBySliceRegionNameWithScrollToNextPage() {
 		// given
-		List<Region> regions = RegionFixedFactory.createFixedRegions();
+		List<Region> regions = RegionTestSupport.createFixedRegions();
 		regionRepository.saveAll(regions);
 
 		Long lastRegionId = null;

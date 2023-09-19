@@ -1,5 +1,6 @@
 package codesquard.app.api.region;
 
+import static codesquard.app.domain.region.RegionTestSupport.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -11,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -18,16 +20,21 @@ import codesquard.app.ControllerTestSupport;
 import codesquard.app.api.errors.handler.GlobalExceptionHandler;
 import codesquard.app.api.region.response.RegionItemResponse;
 import codesquard.app.api.region.response.RegionListResponse;
-import codesquard.app.domain.region.Region;
 
 class RegionRestControllerTest extends ControllerTestSupport {
 
 	private MockMvc mockMvc;
 
+	@Autowired
+	private RegionRestController regionRestController;
+
+	@Autowired
+	private GlobalExceptionHandler globalExceptionHandler;
+
 	@BeforeEach
 	public void setup() {
-		mockMvc = MockMvcBuilders.standaloneSetup(new RegionRestController(regionQueryService))
-			.setControllerAdvice(new GlobalExceptionHandler())
+		mockMvc = MockMvcBuilders.standaloneSetup(regionRestController)
+			.setControllerAdvice(globalExceptionHandler)
 			.alwaysDo(print())
 			.build();
 	}
@@ -43,6 +50,7 @@ class RegionRestControllerTest extends ControllerTestSupport {
 
 		given(regionQueryService.searchBySlice(anyInt(), anyLong(), anyString()))
 			.willReturn(response);
+
 		// when & then
 		mockMvc.perform(get("/api/regions")
 				.param("size", "3")
@@ -56,7 +64,4 @@ class RegionRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("data.paging.hasNext").value(true));
 	}
 
-	private static RegionItemResponse createRegionItemResponse(String name) {
-		return RegionItemResponse.from(Region.create(name));
-	}
 }

@@ -1,12 +1,14 @@
 package codesquard.app.api.region;
 
-import org.assertj.core.api.SoftAssertions;
+import static codesquard.app.domain.region.RegionTestSupport.*;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.region.response.RegionListResponse;
-import codesquard.app.domain.region.RegionFixedFactory;
 
 class RegionQueryServiceTest extends IntegrationTestSupport {
 
@@ -14,7 +16,7 @@ class RegionQueryServiceTest extends IntegrationTestSupport {
 	@Test
 	public void findAllByRegionName() {
 		// given
-		regionRepository.saveAll(RegionFixedFactory.createFixedRegions());
+		regionRepository.saveAll(createFixedRegions());
 		int size = 10;
 		Long cursor = null;
 		String region = null;
@@ -23,11 +25,10 @@ class RegionQueryServiceTest extends IntegrationTestSupport {
 		RegionListResponse response = regionQueryService.searchBySlice(size, cursor, region);
 
 		// then
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(response.getContents()).hasSize(10);
-			softAssertions.assertThat(response.getPaging().getNextCursor()).isNotNull();
-			softAssertions.assertThat(response.getPaging().isHasNext()).isEqualTo(true);
-			softAssertions.assertAll();
+		assertAll(() -> {
+			assertThat(response.getContents()).hasSize(10);
+			assertThat(response.getPaging().getNextCursor()).isNotNull();
+			assertThat(response.getPaging().isHasNext()).isEqualTo(true);
 		});
 	}
 }

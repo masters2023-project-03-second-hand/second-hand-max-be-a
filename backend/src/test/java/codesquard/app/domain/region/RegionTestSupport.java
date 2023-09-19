@@ -3,7 +3,9 @@ package codesquard.app.domain.region;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RegionFixedFactory {
+import codesquard.app.api.region.response.RegionItemResponse;
+
+public class RegionTestSupport {
 	public static List<Region> createFixedRegions() {
 		List<Region> regions = new ArrayList<>();
 		regions.add(Region.create("경기 부천시 원미동"));
@@ -27,5 +29,9 @@ public class RegionFixedFactory {
 		regions.add(Region.create("경기 부천시 작동"));
 		regions.add(Region.create("경기 부천시 원종동"));
 		return regions;
+	}
+
+	public static RegionItemResponse createRegionItemResponse(String name) {
+		return RegionItemResponse.from(Region.create(name));
 	}
 }
