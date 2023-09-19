@@ -7,14 +7,22 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.RegionTestSupport;
 
-class RegionPaginationRepositoryTest extends IntegrationTestSupport {
+@SpringBootTest
+class RegionPaginationRepositoryTest {
+
+	@Autowired
+	private RegionRepository regionRepository;
+
+	@Autowired
+	private RegionPaginationRepository regionPaginationRepository;
 
 	@DisplayName("아무 조건없이 모든 동네중 10개를 조회한다")
 	@Test

@@ -4,13 +4,28 @@ import static codesquard.app.RegionTestSupport.*;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.region.response.RegionListResponse;
+import codesquard.app.domain.region.RegionRepository;
 
-class RegionQueryServiceTest extends IntegrationTestSupport {
+@SpringBootTest
+class RegionQueryServiceTest {
+
+	@Autowired
+	private RegionRepository regionRepository;
+
+	@Autowired
+	private RegionQueryService regionQueryService;
+
+	@AfterEach
+	void tearDown() {
+		regionRepository.deleteAllInBatch();
+	}
 
 	@DisplayName("주소 목록을 처음 조회할때 10개가 조회한다")
 	@Test

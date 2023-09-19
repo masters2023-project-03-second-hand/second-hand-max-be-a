@@ -6,12 +6,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
 
-public class InMemoryOauthClientRepositoryTest extends IntegrationTestSupport {
+@SpringBootTest
+class InMemoryOauthClientRepositoryTest {
 
 	@Autowired
 	private OauthClientRepository oauthClientRepository;

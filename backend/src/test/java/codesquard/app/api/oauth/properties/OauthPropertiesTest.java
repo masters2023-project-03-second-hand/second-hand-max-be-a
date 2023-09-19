@@ -8,12 +8,13 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.properties.OauthProperties;
 
-public class OauthPropertiesTest extends IntegrationTestSupport {
+@SpringBootTest
+public class OauthPropertiesTest {
 
 	@Autowired
 	private OauthProperties oauthProperties;

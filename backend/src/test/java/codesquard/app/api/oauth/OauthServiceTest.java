@@ -10,11 +10,14 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
@@ -22,7 +25,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
@@ -40,18 +42,34 @@ import codesquard.app.api.redis.RedisService;
 import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTown;
+import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
 import codesquard.app.domain.region.Region;
+import codesquard.app.domain.region.RegionRepository;
 
-class OauthServiceTest extends IntegrationTestSupport {
+@SpringBootTest
+class OauthServiceTest {
 
 	@MockBean
 	private OauthClientRepository oauthClientRepository;
 
 	@Mock
 	private OauthClient oauthClient;
+
+	@Autowired
+	private MemberRepository memberRepository;
+
+	@Autowired
+	private MemberTownRepository memberTownRepository;
+
+	@Autowired
+	private RegionRepository regionRepository;
+
+	@Autowired
+	private OauthService oauthService;
 
 	@Autowired
 	private JwtProvider jwtProvider;
@@ -65,15 +83,20 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@AfterEach
+	void tearDown() {
+		memberTownRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
+	}
+
 	@DisplayName("로그인 아이디와 소셜 로그인을 하여 회원가입을 한다")
 	@Test
 	public void signUp() throws IOException {
 		// given
-		String provider = "naver";
-		String code = "1234";
+		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
+		requestBody.put("addressIds", addressIds);
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
@@ -97,6 +120,8 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.willReturn(mockUserProfileResponse);
 		given(imageService.uploadImage(any())).willReturn("avatarUrlValue");
 
+		String provider = "naver";
+		String code = "1234";
 		// when
 		OauthSignUpResponse response = oauthService.signUp(createProfile("cat.png"), request, provider, code);
 
@@ -121,15 +146,16 @@ class OauthServiceTest extends IntegrationTestSupport {
 	public void signupWithDuplicateLoginId() throws IOException {
 		// given
 		memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
-		String provider = "naver";
-		String code = "1234";
 
+		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
+		requestBody.put("addressIds", addressIds);
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
+		String provider = "naver";
+		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
 			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
@@ -145,17 +171,13 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signupWithMultipleLoginId() throws IOException {
 		// given
-		imageRepository.deleteAllInBatch();
-		itemRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
 		memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
-		String provider = "naver";
-		String code = "1234";
-
+		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "bruni2");
-		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
+		requestBody.put("addressIds", addressIds);
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
@@ -178,6 +200,8 @@ class OauthServiceTest extends IntegrationTestSupport {
 		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.willReturn(mockUserProfileResponse);
 
+		String provider = "naver";
+		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
 			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
@@ -194,18 +218,19 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signUpWithInvalidProvider() throws IOException {
 		// given
-		String provider = "github";
-		String code = "1234";
 
+		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
+		requestBody.put("addressIds", addressIds);
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
 		given(oauthClientRepository.findOneBy(anyString()))
 			.willThrow(new RestApiException(OauthErrorCode.NOT_FOUND_PROVIDER));
 
+		String provider = "github";
+		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
 			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
@@ -222,12 +247,10 @@ class OauthServiceTest extends IntegrationTestSupport {
 	@Test
 	public void signUpWithInvalidCode() throws IOException {
 		// given
-		String provider = "naver";
-		String code = "1234";
-
+		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
+		requestBody.put("addressIds", addressIds);
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
@@ -244,6 +267,8 @@ class OauthServiceTest extends IntegrationTestSupport {
 		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.willThrow(new RestApiException(OauthErrorCode.WRONG_AUTHORIZATION_CODE));
 
+		String provider = "naver";
+		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
 			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
@@ -262,7 +287,8 @@ class OauthServiceTest extends IntegrationTestSupport {
 		// given
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong1234@gmail.com", "23Yong"));
 
-		Region region = getRegion("서울 송파구 가락동");
+		Region region = regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")).stream().findAny().orElseThrow();
+
 		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		memberTownRepository.save(memberTown);
 
@@ -270,9 +296,10 @@ class OauthServiceTest extends IntegrationTestSupport {
 		String code = "1234";
 		MockMultipartFile profile = createProfile("cat.png");
 
+		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", getAddressIds(List.of("서울 송파구 가락동")));
+		requestBody.put("addressIds", addressIds);
 		OauthSignUpRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthSignUpRequest.class);
 
@@ -468,5 +495,11 @@ class OauthServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("유효하지 않은 토큰입니다.");
+	}
+
+	protected List<Long> getAddressIds(List<Region> regions) {
+		return regions.stream()
+			.map(Region::getId)
+			.collect(Collectors.toUnmodifiableList());
 	}
 }

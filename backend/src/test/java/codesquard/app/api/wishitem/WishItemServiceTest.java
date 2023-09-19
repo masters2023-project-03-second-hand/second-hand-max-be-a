@@ -7,26 +7,47 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.item.response.ItemResponse;
 import codesquard.app.api.item.response.ItemResponses;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.item.Item;
+import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.member.MemberRepository;
+import codesquard.app.domain.wish.WishRepository;
 import codesquard.app.domain.wish.WishStatus;
+import codesquard.support.SupportRepository;
 
-class WishItemServiceTest extends IntegrationTestSupport {
+@SpringBootTest
+class WishItemServiceTest {
 
 	@Autowired
 	private WishItemService wishItemService;
 	@Autowired
+	private WishRepository wishRepository;
+	@Autowired
+	private SupportRepository supportRepository;
+	@Autowired
+	private MemberRepository memberRepository;
+	@Autowired
+	private ItemRepository itemRepository;
+	@Autowired
 	private EntityManager em;
+
+	@AfterEach
+	void tearDown() {
+		wishRepository.deleteAllInBatch();
+		itemRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
+	}
 
 	@Test
 	@DisplayName("관심상품 등록에 성공한다.")

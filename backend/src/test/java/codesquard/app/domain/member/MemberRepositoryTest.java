@@ -2,15 +2,26 @@ package codesquard.app.domain.member;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 
-class MemberRepositoryTest extends IntegrationTestSupport {
+@SpringBootTest
+class MemberRepositoryTest {
+
+	@Autowired
+	private MemberRepository memberRepository;
+
+	@AfterEach
+	void cleanup() {
+		memberRepository.deleteAllInBatch();
+	}
 
 	@DisplayName("로그인 아이디를 가지고 회원을 조회할 수 있다")
 	@Test
