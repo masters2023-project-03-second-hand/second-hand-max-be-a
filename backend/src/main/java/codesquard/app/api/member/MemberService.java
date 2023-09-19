@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageService;
+import codesquard.app.api.member.response.MemberProfileResponse;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +20,12 @@ public class MemberService {
 	private final ImageService imageService;
 
 	@Transactional
-	public void modifyProfileImage(String loginId, MultipartFile updateImageFile) {
+	public MemberProfileResponse modifyProfileImage(String loginId, MultipartFile updateImageFile) {
 		Member member = memberRepository.findMemberByLoginId(loginId)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
 		imageService.deleteImage(member.getAvatarUrl());
-		member.changeAvatarUrl(imageService.uploadImage(updateImageFile));
+		String avatarUrl = imageService.uploadImage(updateImageFile);
+		member.changeAvatarUrl(avatarUrl);
+		return new MemberProfileResponse(avatarUrl);
 	}
 }
