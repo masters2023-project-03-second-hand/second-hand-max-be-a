@@ -48,6 +48,7 @@ class CategoryRestControllerTest extends ControllerTestSupport {
 		// given
 		CategoryListResponse response = new CategoryListResponse(getCategories());
 		given(categoryQueryService.findAll()).willReturn(response);
+
 		// when & then
 		mockMvc.perform(get("/api/categories"))
 			.andExpect(status().isOk())

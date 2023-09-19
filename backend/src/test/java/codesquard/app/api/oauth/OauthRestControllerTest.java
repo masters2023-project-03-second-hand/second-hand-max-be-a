@@ -1,6 +1,6 @@
 package codesquard.app.api.oauth;
 
-import static codesquard.app.api.oauth.OauthFixedFactory.*;
+import static codesquard.app.MemberTestSupport.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -20,9 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,16 +44,19 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 	private MockMvc mockMvc;
 
-	@Mock
-	ValueOperations<String, Object> valueOperations;
-
 	@MockBean
 	private AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
 
+	@Autowired
+	private OauthRestController oauthRestController;
+
+	@Autowired
+	private GlobalExceptionHandler globalExceptionHandler;
+
 	@BeforeEach
 	public void setup() {
-		mockMvc = MockMvcBuilders.standaloneSetup(new OauthRestController(oauthService))
-			.setControllerAdvice(new GlobalExceptionHandler())
+		mockMvc = MockMvcBuilders.standaloneSetup(oauthRestController)
+			.setControllerAdvice(globalExceptionHandler)
 			.addFilters(
 				new JwtAuthorizationFilter(jwtProvider, authenticationContext, objectMapper, redisService),
 				new LogoutFilter(redisService, objectMapper)
@@ -69,14 +71,6 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@Test
 	public void signup() throws Exception {
 		// given
-		MockMultipartFile mockProfile = createFixedProfile();
-		Map<String, Object> requestBody = new HashMap<>();
-		requestBody.put("loginId", "23Yong");
-		requestBody.put("addressIds", List.of(1L));
-		String requestJson = objectMapper.writeValueAsString(requestBody);
-		MockMultipartFile mockSignupData = new MockMultipartFile("signupData", "signupData", "application/json",
-			requestJson.getBytes(StandardCharsets.UTF_8));
-
 		Map<String, Object> responseBody = new HashMap<>();
 		responseBody.put("id", 1L);
 		responseBody.put("avatarUrl", "avatarUrlValue");
@@ -84,13 +78,18 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		responseBody.put("loginId", "23Yong");
 		OauthSignUpResponse response = objectMapper.readValue(objectMapper.writeValueAsString(responseBody),
 			OauthSignUpResponse.class);
+		given(oauthService.signUp(any(), any(OauthSignUpRequest.class), anyString(), anyString()))
+			.willReturn(response);
 
-		when(oauthService.signUp(any(), any(OauthSignUpRequest.class), anyString(), anyString()))
-			.thenReturn(response);
-
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("loginId", "23Yong");
+		requestBody.put("addressIds", List.of(1L));
+		String requestJson = objectMapper.writeValueAsString(requestBody);
+		MockMultipartFile mockSignupData = new MockMultipartFile("signupData", "signupData", "application/json",
+			requestJson.getBytes(StandardCharsets.UTF_8));
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
-				.file(mockProfile)
+				.file(createProfile("cat.png"))
 				.file(mockSignupData)
 				.param("code", "1234"))
 			.andExpect(status().isCreated())
@@ -102,7 +101,6 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@ParameterizedTest
 	public void signupWhenInvalidLoginId(String loginId) throws Exception {
 		// given
-		MockMultipartFile mockProfile = createFixedProfile();
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", loginId);
 		requestBody.put("addressIds", List.of(1L));
@@ -112,7 +110,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
-				.file(mockProfile)
+				.file(createProfile("cat.png"))
 				.file(mockSignupData)
 				.param("code", "1234"))
 			.andExpect(status().isBadRequest())
@@ -128,7 +126,6 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@ParameterizedTest
 	public void signupWhenInvalidAddrName(List<Long> addressIds) throws Exception {
 		// given
-		MockMultipartFile mockProfile = createFixedProfile();
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
 		requestBody.put("addressIds", addressIds);
@@ -138,7 +135,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
-				.file(mockProfile)
+				.file(createProfile("cat.png"))
 				.file(mockSignupData)
 				.param("code", "1234"))
 			.andExpect(status().isBadRequest())
@@ -153,14 +150,14 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@Test
 	public void logout() throws Exception {
 		// given
-		Map<String, String> map = new HashMap<>();
-		map.put("refreshToken", "refreshTokenValue");
+		Map<String, String> requestBody = new HashMap<>();
+		requestBody.put("refreshToken", "refreshTokenValue");
 
 		// when & then
 		mockMvc.perform(post("/api/auth/logout")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer accessTokenValue")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(map))
+				.content(objectMapper.writeValueAsString(requestBody))
 				.characterEncoding(StandardCharsets.UTF_8)
 			)
 			.andExpect(status().isOk())
@@ -176,8 +173,8 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		given(authPrincipalArgumentResolver.supportsParameter(any())).willReturn(true);
 
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
-		Principal principal = Principal.from(member);
-		given(authPrincipalArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(principal);
+		given(authPrincipalArgumentResolver.resolveArgument(any(), any(), any(), any()))
+			.willReturn(Principal.from(member));
 
 		OauthRefreshResponse response = OauthRefreshResponse.from(
 			Jwt.create("accessTokenValue", "refreshTokenValue", null, null));
@@ -185,11 +182,11 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("refreshToken", "refreshTokenValue");
+
 		// when & then
 		mockMvc.perform(post("/api/auth/token")
 				.content(objectMapper.writeValueAsString(requestBody))
-				.contentType(MediaType.APPLICATION_JSON)
-			)
+				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(200)))
 			.andExpect(jsonPath("message").value(Matchers.equalTo("액세스 토큰 갱신에 성공하였습니다.")))
@@ -211,9 +208,5 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			Arguments.of(List.of(0L)),
 			Arguments.of(List.of(1L, 2L, 3L))
 		);
-	}
-
-	private Member createMember(String avatarUrl, String email, String loginId) {
-		return new Member(avatarUrl, email, loginId);
 	}
 }

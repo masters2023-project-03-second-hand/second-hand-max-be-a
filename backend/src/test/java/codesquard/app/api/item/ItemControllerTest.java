@@ -4,7 +4,6 @@ import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
 import static java.time.LocalDateTime.*;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.BDDMockito.when;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -54,10 +53,10 @@ class ItemControllerTest extends ControllerTestSupport {
 			.alwaysDo(print())
 			.build();
 
-		when(authPrincipalArgumentResolver.supportsParameter(any())).thenReturn(true);
+		given(authPrincipalArgumentResolver.supportsParameter(any())).willReturn(true);
 
-		Principal principal = new Principal(1L, "dragonbead95@naver.com", "bruni", null, null);
-		when(authPrincipalArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(principal);
+		Principal principal = new Principal(1L, "23Yong@gmail.com", "23Yong", null, null);
+		given(authPrincipalArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(principal);
 	}
 
 	@DisplayName("판매자가 자신이 판매하는 상품의 상세한 내용을 조회합니다.")
@@ -66,7 +65,19 @@ class ItemControllerTest extends ControllerTestSupport {
 		// given
 		Member seller = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
 		Category category = CategoryTestSupport.findByName("스포츠/레저");
-		Item item = ItemFixedFactory.createFixedItem(seller, category);
+		Item item = Item.builder()
+			.title("빈티지 롤러 블레이드")
+			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
+			.price(200000L)
+			.status(ON_SALE)
+			.region("가락동")
+			.createdAt(now())
+			.wishCount(0L)
+			.viewCount(0L)
+			.chatCount(0L)
+			.member(seller)
+			.category(category)
+			.build();
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 
 		ItemDetailResponse response = ItemDetailResponse.of(item, seller, seller.getId(), imageUrls);
@@ -80,14 +91,14 @@ class ItemControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("data.imageUrls").isArray())
 			.andExpect(jsonPath("data.seller").value(equalTo("23Yong")))
 			.andExpect(jsonPath("data.status").value(equalTo("판매중")))
-			.andExpect(jsonPath("data.title").value(equalTo("빈티지 롤러 스케이트")))
+			.andExpect(jsonPath("data.title").value(equalTo("빈티지 롤러 블레이드")))
 			.andExpect(jsonPath("data.content").value(equalTo("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")))
 			.andExpect(jsonPath("data.categoryName").value(equalTo("스포츠/레저")))
 			.andExpect(jsonPath("data.createdAt").exists())
 			.andExpect(jsonPath("data.chatCount").value(equalTo(0)))
 			.andExpect(jsonPath("data.wishCount").value(equalTo(0)))
 			.andExpect(jsonPath("data.viewCount").value(equalTo(0)))
-			.andExpect(jsonPath("data.price").value(equalTo(169000)));
+			.andExpect(jsonPath("data.price").value(equalTo(200000)));
 	}
 
 	@DisplayName("구매자가 상품의 상세한 내용을 조회합니다.")
@@ -95,7 +106,7 @@ class ItemControllerTest extends ControllerTestSupport {
 	public void findDetailItemByBuyer() throws Exception {
 		// given
 		Member seller = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
-		Category category = CategoryTestSupport.createdFixedCategory();
+		Category category = CategoryTestSupport.findByName("스포츠/레저");
 		Item item = Item.builder()
 			.title("빈티지 롤러 블레이드")
 			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
@@ -125,7 +136,7 @@ class ItemControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("data.status").value(equalTo("판매중")))
 			.andExpect(jsonPath("data.title").value(equalTo("빈티지 롤러 블레이드")))
 			.andExpect(jsonPath("data.content").value(equalTo("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")))
-			.andExpect(jsonPath("data.categoryName").value(equalTo("가구/인테리어")))
+			.andExpect(jsonPath("data.categoryName").value(equalTo("스포츠/레저")))
 			.andExpect(jsonPath("data.createdAt").exists())
 			.andExpect(jsonPath("data.chatCount").value(equalTo(0)))
 			.andExpect(jsonPath("data.wishCount").value(equalTo(0)))
@@ -137,11 +148,11 @@ class ItemControllerTest extends ControllerTestSupport {
 	@Test
 	public void findDetailItemWithNotExistItem() throws Exception {
 		// given
-		long itemId = 9999L;
-		when(itemQueryService.findDetailItemBy(any(), any()))
-			.thenThrow(new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+		given(itemQueryService.findDetailItemBy(any(), any()))
+			.willThrow(new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+
 		// when & then
-		mockMvc.perform(get("/api/items/" + itemId))
+		mockMvc.perform(get("/api/items/9999"))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("statusCode").value(equalTo(404)))
 			.andExpect(jsonPath("message").value(equalTo("상품을 찾을 수 없습니다.")))

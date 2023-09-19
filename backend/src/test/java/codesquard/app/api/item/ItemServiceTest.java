@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.CategoryTestSupport;
+import codesquard.app.ImageTestSupport;
 import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
@@ -118,15 +119,11 @@ class ItemServiceTest extends IntegrationTestSupport {
 	@Test
 	public void modifyItem() throws IOException {
 		// given
-		Category category = CategoryTestSupport.createdFixedCategory();
-		categoryRepository.save(category);
-
-		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
-		memberRepository.save(member);
+		Category category = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
 		Region region = getRegion("서울 송파구 가락동");
-		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
-		memberTownRepository.save(memberTown);
+		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region));
 
 		Item item = Item.builder()
 			.title("빈티지 롤러 블레이드")
@@ -147,7 +144,7 @@ class ItemServiceTest extends IntegrationTestSupport {
 			new Image("imageUrlValue2", new Item(saveItem.getId())));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
-		List<MultipartFile> addImages = ImageFixedFactory.createFixedMultipartFile();
+		List<MultipartFile> addImages = ImageTestSupport.createFixedMultipartFile();
 		List<String> deleteImageUrls = saveImages.stream()
 			.map(Image::getImageUrl)
 			.collect(Collectors.toUnmodifiableList());

@@ -107,6 +107,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 		// given
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("addressId", null);
+
 		// when & then
 		mockMvc.perform(delete("/api/regions")
 				.content(objectMapper.writeValueAsString(requestBody))

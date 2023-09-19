@@ -1,5 +1,6 @@
 package codesquard.app.api.membertown;
 
+import static codesquard.app.MemberTestSupport.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -208,9 +209,5 @@ class MemberTownServiceTest extends IntegrationTestSupport {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("동네는 최소 1개 이상 선택해야 해요. 새로운 동네를 등록한 후 삭제해주세요.");
-	}
-
-	private Member createMember(String avatarUrl, String email, String loginId) {
-		return new Member(avatarUrl, email, loginId);
 	}
 }

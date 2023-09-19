@@ -1,8 +1,10 @@
 package codesquard.app.api.oauth.properties;
 
+import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Map;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,23 +26,21 @@ public class OauthPropertiesTest extends IntegrationTestSupport {
 
 		// when
 		Map<String, OauthClient> oauthClientMap = oauthProperties.createOauthClientMap();
-		OauthClient naverOauthProvider = oauthClientMap.get(provider);
-
 		// then
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(naverOauthProvider)
+		OauthClient naverOauthProvider = oauthClientMap.get(provider);
+		assertAll(() -> {
+			assertThat(naverOauthProvider)
 				.extracting("clientId")
 				.isEqualTo("NLiiJeoRUwAoN3VtfjQh");
-			softAssertions.assertThat(naverOauthProvider)
+			assertThat(naverOauthProvider)
 				.extracting("redirectUri")
 				.isEqualTo("http://localhost:8080/redirect/auth");
-			softAssertions.assertThat(naverOauthProvider)
+			assertThat(naverOauthProvider)
 				.extracting("tokenUri")
 				.isEqualTo("https://nid.naver.com/oauth2.0/token");
-			softAssertions.assertThat(naverOauthProvider)
+			assertThat(naverOauthProvider)
 				.extracting("userInfoUri")
 				.isEqualTo("https://openapi.naver.com/v1/nid/me");
-			softAssertions.assertAll();
 		});
 	}
 }
