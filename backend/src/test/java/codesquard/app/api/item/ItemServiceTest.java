@@ -174,7 +174,7 @@ class ItemServiceTest {
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
 		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
-		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region, false));
+		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region));
 
 		Item item = Item.builder()
 			.title("빈티지 롤러 블레이드")
@@ -192,8 +192,8 @@ class ItemServiceTest {
 			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
-			Image.basicImage("imageUrlValue1", saveItem.getId()),
-			Image.basicImage("imageUrlValue2", saveItem.getId()));
+			new Image("imageUrlValue1", saveItem, false),
+			new Image("imageUrlValue2", saveItem, false));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
 		List<MultipartFile> addImages = List.of(createMultipartFile("cat.png"),
@@ -239,7 +239,7 @@ class ItemServiceTest {
 				.findAny()
 				.orElseThrow();
 			assertThat(thumnail)
-				.extracting("thumnail")
+				.extracting("thumbnail")
 				.isEqualTo(true);
 		});
 	}
@@ -252,7 +252,7 @@ class ItemServiceTest {
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
 		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
-		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region, false));
+		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region));
 
 		Item item = Item.builder()
 			.title("빈티지 롤러 블레이드")
@@ -270,8 +270,8 @@ class ItemServiceTest {
 			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
-			Image.basicImage("imageUrlValue1", saveItem.getId()),
-			Image.basicImage("imageUrlValue2", saveItem.getId()));
+			new Image("imageUrlValue1", saveItem, false),
+			new Image("imageUrlValue2", saveItem, false));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
 		List<MultipartFile> addImages = List.of(createMultipartFile("cat.png"));
@@ -315,7 +315,7 @@ class ItemServiceTest {
 				.findAny()
 				.orElseThrow();
 			assertThat(thumnail)
-				.extracting("thumnail")
+				.extracting("thumbnail")
 				.isEqualTo(true);
 		});
 	}
@@ -328,7 +328,7 @@ class ItemServiceTest {
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
 		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
-		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region, false));
+		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region));
 
 		Item item = Item.builder()
 			.title("빈티지 롤러 블레이드")
@@ -346,8 +346,8 @@ class ItemServiceTest {
 			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
-			Image.thumnail("imageUrlValue1", saveItem.getId()),
-			Image.basicImage("imageUrlValue2", saveItem.getId()));
+			new Image("imageUrlValue1", saveItem, true),
+			new Image("imageUrlValue2", saveItem, false));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
 		List<MultipartFile> addImages = List.of(createMultipartFile("cat.png"));
@@ -391,7 +391,7 @@ class ItemServiceTest {
 				.findAny()
 				.orElseThrow();
 			assertThat(thumnail)
-				.extracting("thumnail")
+				.extracting("thumbnail")
 				.isEqualTo(true);
 		});
 	}
@@ -437,8 +437,8 @@ class ItemServiceTest {
 		Item saveItem = itemRepository.save(item);
 
 		List<Image> images = List.of(
-			Image.basicImage("imageUrlValue1", saveItem.getId()),
-			Image.basicImage("imageUrlValue2", saveItem.getId()));
+			new Image("imageUrlValue1", saveItem, false),
+			new Image("imageUrlValue2", saveItem, false));
 		imageRepository.saveAll(images);
 
 		Wish wish = new Wish(member, item, now());

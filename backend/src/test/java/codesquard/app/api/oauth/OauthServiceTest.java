@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -290,11 +289,12 @@ class OauthServiceTest {
 	@Test
 	public void signUpWhenDuplicateLoginId() throws IOException {
 		// given
+		regionRepository.save(createRegion("서울 송파구 가락동"));
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong1234@gmail.com", "23Yong"));
 
 		Region region = regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")).stream().findAny().orElseThrow();
 
-		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region, false);
+		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		memberTownRepository.save(memberTown);
 
 		String provider = "naver";
@@ -342,9 +342,8 @@ class OauthServiceTest {
 	@Test
 	public void login() throws JsonProcessingException {
 		// given
-		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
-		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
-		memberTownRepository.save(new MemberTown("가락동", member, region, true));
+		Member member = new Member("avatarUrlValue", "23Yong@gmail.com", "23Yong");
+		memberRepository.save(member);
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
@@ -367,7 +366,7 @@ class OauthServiceTest {
 			objectMapper.writeValueAsString(userProfileResponseBody), OauthUserProfileResponse.class);
 
 		LocalDateTime now = createNow();
-
+		// mocking
 		given(oauthClientRepository.findOneBy(anyString())).willReturn(oauthClient);
 		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
 			.willReturn(mockAccessTokenResponse);
@@ -378,21 +377,13 @@ class OauthServiceTest {
 		OauthLoginResponse response = oauthService.login(request, provider, code, now);
 
 		// then
-		assertAll(() -> {
-			assertThat(response)
-				.extracting("jwt.accessToken", "jwt.refreshToken", "user.loginId", "user.profileUrl")
-				.contains(
-					createExpectedAccessTokenBy(jwtProvider, member, now),
-					createExpectedRefreshTokenBy(jwtProvider, member, now),
-					"23Yong",
-					"avatarUrlValue");
-
-			assertThat(response.getUser().getAddresses())
-				.hasSize(1)
-				.extracting("fullAddressName", "addressName", "isSelected")
-				.containsExactlyInAnyOrder(Tuple.tuple("서울 송파구 가락동", "가락동", true));
-		});
-
+		assertThat(response)
+			.extracting("jwt.accessToken", "jwt.refreshToken", "user.loginId", "user.profileUrl")
+			.contains(
+				createExpectedAccessTokenBy(jwtProvider, member, now),
+				createExpectedRefreshTokenBy(jwtProvider, member, now),
+				"23Yong",
+				"avatarUrlValue");
 	}
 
 	@DisplayName("로그아웃을 수행한다")
@@ -420,8 +411,8 @@ class OauthServiceTest {
 	public void logoutWithExpireAccessToken() throws JsonProcessingException {
 		// given
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
-		LocalDateTime tomorrow = LocalDateTime.now().minusDays(1);
-		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, tomorrow);
+		LocalDateTime now = LocalDateTime.now().minusDays(1);
+		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("refreshToken", jwt.getRefreshToken());

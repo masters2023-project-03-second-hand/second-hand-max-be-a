@@ -86,9 +86,9 @@ public class ItemService {
 
 	@Transactional
 	public void modifyItem(Long itemId, ItemModifyRequest request, List<MultipartFile> addImages,
-		MultipartFile thumnailFile, Principal writer) {
+		MultipartFile thumbnailFile, Principal writer) {
 		log.info("상품 수정 서비스 요청 : itemId={}, request={}, writer={}", itemId, request, writer.getLoginId());
-		log.info("상품 수정 서비스 요청 : addImages={}, thumnailFile={}", addImages, thumnailFile);
+		log.info("상품 수정 서비스 요청 : addImages={}, thumnailFile={}", addImages, thumbnailFile);
 
 		Item item = findItemBy(itemId);
 		log.debug("상품 수정 서비스의 상품 조회 결과 : {}", item);
@@ -109,7 +109,7 @@ public class ItemService {
 		Category category = findCategoryBy(request.getCategoryId());
 		log.debug("상품 수정 서비스의 카테고리 조회 결과 : {}", category);
 
-		String thumbnailUrl = updateThumnail(item, thumnailFile, request.getThumnailImage());
+		String thumbnailUrl = updateThumnail(item, thumbnailFile, request.getThumnailImage());
 		log.debug("썸네일 갱신 결과 : thumbnailUrl={}", thumbnailUrl);
 
 		item.change(category, request.toEntity(), thumbnailUrl);
@@ -120,38 +120,38 @@ public class ItemService {
 			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 	}
 
-	private String updateThumnail(Item item, MultipartFile thumnailFile, String thumnailUrl) {
-		if (thumnailFile != null && !thumnailFile.isEmpty()) {
-			String thumnail = updateNewThumnail(item.getId(), thumnailFile);
-			return updateThumnail(thumnail, item);
+	private String updateThumnail(Item item, MultipartFile thumbnailFile, String thumbnailUrl) {
+		if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
+			String thumbnail = updateNewThumnail(item.getId(), thumbnailFile);
+			return updateThumbnailStatus(thumbnail, item);
 		}
-		if (thumnailUrl != null) {
-			return updateThumnail(thumnailUrl, item);
+		if (thumbnailUrl != null) {
+			return updateThumbnailStatus(thumbnailUrl, item);
 		}
 		return item.getThumbnailUrl();
 	}
 
-	private String updateNewThumnail(Long itemId, MultipartFile thumnailFile) {
-		String thumnailImageUrl = imageService.uploadImage(thumnailFile);
+	private String updateNewThumnail(Long itemId, MultipartFile thumbnailFile) {
+		String thumnailImageUrl = imageService.uploadImage(thumbnailFile);
 		log.debug("썸네일 이미지 S3 업로드 결과 : thumnailImageUrl={}", thumnailImageUrl);
 
-		Image thumnail = imageRepository.save(Image.thumnail(thumnailImageUrl, itemId));
-		log.debug("썸네일 이미지 테이블 저장 결과 : image={}", thumnail);
+		Image thumbnail = imageRepository.save(Image.thumbnail(thumnailImageUrl, itemId));
+		log.debug("썸네일 이미지 테이블 저장 결과 : image={}", thumbnail);
 		return thumnailImageUrl;
 	}
 
-	private String updateThumnail(String changeThumnail, Item item) {
-		if (changeThumnail == null) {
+	private String updateThumbnailStatus(String changeThumbnail, Item item) {
+		if (changeThumbnail == null) {
 			return null;
 		}
 
-		int result = imageRepository.updateAllThumnailIsFalseByItemId(item.getId());
+		int result = imageRepository.updateThumnailToFalseByItemIdAndThumbnailIsTrue(item.getId());
 		log.debug("기존 이미지 썸네일 표시 변경 결과 : result={}", result);
 
-		result = imageRepository.updateThumnailByItemIdAndImageUrl(item.getId(), changeThumnail, true);
+		result = imageRepository.updateThumbnailByItemIdAndImageUrl(item.getId(), changeThumbnail, true);
 		log.debug("요청 이미지 썸네일 표시 변경 결과 : result={}", result);
 
-		return changeThumnail;
+		return changeThumbnail;
 	}
 
 	private int deleteImages(Long itemId, List<String> deleteImageUrls) {

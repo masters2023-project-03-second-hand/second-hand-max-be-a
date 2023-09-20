@@ -69,6 +69,33 @@ logging:
     codesquard: info
 
 ---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: ${db.local.datasource.url}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${db.local.datasource.username}
+    password: ${db.local.datasource.password}
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true
+    show-sql: true
+  redis:
+    host: localhost
+    port: 6379
+logging:
+  level:
+    codesquard: debug
+---
 
 spring:
   config:

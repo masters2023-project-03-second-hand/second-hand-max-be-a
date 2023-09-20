@@ -33,8 +33,8 @@ VALUES ('https://nid.naver.com/user2/api/route?m=routePcProfileModification',
         'dragonbead95@naver.com',
         'bruni');
 
-INSERT INTO member_town(name, member_id, region_id, is_selected)
-VALUES ('청운동', 1, 1, true);
+INSERT INTO member_town(name, member_id, region_id)
+VALUES ('청운동', 1, 1);
 
 INSERT INTO item(chat_count,
                  content,
@@ -52,7 +52,7 @@ VALUES (0, '롤러블레이드 팝니다', now(), 169000, '청운동', 'ON_SALE'
         'https://second-hand-team03-a.s3.ap-northeast-2.amazonaws.com/public/sample/roller_blade.jpeg',
         '롤러 블레이드', 0, 0, 1, 1);
 
-INSERT INTO image (image_url, thumnail, item_id)
+INSERT INTO image (image_url, thumbnail, item_id)
 VALUES ('https://second-hand-team03-a.s3.ap-northeast-2.amazonaws.com/public/sample/roller_blade.jpeg',
         true,
         1);

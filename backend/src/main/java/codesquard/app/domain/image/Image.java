@@ -31,13 +31,13 @@ public class Image {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_id")
 	private Item item;
-	@Column(name = "thumnail", nullable = false)
-	private boolean thumnail;
+	@Column(name = "thumbnail", nullable = false)
+	private boolean thumbnail;
 
-	public Image(String imageUrl, Item item, boolean thumnail) {
+	public Image(String imageUrl, Item item, boolean thumbnail) {
 		this.imageUrl = imageUrl;
 		this.item = item;
-		this.thumnail = thumnail;
+		this.thumbnail = thumbnail;
 	}
 
 	public static List<Image> createImages(List<String> imageUrls, Item item) {
@@ -48,12 +48,8 @@ public class Image {
 		return images;
 	}
 
-	public static Image thumnail(String imageUrl, Long itemId) {
+	public static Image thumbnail(String imageUrl, Long itemId) {
 		return new Image(imageUrl, new Item(itemId), true);
-	}
-
-	public static Image basicImage(String imageUrl, Long itemId) {
-		return new Image(imageUrl, new Item(itemId), false);
 	}
 
 	@Override
