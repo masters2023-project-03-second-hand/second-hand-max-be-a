@@ -88,6 +88,7 @@ public class ItemService {
 	public void modifyItem(Long itemId, ItemModifyRequest request, List<MultipartFile> addImages,
 		MultipartFile thumnailFile, Principal writer) {
 		log.info("상품 수정 서비스 요청 : itemId={}, request={}, writer={}", itemId, request, writer.getLoginId());
+		log.info("상품 수정 서비스 요청 : addImages={}, thumnailFile={}", addImages, thumnailFile);
 
 		Item item = findItemBy(itemId);
 		log.debug("상품 수정 서비스의 상품 조회 결과 : {}", item);
@@ -120,11 +121,12 @@ public class ItemService {
 	}
 
 	private String updateThumnail(Item item, MultipartFile thumnailFile, String thumnailUrl) {
-		if (thumnailFile != null) {
-			return updateNewThumnail(item.getId(), thumnailFile);
+		if (!thumnailFile.isEmpty()) {
+			String thumnail = updateNewThumnail(item.getId(), thumnailFile);
+			return updateThumnail(thumnail, item);
 		}
 		if (thumnailUrl != null) {
-			return updateExistThumnail(thumnailUrl, item);
+			return updateThumnail(thumnailUrl, item);
 		}
 		return item.getThumbnailUrl();
 	}
@@ -138,15 +140,12 @@ public class ItemService {
 		return thumnailImageUrl;
 	}
 
-	private String updateExistThumnail(String changeThumnail, Item item) {
+	private String updateThumnail(String changeThumnail, Item item) {
 		if (changeThumnail == null) {
 			return null;
 		}
-		if (!item.equalThumnailImageUrl(changeThumnail)) {
-			return null;
-		}
 
-		int result = imageRepository.updateThumnailByItemIdAndImageUrl(item.getId(), item.getThumbnailUrl(), false);
+		int result = imageRepository.updateAllThumnailIsFalseByItemId(item.getId());
 		log.debug("기존 이미지 썸네일 표시 변경 결과 : result={}", result);
 
 		result = imageRepository.updateThumnailByItemIdAndImageUrl(item.getId(), changeThumnail, true);
