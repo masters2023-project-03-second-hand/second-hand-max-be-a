@@ -31,7 +31,7 @@ public class Image {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_id")
 	private Item item;
-	@Column(name = "thumnail", nullable = false)
+	@Column(name = "thumbnail", nullable = false)
 	private boolean thumbnail;
 
 	public Image(String imageUrl, Item item, boolean thumbnail) {
@@ -48,7 +48,7 @@ public class Image {
 		return images;
 	}
 
-	public static Image thumnail(String imageUrl, Long itemId) {
+	public static Image thumbnail(String imageUrl, Long itemId) {
 		return new Image(imageUrl, new Item(itemId), true);
 	}
 

@@ -122,8 +122,8 @@ public class ItemService {
 
 	private String updateThumnail(Item item, MultipartFile thumbnailFile, String thumbnailUrl) {
 		if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
-			String thumnail = updateNewThumnail(item.getId(), thumbnailFile);
-			return updateThumbnailStatus(thumnail, item);
+			String thumbnail = updateNewThumnail(item.getId(), thumbnailFile);
+			return updateThumbnailStatus(thumbnail, item);
 		}
 		if (thumbnailUrl != null) {
 			return updateThumbnailStatus(thumbnailUrl, item);
@@ -135,8 +135,8 @@ public class ItemService {
 		String thumnailImageUrl = imageService.uploadImage(thumbnailFile);
 		log.debug("썸네일 이미지 S3 업로드 결과 : thumnailImageUrl={}", thumnailImageUrl);
 
-		Image thumnail = imageRepository.save(Image.thumnail(thumnailImageUrl, itemId));
-		log.debug("썸네일 이미지 테이블 저장 결과 : image={}", thumnail);
+		Image thumbnail = imageRepository.save(Image.thumbnail(thumnailImageUrl, itemId));
+		log.debug("썸네일 이미지 테이블 저장 결과 : image={}", thumbnail);
 		return thumnailImageUrl;
 	}
 
