@@ -84,8 +84,8 @@ public class RedisService {
 
 	@Transactional
 	@Scheduled(cron = "0 0/1 * * * ?")
-	public void deleteViewCountCacheFromRedis() {
-		Set<String> keys = redisTemplate.keys("itemId*");
+	public void deleteViewCountCache() {
+		Set<String> keys = redisTemplate.keys("itemId:*");
 		Iterator<String> iterator = keys.iterator();
 		while (iterator.hasNext()) {
 			String data = iterator.next();

@@ -27,13 +27,13 @@ import codesquard.support.SupportRepository;
 class RedisServiceTest extends CacheTestSupport {
 
 	@SpyBean
-	RedisService redisService;
+	private RedisService redisService;
 
 	@Autowired
-	SupportRepository supportRepository;
+	private SupportRepository supportRepository;
 
 	@Autowired
-	ItemRepository itemRepository;
+	private ItemRepository itemRepository;
 
 	@AfterEach
 	void tearDown() {
@@ -56,7 +56,7 @@ class RedisServiceTest extends CacheTestSupport {
 		await().atMost(2, TimeUnit.MINUTES).untilAsserted(
 			() -> {
 				verify(redisService, atLeast(2
-				)).deleteViewCountCacheFromRedis();
+				)).deleteViewCountCache();
 			}
 		);
 
