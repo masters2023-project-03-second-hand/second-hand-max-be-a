@@ -121,7 +121,7 @@ public class ItemService {
 	}
 
 	private String updateThumnail(Item item, MultipartFile thumnailFile, String thumnailUrl) {
-		if (!thumnailFile.isEmpty()) {
+		if (thumnailFile != null && !thumnailFile.isEmpty()) {
 			String thumnail = updateNewThumnail(item.getId(), thumnailFile);
 			return updateThumnail(thumnail, item);
 		}
