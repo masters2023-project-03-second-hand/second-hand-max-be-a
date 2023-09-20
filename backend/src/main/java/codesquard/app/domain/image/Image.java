@@ -32,12 +32,12 @@ public class Image {
 	@JoinColumn(name = "item_id")
 	private Item item;
 	@Column(name = "thumnail", nullable = false)
-	private boolean thumnail;
+	private boolean thumbnail;
 
-	public Image(String imageUrl, Item item, boolean thumnail) {
+	public Image(String imageUrl, Item item, boolean thumbnail) {
 		this.imageUrl = imageUrl;
 		this.item = item;
-		this.thumnail = thumnail;
+		this.thumbnail = thumbnail;
 	}
 
 	public static List<Image> createImages(List<String> imageUrls, Item item) {

@@ -65,9 +65,9 @@ public class ItemController {
 	public ApiResponse<Void> modifyItem(@PathVariable Long itemId,
 		@RequestPart(value = "images", required = false) List<MultipartFile> addImages,
 		@Valid @RequestPart("item") ItemModifyRequest request,
-		@RequestPart(value = "thumnailImage", required = false) MultipartFile thumnailImage,
+		@RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
 		@AuthPrincipal Principal principal) {
-		itemService.modifyItem(itemId, request, addImages, thumnailImage, principal);
+		itemService.modifyItem(itemId, request, addImages, thumbnailImage, principal);
 		return ApiResponse.ok("상품 수정을 완료하였습니다.", null);
 	}
 
