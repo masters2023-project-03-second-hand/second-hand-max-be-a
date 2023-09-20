@@ -29,4 +29,9 @@ public class Category {
 		this.imageUrl = imageUrl;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("%s, %s(id=%d, name=%s)", "카테고리", this.getClass().getSimpleName(), id, name);
+	}
+
 }

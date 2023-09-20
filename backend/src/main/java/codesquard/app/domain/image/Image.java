@@ -3,6 +3,7 @@ package codesquard.app.domain.image;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -30,18 +31,29 @@ public class Image {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_id")
 	private Item item;
+	@Column(name = "thumnail", nullable = false)
+	private boolean thumnail;
 
-	public Image(String imageUrl, Item item) {
+	public Image(String imageUrl, Item item, boolean thumnail) {
 		this.imageUrl = imageUrl;
 		this.item = item;
+		this.thumnail = thumnail;
 	}
 
 	public static List<Image> createImages(List<String> imageUrls, Item item) {
 		List<Image> images = new ArrayList<>();
 		for (String imageUrl : imageUrls) {
-			images.add(new Image(imageUrl, item));
+			images.add(new Image(imageUrl, item, false));
 		}
 		return images;
+	}
+
+	public static Image thumnail(String imageUrl, Long itemId) {
+		return new Image(imageUrl, new Item(itemId), true);
+	}
+
+	public static Image basicImage(String imageUrl, Long itemId) {
+		return new Image(imageUrl, new Item(itemId), false);
 	}
 
 	@Override

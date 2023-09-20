@@ -32,6 +32,7 @@ public class ItemModifyRequest {
 	@NotBlank(message = "카테고리명은 필수 정보입니다.")
 	private String categoryName;
 	private List<String> deleteImageUrls;
+	private String thumnailImage;
 
 	public Item toEntity() {
 		return Item.builder()

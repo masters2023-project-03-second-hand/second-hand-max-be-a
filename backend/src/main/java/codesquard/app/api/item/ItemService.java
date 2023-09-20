@@ -67,7 +67,7 @@ public class ItemService {
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		item.changeStatus(status);
 	}
-	
+
 	public ItemDetailResponse findDetailItemBy(Long itemId, Long loginMemberId) {
 		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
 		Item item = itemRepository.findById(itemId)
@@ -85,20 +85,19 @@ public class ItemService {
 	}
 
 	@Transactional
-	public void modifyItem(Long itemId, ItemModifyRequest request, List<MultipartFile> addImages, Principal writer) {
+	public void modifyItem(Long itemId, ItemModifyRequest request, List<MultipartFile> addImages,
+		MultipartFile thumnailFile, Principal writer) {
 		log.info("상품 수정 서비스 요청 : itemId={}, request={}, writer={}", itemId, request, writer.getLoginId());
 
-		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+		Item item = findItemBy(itemId);
 		log.debug("상품 수정 서비스의 상품 조회 결과 : {}", item);
 		item.validateSeller(writer.getMemberId());
 
 		List<String> addImageUrls = imageService.uploadImages(addImages);
 		log.debug("상품 수정 서비스의 S3 이미지 추가 결과 : {}", addImageUrls);
 
-		List<Image> images = Image.createImages(addImageUrls, new Item(itemId));
-		imageRepository.saveAll(images);
-		log.debug("상품 수정 서비스의 이미지 테이블 저장 결과 : {}", images);
+		List<Image> saveImages = imageRepository.saveAll(Image.createImages(addImageUrls, new Item(itemId)));
+		log.debug("상품 수정 서비스의 이미지 테이블 저장 결과 : {}", saveImages);
 
 		List<String> deleteImageUrls = request.getDeleteImageUrls();
 		int deleteImageSize = deleteImages(itemId, deleteImageUrls);
@@ -106,13 +105,50 @@ public class ItemService {
 
 		deleteImagesFromS3(deleteImageUrls);
 
-		String thumbnailUrl = findThumbnailUrlBy(item);
-		Item changeItem = request.toEntity();
-
 		Category category = categoryRepository.findById(request.getCategoryId())
 			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 		log.debug("상품 수정 서비스의 카테고리 조회 결과 : {}", category);
-		item.change(category, changeItem, thumbnailUrl);
+
+		String thumbnailUrl = updateThumnail(item, thumnailFile, request.getThumnailImage());
+		log.debug("썸네일 갱신 결과 : thumbnailUrl={}", thumbnailUrl);
+
+		item.change(category, request.toEntity(), thumbnailUrl);
+	}
+
+	private String updateThumnail(Item item, MultipartFile thumnailFile, String thumnailUrl) {
+		if (thumnailFile != null) {
+			return updateNewThumnail(item.getId(), thumnailFile);
+		}
+		if (thumnailUrl != null) {
+			return updateExistThumnail(thumnailUrl, item);
+		}
+		return item.getThumbnailUrl();
+	}
+
+	private String updateExistThumnail(String changeThumnail, Item item) {
+		if (changeThumnail == null) {
+			return null;
+		}
+		if (!item.equalThumnailImageUrl(changeThumnail)) {
+			return null;
+		}
+
+		int result = imageRepository.updateThumnailByItemIdAndImageUrl(item.getId(), item.getThumbnailUrl(), false);
+		log.debug("기존 이미지 썸네일 표시 변경 결과 : result={}", result);
+
+		result = imageRepository.updateThumnailByItemIdAndImageUrl(item.getId(), changeThumnail, true);
+		log.debug("요청 이미지 썸네일 표시 변경 결과 : result={}", result);
+
+		return changeThumnail;
+	}
+
+	private String updateNewThumnail(Long itemId, MultipartFile thumnailFile) {
+		String thumnailImageUrl = imageService.uploadImage(thumnailFile);
+		log.debug("썸네일 이미지 S3 업로드 결과 : thumnailImageUrl={}", thumnailImageUrl);
+
+		Image thumnail = imageRepository.save(Image.thumnail(thumnailImageUrl, itemId));
+		log.debug("썸네일 이미지 테이블 저장 결과 : image={}", thumnail);
+		return thumnailImageUrl;
 	}
 
 	private int deleteImages(Long itemId, List<String> deleteImageUrls) {
@@ -123,15 +159,12 @@ public class ItemService {
 		return imageRepository.deleteImagesByItemIdAndImageUrlIn(itemId, deleteImageUrls);
 	}
 
-	private String findThumbnailUrlBy(Item item) {
-		List<Image> images = imageRepository.findAllByItemId(item.getId());
-		if (images.isEmpty()) {
-			throw new RestApiException(ImageErrorCode.EMPTY_IMAGE);
-		}
-		return images.get(0).getImageUrl();
-	}
-
 	private void deleteImagesFromS3(List<String> deleteImageUrls) {
 		deleteImageUrls.forEach(imageService::deleteImage);
+	}
+
+	private Item findItemBy(Long itemId) {
+		return itemRepository.findById(itemId)
+			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 	}
 }

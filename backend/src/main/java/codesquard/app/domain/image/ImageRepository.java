@@ -17,4 +17,11 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 		@Param("imageUrls") List<String> imageUrls);
 
 	int countImageByItemId(Long itemId);
+
+	@Modifying
+	@Query("update Image set thumnail = :thumnail where item.id = :itemId and imageUrl = :imageUrl")
+	int updateThumnailByItemIdAndImageUrl(
+		@Param("itemId") Long itemId,
+		@Param("imageUrl") String imageUrl,
+		@Param("thumnail") boolean thumnail);
 }
