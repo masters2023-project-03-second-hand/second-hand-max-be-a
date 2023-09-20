@@ -24,6 +24,7 @@ import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.item.request.ItemStatusModifyRequest;
 import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.api.item.response.ItemResponses;
+import codesquard.app.api.redis.RedisService;
 import codesquard.app.api.response.ApiResponse;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
@@ -35,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 public class ItemController {
 
 	private final ItemService itemService;
+	private final RedisService redisService;
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
@@ -56,8 +58,8 @@ public class ItemController {
 	@GetMapping("/{itemId}")
 	public ApiResponse<ItemDetailResponse> findDetailItem(@PathVariable Long itemId,
 		@AuthPrincipal Principal principal) {
-		Long memberId = principal.getMemberId();
-		ItemDetailResponse response = itemService.findDetailItemBy(itemId, memberId);
+		redisService.addViewCount(itemId);
+		ItemDetailResponse response = itemService.findDetailItemBy(itemId, principal.getMemberId());
 		return ApiResponse.ok("상품 상세 조회에 성공하였습니다.", response);
 	}
 
