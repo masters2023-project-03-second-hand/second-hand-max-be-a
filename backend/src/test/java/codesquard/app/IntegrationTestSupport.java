@@ -9,7 +9,7 @@ import codesquard.app.api.item.ItemService;
 import codesquard.app.api.member.MemberService;
 import codesquard.app.api.membertown.MemberTownService;
 import codesquard.app.api.oauth.OauthService;
-import codesquard.app.api.region.RegionQueryService;
+import codesquard.app.api.region.RegionService;
 import codesquard.app.api.sales.SalesItemService;
 import codesquard.app.domain.category.CategoryRepository;
 import codesquard.app.domain.chat.ChatLogRepository;
@@ -63,7 +63,7 @@ public abstract class IntegrationTestSupport {
 	protected RegionRepository regionRepository;
 
 	@Autowired
-	protected RegionQueryService regionQueryService;
+	protected RegionService regionService;
 
 	@Autowired
 	protected MemberService memberService;

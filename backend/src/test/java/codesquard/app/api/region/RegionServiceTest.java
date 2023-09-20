@@ -16,13 +16,13 @@ import codesquard.app.domain.region.RegionRepository;
 
 @ActiveProfiles("test")
 @SpringBootTest
-class RegionQueryServiceTest {
+class RegionServiceTest {
 
 	@Autowired
 	private RegionRepository regionRepository;
 
 	@Autowired
-	private RegionQueryService regionQueryService;
+	private RegionService regionService;
 
 	@AfterEach
 	void tearDown() {
@@ -39,7 +39,7 @@ class RegionQueryServiceTest {
 		String region = null;
 
 		// when
-		RegionListResponse response = regionQueryService.searchBySlice(size, cursor, region);
+		RegionListResponse response = regionService.searchBySlice(size, cursor, region);
 
 		// then
 		assertAll(() -> {

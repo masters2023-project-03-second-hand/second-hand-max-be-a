@@ -33,7 +33,7 @@ class RegionRestControllerTest extends ControllerTestSupport {
 	private RegionRestController regionRestController;
 
 	@MockBean
-	private RegionQueryService regionQueryService;
+	private RegionService regionService;
 
 	@BeforeEach
 	public void setup() {
@@ -52,7 +52,7 @@ class RegionRestControllerTest extends ControllerTestSupport {
 		RegionItemResponse region3 = createRegionItemResponse("경기 부천시 범박동");
 		RegionListResponse response = new RegionListResponse(List.of(region1, region2, region3), true, 3L);
 
-		given(regionQueryService.searchBySlice(anyInt(), anyLong(), anyString()))
+		given(regionService.searchBySlice(anyInt(), anyLong(), anyString()))
 			.willReturn(response);
 
 		// when & then

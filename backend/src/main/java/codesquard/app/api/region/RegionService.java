@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class RegionQueryService {
+public class RegionService {
 
 	private final RegionPaginationRepository regionPaginationRepository;
 
