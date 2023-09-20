@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,6 +58,7 @@ import codesquard.app.domain.wish.Wish;
 import codesquard.app.domain.wish.WishRepository;
 import codesquard.support.SupportRepository;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class ItemServiceTest {
 

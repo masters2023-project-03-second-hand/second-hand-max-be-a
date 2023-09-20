@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.item.response.ItemResponses;
@@ -20,6 +20,7 @@ import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.sales.SalesStatus;
 import codesquard.support.SupportRepository;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class SalesItemServiceTest {
 
@@ -34,12 +35,6 @@ class SalesItemServiceTest {
 
 	@Autowired
 	private ItemRepository itemRepository;
-
-	@BeforeEach
-	void cleanup() {
-		itemRepository.deleteAllInBatch();
-		memberRepository.deleteAllInBatch();
-	}
 
 	@AfterEach
 	void tearDown() {
