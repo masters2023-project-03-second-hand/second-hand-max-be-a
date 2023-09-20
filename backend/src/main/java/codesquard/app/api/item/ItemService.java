@@ -145,7 +145,7 @@ public class ItemService {
 			return null;
 		}
 
-		int result = imageRepository.updateAllThumnailIsFalseByItemId(item.getId());
+		int result = imageRepository.updateThumnailToFalseByItemIdAndThumbnailIsTrue(item.getId());
 		log.debug("기존 이미지 썸네일 표시 변경 결과 : result={}", result);
 
 		result = imageRepository.updateThumbnailByItemIdAndImageUrl(item.getId(), changeThumbnail, true);
