@@ -11,7 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import codesquard.app.api.region.response.RegionListResponse;
+import codesquard.app.domain.member.MemberRepository;
+import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.region.RegionRepository;
 
 @ActiveProfiles("test")
@@ -24,9 +28,20 @@ class RegionServiceTest {
 	@Autowired
 	private RegionService regionService;
 
+	@Autowired
+	private MemberRepository memberRepository;
+
+	@Autowired
+	private MemberTownRepository memberTownRepository;
+
+	@Autowired
+	private ObjectMapper objectMapper;
+
 	@AfterEach
 	void tearDown() {
 		regionRepository.deleteAllInBatch();
+		memberTownRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
 	}
 
 	@DisplayName("주소 목록을 처음 조회할때 10개가 조회한다")
