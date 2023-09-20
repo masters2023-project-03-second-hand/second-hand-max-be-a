@@ -1,20 +1,37 @@
 package codesquard.app.api.region;
 
-import org.assertj.core.api.SoftAssertions;
+import static codesquard.app.RegionTestSupport.*;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.region.response.RegionListResponse;
-import codesquard.app.domain.region.RegionFixedFactory;
+import codesquard.app.domain.region.RegionRepository;
 
-class RegionQueryServiceTest extends IntegrationTestSupport {
+@SpringBootTest
+class RegionQueryServiceTest {
+
+	@Autowired
+	private RegionRepository regionRepository;
+
+	@Autowired
+	private RegionQueryService regionQueryService;
+
+	@AfterEach
+	void tearDown() {
+		regionRepository.deleteAllInBatch();
+	}
 
 	@DisplayName("주소 목록을 처음 조회할때 10개가 조회한다")
 	@Test
 	public void findAllByRegionName() {
 		// given
-		regionRepository.saveAll(RegionFixedFactory.createFixedRegions());
+		regionRepository.saveAll(createFixedRegions());
 		int size = 10;
 		Long cursor = null;
 		String region = null;
@@ -23,11 +40,10 @@ class RegionQueryServiceTest extends IntegrationTestSupport {
 		RegionListResponse response = regionQueryService.searchBySlice(size, cursor, region);
 
 		// then
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(response.getContents()).hasSize(10);
-			softAssertions.assertThat(response.getPaging().getNextCursor()).isNotNull();
-			softAssertions.assertThat(response.getPaging().isHasNext()).isEqualTo(true);
-			softAssertions.assertAll();
+		assertAll(() -> {
+			assertThat(response.getContents()).hasSize(10);
+			assertThat(response.getPaging().getNextCursor()).isNotNull();
+			assertThat(response.getPaging().isHasNext()).isEqualTo(true);
 		});
 	}
 }

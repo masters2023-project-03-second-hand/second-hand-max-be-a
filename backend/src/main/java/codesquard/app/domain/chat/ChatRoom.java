@@ -36,13 +36,9 @@ public class ChatRoom {
 	@JoinColumn(name = "item_id")
 	private Item item;
 
-	private ChatRoom(LocalDateTime createdAt, Member member, Item item) {
+	public ChatRoom(LocalDateTime createdAt, Member member, Item item) {
 		this.createdAt = createdAt;
 		this.member = member;
 		this.item = item;
-	}
-
-	public static ChatRoom create(LocalDateTime createdAt, Member member, Item item) {
-		return new ChatRoom(createdAt, member, item);
 	}
 }

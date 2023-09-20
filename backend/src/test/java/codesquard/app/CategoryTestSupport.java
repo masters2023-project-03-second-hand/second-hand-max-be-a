@@ -1,4 +1,4 @@
-package codesquard.app.api.category;
+package codesquard.app;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +40,8 @@ public class CategoryTestSupport {
 
 	public static Category findByName(String name) {
 		return categories.stream()
-			.filter(category -> category.getName().equals("스포츠/레저"))
+			.filter(category -> category.getName().equals(name))
 			.findAny()
 			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
-	}
-
-	public static Category createdFixedCategory() {
-		return Category.create("가구/인테리어", "https://i.ibb.co/cyYH5V8/furniture.png");
 	}
 }

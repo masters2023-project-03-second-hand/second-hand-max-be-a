@@ -1,17 +1,23 @@
 package codesquard.app.domain.jwt;
 
+import static codesquard.app.MemberTestSupport.*;
+
 import java.time.LocalDateTime;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import codesquard.app.IntegrationTestSupport;
-import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.member.MemberRepository;
 
-class JwtProviderTest extends IntegrationTestSupport {
+@SpringBootTest
+class JwtProviderTest {
+
+	@Autowired
+	private MemberRepository memberRepository;
 
 	@Autowired
 	private JwtProperties jwtProperties;
@@ -21,10 +27,9 @@ class JwtProviderTest extends IntegrationTestSupport {
 	public void createJwtBasedOnAuthenticateMember() {
 		// given
 		JwtProvider jwtProvider = new JwtProvider(jwtProperties);
-		Member member = OauthFixedFactory.createFixedMember();
+		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		Member saveMember = memberRepository.save(member);
-
-		LocalDateTime now = OauthFixedFactory.createNow();
+		LocalDateTime now = createNow();
 
 		// when
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(saveMember, now);
@@ -32,9 +37,9 @@ class JwtProviderTest extends IntegrationTestSupport {
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(jwt.getAccessToken()).isEqualTo(
-				OauthFixedFactory.createExpectedAccessTokenBy(jwtProvider, member, now));
+				createExpectedAccessTokenBy(jwtProvider, member, now));
 			softAssertions.assertThat(jwt.getRefreshToken()).isEqualTo(
-				OauthFixedFactory.createExpectedRefreshTokenBy(jwtProvider, member, now));
+				createExpectedRefreshTokenBy(jwtProvider, member, now));
 			softAssertions.assertAll();
 		});
 	}

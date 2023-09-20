@@ -7,37 +7,58 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.item.response.ItemResponse;
 import codesquard.app.api.item.response.ItemResponses;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.item.Item;
+import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.member.MemberRepository;
+import codesquard.app.domain.wish.WishRepository;
 import codesquard.app.domain.wish.WishStatus;
+import codesquard.support.SupportRepository;
 
-class WishItemServiceTest extends IntegrationTestSupport {
+@SpringBootTest
+class WishItemServiceTest {
 
 	@Autowired
 	private WishItemService wishItemService;
 	@Autowired
+	private WishRepository wishRepository;
+	@Autowired
+	private SupportRepository supportRepository;
+	@Autowired
+	private MemberRepository memberRepository;
+	@Autowired
+	private ItemRepository itemRepository;
+	@Autowired
 	private EntityManager em;
+
+	@AfterEach
+	void tearDown() {
+		wishRepository.deleteAllInBatch();
+		itemRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
+	}
 
 	@Test
 	@DisplayName("관심상품 등록에 성공한다.")
 	void wishRegisterTest() {
 
 		// given
-		Category category = supportRepository.save(Category.create("식품", "!!"));
+		Category category = supportRepository.save(new Category("식품", "!!"));
 		ItemRegisterRequest request = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "pieeeeeee"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "pieeeeeee"));
 		Item item1 = supportRepository.save(request.toEntity(member, "thumbnail"));
 
 		// when
@@ -53,10 +74,10 @@ class WishItemServiceTest extends IntegrationTestSupport {
 	void wishCancelTest() {
 
 		// given
-		Category category = supportRepository.save(Category.create("식품", "!!"));
+		Category category = supportRepository.save(new Category("식품", "!!"));
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "piepie"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "piepie"));
 		Item saveItem = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		wishItemService.changeWishStatus(saveItem.getId(), member.getId(), WishStatus.YES);
 
@@ -73,15 +94,15 @@ class WishItemServiceTest extends IntegrationTestSupport {
 	void wishListFindAll() {
 
 		// given
-		Category category1 = supportRepository.save(Category.create("가전", "~~~~"));
-		Category category2 = supportRepository.save(Category.create("식품", "~~~~!"));
+		Category category1 = supportRepository.save(new Category("가전", "~~~~"));
+		Category category2 = supportRepository.save(new Category("식품", "~~~~!"));
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "구래동", ItemStatus.ON_SALE, category1.getId(), null);
 		ItemRegisterRequest request2 = new ItemRegisterRequest(
 			"전기밥솥", null, null, "화곡동", ItemStatus.ON_SALE, category2.getId(), null);
 		ItemRegisterRequest request3 = new ItemRegisterRequest(
 			"노트북", null, null, "구래동", ItemStatus.ON_SALE, category1.getId(), null);
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "piepie"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "piepie"));
 		Item item1 = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		Item item2 = supportRepository.save(request2.toEntity(member, "thumb"));
 		Item item3 = supportRepository.save(request3.toEntity(member, "nail"));
@@ -109,8 +130,8 @@ class WishItemServiceTest extends IntegrationTestSupport {
 	void wishListByCategoryTest() {
 
 		// given
-		Category category1 = supportRepository.save(Category.create("가전", "~~~~"));
-		Category category2 = supportRepository.save(Category.create("식품", "~~~~!"));
+		Category category1 = supportRepository.save(new Category("가전", "~~~~"));
+		Category category2 = supportRepository.save(new Category("식품", "~~~~!"));
 
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "구래동", ItemStatus.ON_SALE, category1.getId(), null);
@@ -118,7 +139,7 @@ class WishItemServiceTest extends IntegrationTestSupport {
 			"전기밥솥", null, null, "화곡동", ItemStatus.ON_SALE, category2.getId(), null);
 		ItemRegisterRequest request3 = new ItemRegisterRequest(
 			"노트북", null, null, "구래동", ItemStatus.ON_SALE, category1.getId(), null);
-		Member member = supportRepository.save(Member.create("avatar", "pie@pie", "piepie"));
+		Member member = supportRepository.save(new Member("avatar", "pie@pie", "piepie"));
 		Item item1 = supportRepository.save(request1.toEntity(member, "thumbnail"));
 		Item item2 = supportRepository.save(request2.toEntity(member, "thumb"));
 		Item item3 = supportRepository.save(request3.toEntity(member, "nail"));

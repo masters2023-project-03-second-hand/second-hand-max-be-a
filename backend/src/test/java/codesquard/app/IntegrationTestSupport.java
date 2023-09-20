@@ -1,8 +1,5 @@
 package codesquard.app;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +18,6 @@ import codesquard.app.domain.image.ImageRepository;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTownRepository;
-import codesquard.app.domain.region.Region;
 import codesquard.app.domain.region.RegionPaginationRepository;
 import codesquard.app.domain.region.RegionRepository;
 import codesquard.app.domain.wish.WishRepository;
@@ -94,23 +90,5 @@ public abstract class IntegrationTestSupport {
 		categoryRepository.deleteAllInBatch();
 		memberTownRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
-	}
-
-	protected List<Long> getAddressIds(String name) {
-		List<Region> regions = regionRepository.findAllByNameIn(List.of(name));
-		return regions.stream()
-			.map(Region::getId)
-			.collect(Collectors.toUnmodifiableList());
-	}
-
-	protected List<Region> getRegions(List<String> names) {
-		return regionRepository.findAllByNameIn(names);
-	}
-
-	protected Region getRegion(String name) {
-		return regionRepository.findAllByNameIn(List.of(name))
-			.stream()
-			.findAny()
-			.orElseThrow();
 	}
 }

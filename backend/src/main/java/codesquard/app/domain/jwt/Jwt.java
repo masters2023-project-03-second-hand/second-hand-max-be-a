@@ -22,16 +22,11 @@ public class Jwt {
 
 	}
 
-	private Jwt(String accessToken, String refreshToken, Date expireDateAccessToken, Date expireDateRefreshToken) {
+	public Jwt(String accessToken, String refreshToken, Date expireDateAccessToken, Date expireDateRefreshToken) {
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
 		this.expireDateAccessToken = expireDateAccessToken;
 		this.expireDateRefreshToken = expireDateRefreshToken;
-	}
-
-	public static Jwt create(String accessToken, String refreshToken, Date expireDateAccessToken,
-		Date expireDateRefreshToken) {
-		return new Jwt(accessToken, refreshToken, expireDateAccessToken, expireDateRefreshToken);
 	}
 
 	public long convertExpireDateRefreshTokenTimeWithLong() {

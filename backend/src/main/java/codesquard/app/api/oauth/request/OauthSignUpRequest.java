@@ -20,7 +20,7 @@ public class OauthSignUpRequest {
 	private List<Long> addressIds;
 
 	public Member toEntity(String avatarUrl, String email) {
-		return Member.create(avatarUrl, email, loginId);
+		return new Member(avatarUrl, email, loginId);
 	}
 
 	@Override

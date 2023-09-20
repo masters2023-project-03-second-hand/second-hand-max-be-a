@@ -41,10 +41,6 @@ public class Member {
 		this.loginId = loginId;
 	}
 
-	public static Member create(String avatarUrl, String email, String loginId) {
-		return new Member(avatarUrl, email, loginId);
-	}
-
 	public void changeAvatarUrl(String avatarUrl) {
 		this.avatarUrl = avatarUrl;
 	}

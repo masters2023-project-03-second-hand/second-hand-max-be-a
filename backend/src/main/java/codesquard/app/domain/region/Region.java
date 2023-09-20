@@ -20,17 +20,8 @@ public class Region {
 	private Long id;
 	private String name;
 
-	private Region(String name) {
+	public Region(String name) {
 		this.name = name;
-	}
-
-	public static Region create(String name) {
-		return new Region(name);
-	}
-
-	@Override
-	public String toString() {
-		return String.format("%s, %s(id=%d, name=%s)", "지역", this.getClass().getSimpleName(), id, name);
 	}
 
 	public String getShortAddress() {
@@ -39,4 +30,10 @@ public class Region {
 			.skip(2)
 			.collect(Collectors.joining(space));
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(id=%d, name=%s)", "지역", this.getClass().getSimpleName(), id, name);
+	}
+
 }

@@ -18,14 +18,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
 import codesquard.support.SupportRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-class MemberServiceTest extends IntegrationTestSupport {
+class MemberServiceTest {
 
 	@Autowired
 	private JwtProvider jwtProvider;
@@ -41,7 +40,7 @@ class MemberServiceTest extends IntegrationTestSupport {
 		// given
 		given(imageUploader.uploadImageToS3(any(), anyString())).willReturn("url");
 		willDoNothing().given(imageUploader).deleteImage(anyString());
-		repository.save(Member.create("url", "email", "pie"));
+		repository.save(new Member("url", "email", "pie"));
 
 		LocalDateTime now = LocalDateTime.now();
 		var request = given().log().all()

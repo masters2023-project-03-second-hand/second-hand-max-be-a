@@ -53,14 +53,12 @@ public class OauthService {
 		String authorizationCode) {
 		log.info("{}, provider : {}, authorizationCode : {}", request, provider,
 			authorizationCode);
-		Optional<MultipartFile> optionalProfile = Optional.ofNullable(profile);
-
 		validateDuplicateLoginId(request.getLoginId());
 
 		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, authorizationCode);
-
 		validateMultipleSignUp(userProfileResponse.getEmail());
 
+		Optional<MultipartFile> optionalProfile = Optional.ofNullable(profile);
 		String avatarUrl = optionalProfile.map(imageService::uploadImage)
 			.orElse(userProfileResponse.getProfileImage());
 		log.debug("회원 가입 서비스에서 생성한 아바타 주소 : {}", avatarUrl);
@@ -137,9 +135,14 @@ public class OauthService {
 	}
 
 	private void deleteRefreshTokenBy(String refreshToken) {
-		String email = redisService.findEmailByRefreshTokenValue(refreshToken);
-		boolean result = redisService.delete(String.format("RT:%s", email));
-		log.debug("리프레쉬 토큰 삭제 결과 : {}", result);
+		try {
+			String email = redisService.findEmailByRefreshTokenValue(refreshToken);
+			log.debug("리프레시 토큰 값에 따른 이메일 조회 결과 : email={}", email);
+			boolean result = redisService.delete(String.format("RT:%s", email));
+			log.debug("리프레쉬 토큰 삭제 결과 : {}", result);
+		} catch (RestApiException e) {
+			log.error("리프레시 토큰에 따른 이메일 없음 : {}", e.getErrorCode().getMessage());
+		}
 	}
 
 	private void banAccessToken(String accessToken) {

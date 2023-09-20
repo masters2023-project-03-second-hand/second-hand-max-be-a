@@ -34,27 +34,18 @@ public class MemberTown {
 	@JoinColumn(name = "region_id")
 	private Region region;
 
-	private MemberTown(String name, Member member, Region region) {
+	public MemberTown(String name, Member member, Region region) {
 		this.name = name;
 		this.member = member;
 		this.region = region;
 	}
 
-	public static MemberTown create(String name, Member member, Region region) {
-		return new MemberTown(name, member, region);
-	}
-
 	public static List<MemberTown> createMemberTowns(List<Region> regions, Member member) {
 		List<MemberTown> memberTowns = new ArrayList<>();
 		for (Region region : regions) {
-			memberTowns.add(create(region, member));
+			memberTowns.add(new MemberTown(region.getShortAddress(), member, region));
 		}
 		return memberTowns;
-	}
-
-	public static MemberTown create(Region region, Member member) {
-		String name = region.getShortAddress();
-		return create(name, member, region);
 	}
 
 	@Override

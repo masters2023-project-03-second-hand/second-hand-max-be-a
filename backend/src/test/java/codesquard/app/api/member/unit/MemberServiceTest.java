@@ -35,7 +35,7 @@ class MemberServiceTest extends IntegrationTestSupport {
 
 		// given
 		given(imageUploader.uploadImageToS3(any(), anyString())).willReturn("test-image.png");
-		Member member = supportRepository.save(Member.create("123123", "123@123", "pieeeee"));
+		Member member = supportRepository.save(new Member("123123", "123@123", "pieeeee"));
 		MockMultipartFile mockMultipartFile = new MockMultipartFile(
 			"test-image",
 			"test-image.png",

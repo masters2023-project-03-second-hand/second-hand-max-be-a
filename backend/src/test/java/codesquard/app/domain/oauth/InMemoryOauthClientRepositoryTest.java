@@ -1,15 +1,18 @@
 package codesquard.app.domain.oauth;
 
-import org.assertj.core.api.SoftAssertions;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import codesquard.app.IntegrationTestSupport;
 import codesquard.app.domain.oauth.client.OauthClient;
 import codesquard.app.domain.oauth.repository.OauthClientRepository;
 
-public class InMemoryOauthClientRepositoryTest extends IntegrationTestSupport {
+@SpringBootTest
+class InMemoryOauthClientRepositoryTest {
 
 	@Autowired
 	private OauthClientRepository oauthClientRepository;
@@ -24,20 +27,19 @@ public class InMemoryOauthClientRepositoryTest extends IntegrationTestSupport {
 		OauthClient oauthClient = oauthClientRepository.findOneBy(provider);
 
 		// then
-		SoftAssertions.assertSoftly(softAssertions -> {
-			softAssertions.assertThat(oauthClient)
+		assertAll(() -> {
+			assertThat(oauthClient)
 				.extracting("clientId")
 				.isEqualTo("NLiiJeoRUwAoN3VtfjQh");
-			softAssertions.assertThat(oauthClient)
+			assertThat(oauthClient)
 				.extracting("redirectUri")
 				.isEqualTo("http://localhost:8080/redirect/auth");
-			softAssertions.assertThat(oauthClient)
+			assertThat(oauthClient)
 				.extracting("tokenUri")
 				.isEqualTo("https://nid.naver.com/oauth2.0/token");
-			softAssertions.assertThat(oauthClient)
+			assertThat(oauthClient)
 				.extracting("userInfoUri")
 				.isEqualTo("https://openapi.naver.com/v1/nid/me");
-			softAssertions.assertAll();
 		});
 	}
 }

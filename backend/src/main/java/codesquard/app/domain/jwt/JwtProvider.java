@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
@@ -18,11 +16,11 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JwtProvider {
-
-	private static final Logger log = LoggerFactory.getLogger(JwtProvider.class);
 
 	private final JwtProperties jwtProperties;
 
@@ -47,7 +45,7 @@ public class JwtProvider {
 	private Jwt createJwt(Map<String, Object> claims, Date expireDateAccessToken, Date expireDateRefreshToken) {
 		String accessToken = createToken(claims, expireDateAccessToken);
 		String refreshToken = createToken(new HashMap<>(), expireDateRefreshToken);
-		return Jwt.create(accessToken, refreshToken, expireDateAccessToken, expireDateRefreshToken);
+		return new Jwt(accessToken, refreshToken, expireDateAccessToken, expireDateRefreshToken);
 	}
 
 	private String createToken(Map<String, Object> claims, Date expireDate) {

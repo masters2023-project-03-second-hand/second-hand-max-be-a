@@ -1,5 +1,6 @@
 package codesquard.app.api.membertown;
 
+import static codesquard.app.MemberTestSupport.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -14,34 +15,32 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
-import codesquard.app.api.errors.handler.GlobalExceptionHandler;
 import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
 import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
-import codesquard.app.api.oauth.OauthFixedFactory;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
-import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.domain.region.Region;
 
+@WebMvcTest(controllers = MemberTownRestController.class)
 class MemberTownRestControllerTest extends ControllerTestSupport {
 
-	@Autowired
 	private MockMvc mockMvc;
-	@Autowired
-	private GlobalExceptionHandler globalExceptionHandler;
+
 	@Autowired
 	private MemberTownRestController memberTownRestController;
+
 	@MockBean
-	private AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
+	private MemberTownService memberTownService;
 
 	@BeforeEach
 	public void setup() {
@@ -59,8 +58,9 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("addressId", 1L);
 
-		Member member = OauthFixedFactory.createFixedMember();
-		MemberTown memberTown = MemberTown.create(Region.create("서울 송파구 가락동"), member);
+		Member member = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
+		Region region = new Region("서울 송파구 가락동");
+		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
 		MemberAddRegionResponse response = MemberAddRegionResponse.from(memberTown);
 
 		given(memberTownService.addMemberTown(
@@ -106,6 +106,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 		// given
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("addressId", null);
+
 		// when & then
 		mockMvc.perform(delete("/api/regions")
 				.content(objectMapper.writeValueAsString(requestBody))
