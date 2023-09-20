@@ -105,14 +105,18 @@ public class ItemService {
 
 		deleteImagesFromS3(deleteImageUrls);
 
-		Category category = categoryRepository.findById(request.getCategoryId())
-			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
+		Category category = findCategoryBy(request.getCategoryId());
 		log.debug("상품 수정 서비스의 카테고리 조회 결과 : {}", category);
 
 		String thumbnailUrl = updateThumnail(item, thumnailFile, request.getThumnailImage());
 		log.debug("썸네일 갱신 결과 : thumbnailUrl={}", thumbnailUrl);
 
 		item.change(category, request.toEntity(), thumbnailUrl);
+	}
+
+	private Category findCategoryBy(Long categoryId) {
+		return categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 	}
 
 	private String updateThumnail(Item item, MultipartFile thumnailFile, String thumnailUrl) {
@@ -123,6 +127,15 @@ public class ItemService {
 			return updateExistThumnail(thumnailUrl, item);
 		}
 		return item.getThumbnailUrl();
+	}
+
+	private String updateNewThumnail(Long itemId, MultipartFile thumnailFile) {
+		String thumnailImageUrl = imageService.uploadImage(thumnailFile);
+		log.debug("썸네일 이미지 S3 업로드 결과 : thumnailImageUrl={}", thumnailImageUrl);
+
+		Image thumnail = imageRepository.save(Image.thumnail(thumnailImageUrl, itemId));
+		log.debug("썸네일 이미지 테이블 저장 결과 : image={}", thumnail);
+		return thumnailImageUrl;
 	}
 
 	private String updateExistThumnail(String changeThumnail, Item item) {
@@ -140,15 +153,6 @@ public class ItemService {
 		log.debug("요청 이미지 썸네일 표시 변경 결과 : result={}", result);
 
 		return changeThumnail;
-	}
-
-	private String updateNewThumnail(Long itemId, MultipartFile thumnailFile) {
-		String thumnailImageUrl = imageService.uploadImage(thumnailFile);
-		log.debug("썸네일 이미지 S3 업로드 결과 : thumnailImageUrl={}", thumnailImageUrl);
-
-		Image thumnail = imageRepository.save(Image.thumnail(thumnailImageUrl, itemId));
-		log.debug("썸네일 이미지 테이블 저장 결과 : image={}", thumnail);
-		return thumnailImageUrl;
 	}
 
 	private int deleteImages(Long itemId, List<String> deleteImageUrls) {
