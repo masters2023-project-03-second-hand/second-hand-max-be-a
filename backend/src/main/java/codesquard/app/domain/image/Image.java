@@ -52,10 +52,6 @@ public class Image {
 		return new Image(imageUrl, new Item(itemId), true);
 	}
 
-	public static Image basicImage(String imageUrl, Long itemId) {
-		return new Image(imageUrl, new Item(itemId), false);
-	}
-
 	@Override
 	public String toString() {
 		return String.format("%s, %s(id=%d, imageUrl=%s, item_id=%d)",

@@ -190,8 +190,8 @@ class ItemServiceTest {
 			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
-			Image.basicImage("imageUrlValue1", saveItem.getId()),
-			Image.basicImage("imageUrlValue2", saveItem.getId()));
+			new Image("imageUrlValue1", saveItem, false),
+			new Image("imageUrlValue2", saveItem, false));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
 		List<MultipartFile> addImages = List.of(createMultipartFile("cat.png"),
@@ -268,8 +268,8 @@ class ItemServiceTest {
 			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
-			Image.basicImage("imageUrlValue1", saveItem.getId()),
-			Image.basicImage("imageUrlValue2", saveItem.getId()));
+			new Image("imageUrlValue1", saveItem, false),
+			new Image("imageUrlValue2", saveItem, false));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
 		List<MultipartFile> addImages = List.of(createMultipartFile("cat.png"));
@@ -344,8 +344,8 @@ class ItemServiceTest {
 			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
-			Image.thumnail("imageUrlValue1", saveItem.getId()),
-			Image.basicImage("imageUrlValue2", saveItem.getId()));
+			new Image("imageUrlValue1", saveItem, true),
+			new Image("imageUrlValue2", saveItem, false));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
 		List<MultipartFile> addImages = List.of(createMultipartFile("cat.png"));
@@ -435,8 +435,8 @@ class ItemServiceTest {
 		Item saveItem = itemRepository.save(item);
 
 		List<Image> images = List.of(
-			Image.basicImage("imageUrlValue1", saveItem.getId()),
-			Image.basicImage("imageUrlValue2", saveItem.getId()));
+			new Image("imageUrlValue1", saveItem, false),
+			new Image("imageUrlValue2", saveItem, false));
 		imageRepository.saveAll(images);
 
 		Wish wish = new Wish(member, item, now());
