@@ -3,6 +3,7 @@ package codesquard.app.api.item;
 import static codesquard.app.CategoryTestSupport.*;
 import static codesquard.app.ImageTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
+import static codesquard.app.MemberTownTestSupport.*;
 import static codesquard.app.RegionTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
 import static java.time.LocalDateTime.*;
@@ -33,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import codesquard.app.MemberTownTestSupport;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
@@ -174,7 +176,7 @@ class ItemServiceTest {
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
 		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
-		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region, true));
+		memberTownRepository.save(MemberTownTestSupport.createMemberTown(member, region, true));
 
 		Item item = Item.builder()
 			.title("빈티지 롤러 블레이드")
@@ -473,5 +475,140 @@ class ItemServiceTest {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("상품을 찾을 수 없습니다.");
+	}
+
+	@DisplayName("상품을 삭제합니다.")
+	@Test
+	public void deleteItem() {
+		// given
+		Category category = categoryRepository.save(findByName("스포츠/레저"));
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		List<Region> regions = regionRepository.saveAll(
+			List.of(createRegion("서울 송파구 가락동"), createRegion("서울 종로구 청운동")));
+		memberTownRepository.saveAll(List.of(
+			createMemberTown(member, regions.get(0), true),
+			createMemberTown(member, regions.get(1), false)));
+
+		Item item = Item.builder()
+			.title("빈티지 롤러 블레이드")
+			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
+			.price(200000L)
+			.status(ON_SALE)
+			.region("가락동")
+			.createdAt(now())
+			.wishCount(0L)
+			.viewCount(0L)
+			.chatCount(0L)
+			.member(member)
+			.category(category)
+			.build();
+		Item saveItem = itemRepository.save(item);
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", saveItem, true),
+			new Image("imageUrlValue2", saveItem, false));
+		imageRepository.saveAll(images);
+		Principal principal = Principal.from(member);
+
+		// when
+		itemService.deleteItem(saveItem.getId(), principal);
+
+		// then
+		assertAll(() -> {
+			boolean empty = itemRepository.findById(saveItem.getId()).isEmpty();
+			assertThat(empty).isTrue();
+
+			List<Image> findImages = imageRepository.findAllByItemId(saveItem.getId());
+			assertThat(findImages).isEmpty();
+		});
+	}
+
+	@DisplayName("존재하지 않는 상품을 삭제할 수 없다.")
+	@Test
+	public void deleteItemWithNotExistItem() {
+		// given
+		Category category = categoryRepository.save(findByName("스포츠/레저"));
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		List<Region> regions = regionRepository.saveAll(
+			List.of(createRegion("서울 송파구 가락동"), createRegion("서울 종로구 청운동")));
+		memberTownRepository.saveAll(List.of(
+			createMemberTown(member, regions.get(0), true),
+			createMemberTown(member, regions.get(1), false)));
+
+		Item item = Item.builder()
+			.title("빈티지 롤러 블레이드")
+			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
+			.price(200000L)
+			.status(ON_SALE)
+			.region("가락동")
+			.createdAt(now())
+			.wishCount(0L)
+			.viewCount(0L)
+			.chatCount(0L)
+			.member(member)
+			.category(category)
+			.build();
+		Item saveItem = itemRepository.save(item);
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", saveItem, true),
+			new Image("imageUrlValue2", saveItem, false));
+		imageRepository.saveAll(images);
+		Principal principal = Principal.from(member);
+		Long itemId = 9999L;
+
+		// when
+		Throwable throwable = catchThrowable(() -> itemService.deleteItem(itemId, principal));
+
+		// then
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("상품을 찾을 수 없습니다.");
+
+	}
+
+	@DisplayName("판매자가 아닌 사람이 판매자의 상품을 삭제할 수 없다")
+	@Test
+	public void deleteItemWithNotSeller() {
+		// given
+		Category category = categoryRepository.save(findByName("스포츠/레저"));
+		List<Member> members = memberRepository.saveAll(
+			List.of(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"),
+				createMember("avatarUrlValue", "bruni@gmail.com", "bruni")));
+		Member seller = members.get(0);
+		List<Region> regions = regionRepository.saveAll(
+			List.of(createRegion("서울 송파구 가락동"), createRegion("서울 종로구 청운동")));
+		memberTownRepository.saveAll(List.of(
+			createMemberTown(seller, regions.get(0), true),
+			createMemberTown(seller, regions.get(1), false)));
+
+		Item item = Item.builder()
+			.title("빈티지 롤러 블레이드")
+			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
+			.price(200000L)
+			.status(ON_SALE)
+			.region("가락동")
+			.createdAt(now())
+			.wishCount(0L)
+			.viewCount(0L)
+			.chatCount(0L)
+			.member(seller)
+			.category(category)
+			.build();
+		Item saveItem = itemRepository.save(item);
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", saveItem, true),
+			new Image("imageUrlValue2", saveItem, false));
+		imageRepository.saveAll(images);
+		Principal principal = Principal.from(members.get(1));
+
+		// when
+		Throwable throwable = catchThrowable(() -> itemService.deleteItem(saveItem.getId(), principal));
+
+		// then
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("상품에 대한 권한이 없습니다.");
+
 	}
 }
