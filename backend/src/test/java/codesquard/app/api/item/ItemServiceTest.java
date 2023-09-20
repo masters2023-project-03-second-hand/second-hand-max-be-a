@@ -239,7 +239,7 @@ class ItemServiceTest {
 				.findAny()
 				.orElseThrow();
 			assertThat(thumnail)
-				.extracting("thumnail")
+				.extracting("thumbnail")
 				.isEqualTo(true);
 		});
 	}
@@ -315,7 +315,7 @@ class ItemServiceTest {
 				.findAny()
 				.orElseThrow();
 			assertThat(thumnail)
-				.extracting("thumnail")
+				.extracting("thumbnail")
 				.isEqualTo(true);
 		});
 	}
@@ -391,7 +391,7 @@ class ItemServiceTest {
 				.findAny()
 				.orElseThrow();
 			assertThat(thumnail)
-				.extracting("thumnail")
+				.extracting("thumbnail")
 				.isEqualTo(true);
 		});
 	}

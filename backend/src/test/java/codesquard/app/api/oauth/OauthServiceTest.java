@@ -1,6 +1,7 @@
 package codesquard.app.api.oauth;
 
 import static codesquard.app.MemberTestSupport.*;
+import static codesquard.app.RegionTestSupport.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -95,6 +96,7 @@ class OauthServiceTest {
 	@Test
 	public void signUp() throws IOException {
 		// given
+		regionRepository.save(createRegion("서울 송파구 가락동"));
 		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
@@ -287,6 +289,7 @@ class OauthServiceTest {
 	@Test
 	public void signUpWhenDuplicateLoginId() throws IOException {
 		// given
+		regionRepository.save(createRegion("서울 송파구 가락동"));
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong1234@gmail.com", "23Yong"));
 
 		Region region = regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")).stream().findAny().orElseThrow();
@@ -408,7 +411,7 @@ class OauthServiceTest {
 	public void logoutWithExpireAccessToken() throws JsonProcessingException {
 		// given
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
-		LocalDateTime now = LocalDateTime.now().minusMinutes(5);
+		LocalDateTime now = LocalDateTime.now().minusDays(1);
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 
 		Map<String, Object> requestBody = new HashMap<>();

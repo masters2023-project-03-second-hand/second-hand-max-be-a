@@ -120,13 +120,13 @@ public class ItemService {
 			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 	}
 
-	private String updateThumnail(Item item, MultipartFile thumbnailFile, String thumnailUrl) {
-		if (!thumbnailFile.isEmpty()) {
+	private String updateThumnail(Item item, MultipartFile thumbnailFile, String thumbnailUrl) {
+		if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
 			String thumnail = updateNewThumnail(item.getId(), thumbnailFile);
 			return updateThumbnailStatus(thumnail, item);
 		}
-		if (thumnailUrl != null) {
-			return updateThumbnailStatus(thumnailUrl, item);
+		if (thumbnailUrl != null) {
+			return updateThumbnailStatus(thumbnailUrl, item);
 		}
 		return item.getThumbnailUrl();
 	}
