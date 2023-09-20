@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,6 +58,7 @@ import codesquard.app.domain.wish.Wish;
 import codesquard.app.domain.wish.WishRepository;
 import codesquard.support.SupportRepository;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class ItemServiceTest {
 
@@ -164,7 +166,7 @@ class ItemServiceTest {
 			() -> assertThat(all.getPaging().getNextCursor()).isEqualTo(item.getId()));
 	}
 
-	@DisplayName("회원은 상품의 정보를 수정한다")
+	@DisplayName("회원은 상품 정보 수정시 기존 썸네일 이미지를 두고 수정한다")
 	@Test
 	public void modifyItem() throws IOException {
 		// given
@@ -184,20 +186,101 @@ class ItemServiceTest {
 			.wishCount(0L)
 			.viewCount(0L)
 			.chatCount(0L)
+			.thumbnailUrl("imageUrlValue1")
 			.member(member)
 			.category(category)
 			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
-			new Image("imageUrlValue1", new Item(saveItem.getId())),
-			new Image("imageUrlValue2", new Item(saveItem.getId())));
+			new Image("imageUrlValue1", saveItem, false),
+			new Image("imageUrlValue2", saveItem, false));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
 		List<MultipartFile> addImages = List.of(createMultipartFile("cat.png"),
 			createMultipartFile("roller_blade.jpeg"));
 		List<String> deleteImageUrls = saveImages.stream()
 			.map(Image::getImageUrl)
+			.filter(imageUrl -> imageUrl.equals("imageUrlValue2"))
 			.collect(Collectors.toUnmodifiableList());
+		MultipartFile thumnailFile = null;
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("title", "빈티지 롤러 스케이트");
+		requestBody.put("price", 169000);
+		requestBody.put("content", "내용");
+		requestBody.put("region", "가락동");
+		requestBody.put("status", "판매중");
+		requestBody.put("categoryId", category.getId());
+		requestBody.put("categoryName", category.getName());
+		requestBody.put("deleteImageUrls", deleteImageUrls);
+		requestBody.put("thumnailImage", "imageUrlValue1");
+		ItemModifyRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			ItemModifyRequest.class);
+
+		given(imageUploader.uploadImageToS3(any(), any()))
+			.willReturn("imageUrlValue3", "imageUrlValue4");
+
+		// when
+		itemService.modifyItem(saveItem.getId(), request, addImages, thumnailFile, Principal.from(member));
+
+		// then
+		assertAll(() -> {
+			Item modifiedItem = itemRepository.findById(saveItem.getId()).orElseThrow();
+			assertThat(modifiedItem)
+				.extracting("title", "content", "price", "status", "region", "thumbnailUrl")
+				.contains(request.getTitle(), request.getContent(), request.getPrice(), request.getStatus(),
+					request.getRegion(), request.getThumnailImage());
+
+			List<Image> modifiedImages = imageRepository.findAllByItemId(saveItem.getId());
+			assertThat(modifiedImages).hasSize(3);
+
+			Image thumnail = modifiedImages.stream()
+				.filter(image -> image.getImageUrl().equals("imageUrlValue1"))
+				.findAny()
+				.orElseThrow();
+			assertThat(thumnail)
+				.extracting("thumbnail")
+				.isEqualTo(true);
+		});
+	}
+
+	@DisplayName("회원은 상품 정보 수정시 새로운 썸네일 이미지를 두고 수정한다")
+	@Test
+	public void modifyItemWithNewThumnail() throws IOException {
+		// given
+		Category category = categoryRepository.save(findByName("스포츠/레저"));
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+
+		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
+		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region));
+
+		Item item = Item.builder()
+			.title("빈티지 롤러 블레이드")
+			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
+			.price(200000L)
+			.status(ON_SALE)
+			.region("가락동")
+			.createdAt(now())
+			.wishCount(0L)
+			.viewCount(0L)
+			.chatCount(0L)
+			.thumbnailUrl("imageUrlValue1")
+			.member(member)
+			.category(category)
+			.build();
+		Item saveItem = itemRepository.save(item);
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", saveItem, false),
+			new Image("imageUrlValue2", saveItem, false));
+		List<Image> saveImages = imageRepository.saveAll(images);
+
+		List<MultipartFile> addImages = List.of(createMultipartFile("cat.png"));
+		List<String> deleteImageUrls = saveImages.stream()
+			.map(Image::getImageUrl)
+			.filter(imageUrl -> imageUrl.equals("imageUrlValue2"))
+			.collect(Collectors.toUnmodifiableList());
+		MultipartFile thumnailFile = createMultipartFile("roller_blade.jpeg");
+
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("title", "빈티지 롤러 스케이트");
 		requestBody.put("price", 169000);
@@ -211,17 +294,105 @@ class ItemServiceTest {
 			ItemModifyRequest.class);
 
 		given(imageUploader.uploadImageToS3(any(), any()))
-			.willReturn("http://s3_image1.com", "http://s3_image2.com");
+			.willReturn("imageUrlValue3", "imageUrlValue4");
+
 		// when
-		itemService.modifyItem(saveItem.getId(), request, addImages, Principal.from(member));
+		itemService.modifyItem(saveItem.getId(), request, addImages, thumnailFile, Principal.from(member));
+
 		// then
-		Item modifiedItem = itemRepository.findById(saveItem.getId()).orElseThrow();
 		assertAll(() -> {
+			Item modifiedItem = itemRepository.findById(saveItem.getId()).orElseThrow();
 			assertThat(modifiedItem)
-				.extracting("title", "content", "price", "status", "region")
+				.extracting("title", "content", "price", "status", "region", "thumbnailUrl")
 				.contains(request.getTitle(), request.getContent(), request.getPrice(), request.getStatus(),
-					request.getRegion());
-			assertThat(images).hasSize(2);
+					request.getRegion(), "imageUrlValue4");
+
+			List<Image> modifiedImages = imageRepository.findAllByItemId(saveItem.getId());
+			assertThat(modifiedImages).hasSize(3);
+
+			Image thumnail = modifiedImages.stream()
+				.filter(image -> image.getImageUrl().equals("imageUrlValue4"))
+				.findAny()
+				.orElseThrow();
+			assertThat(thumnail)
+				.extracting("thumbnail")
+				.isEqualTo(true);
+		});
+	}
+
+	@DisplayName("회원은 상품 정보 수정시 썸네일 이미지를 그대로 두고 수정한다")
+	@Test
+	public void modifyItemWithNonChange() throws IOException {
+		// given
+		Category category = categoryRepository.save(findByName("스포츠/레저"));
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+
+		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
+		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region));
+
+		Item item = Item.builder()
+			.title("빈티지 롤러 블레이드")
+			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
+			.price(200000L)
+			.status(ON_SALE)
+			.region("가락동")
+			.createdAt(now())
+			.wishCount(0L)
+			.viewCount(0L)
+			.chatCount(0L)
+			.thumbnailUrl("imageUrlValue1")
+			.member(member)
+			.category(category)
+			.build();
+		Item saveItem = itemRepository.save(item);
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", saveItem, true),
+			new Image("imageUrlValue2", saveItem, false));
+		List<Image> saveImages = imageRepository.saveAll(images);
+
+		List<MultipartFile> addImages = List.of(createMultipartFile("cat.png"));
+		List<String> deleteImageUrls = saveImages.stream()
+			.map(Image::getImageUrl)
+			.filter(imageUrl -> imageUrl.equals("imageUrlValue2"))
+			.collect(Collectors.toUnmodifiableList());
+		MultipartFile thumnailFile = null;
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("title", "빈티지 롤러 스케이트");
+		requestBody.put("price", 169000);
+		requestBody.put("content", "내용");
+		requestBody.put("region", "가락동");
+		requestBody.put("status", "판매중");
+		requestBody.put("categoryId", category.getId());
+		requestBody.put("categoryName", category.getName());
+		requestBody.put("deleteImageUrls", deleteImageUrls);
+		ItemModifyRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			ItemModifyRequest.class);
+
+		given(imageUploader.uploadImageToS3(any(), any()))
+			.willReturn("imageUrlValue3");
+
+		// when
+		itemService.modifyItem(saveItem.getId(), request, addImages, thumnailFile, Principal.from(member));
+
+		// then
+		assertAll(() -> {
+			Item modifiedItem = itemRepository.findById(saveItem.getId()).orElseThrow();
+			assertThat(modifiedItem)
+				.extracting("title", "content", "price", "status", "region", "thumbnailUrl")
+				.contains(request.getTitle(), request.getContent(), request.getPrice(), request.getStatus(),
+					request.getRegion(), "imageUrlValue1");
+
+			List<Image> modifiedImages = imageRepository.findAllByItemId(saveItem.getId());
+			assertThat(modifiedImages).hasSize(2);
+
+			Image thumnail = modifiedImages.stream()
+				.filter(image -> image.getImageUrl().equals("imageUrlValue1"))
+				.findAny()
+				.orElseThrow();
+			assertThat(thumnail)
+				.extracting("thumbnail")
+				.isEqualTo(true);
 		});
 	}
 
@@ -266,8 +437,8 @@ class ItemServiceTest {
 		Item saveItem = itemRepository.save(item);
 
 		List<Image> images = List.of(
-			new Image("imageUrlValue1", new Item(saveItem.getId())),
-			new Image("imageUrlValue2", new Item(saveItem.getId())));
+			new Image("imageUrlValue1", saveItem, false),
+			new Image("imageUrlValue2", saveItem, false));
 		imageRepository.saveAll(images);
 
 		Wish wish = new Wish(member, item, now());

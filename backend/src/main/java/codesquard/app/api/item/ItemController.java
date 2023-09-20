@@ -63,10 +63,11 @@ public class ItemController {
 
 	@PatchMapping("/{itemId}")
 	public ApiResponse<Void> modifyItem(@PathVariable Long itemId,
-		@RequestPart("images") List<MultipartFile> addImages,
+		@RequestPart(value = "images", required = false) List<MultipartFile> addImages,
 		@Valid @RequestPart("item") ItemModifyRequest request,
+		@RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
 		@AuthPrincipal Principal principal) {
-		itemService.modifyItem(itemId, request, addImages, principal);
+		itemService.modifyItem(itemId, request, addImages, thumbnailImage, principal);
 		return ApiResponse.ok("상품 수정을 완료하였습니다.", null);
 	}
 

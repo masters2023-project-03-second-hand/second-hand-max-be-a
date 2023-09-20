@@ -133,4 +133,11 @@ public class Item {
 			throw new RestApiException(ItemErrorCode.ITEM_FORBIDDEN);
 		}
 	}
+
+	public boolean equalThumnailImageUrl(String requestThumnailImage) {
+		if (thumbnailUrl == null) {
+			return false;
+		}
+		return thumbnailUrl.equals(requestThumnailImage);
+	}
 }

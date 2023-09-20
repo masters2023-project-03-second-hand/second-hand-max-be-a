@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.item.response.ItemResponses;
@@ -19,6 +20,7 @@ import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.sales.SalesStatus;
 import codesquard.support.SupportRepository;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class SalesItemServiceTest {
 
