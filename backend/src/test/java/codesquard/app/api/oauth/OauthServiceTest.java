@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,6 +51,7 @@ import codesquard.app.domain.oauth.repository.OauthClientRepository;
 import codesquard.app.domain.region.Region;
 import codesquard.app.domain.region.RegionRepository;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class OauthServiceTest {
 

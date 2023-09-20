@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.item.response.ItemResponse;
@@ -26,6 +27,7 @@ import codesquard.app.domain.wish.WishRepository;
 import codesquard.app.domain.wish.WishStatus;
 import codesquard.support.SupportRepository;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class WishItemServiceTest {
 

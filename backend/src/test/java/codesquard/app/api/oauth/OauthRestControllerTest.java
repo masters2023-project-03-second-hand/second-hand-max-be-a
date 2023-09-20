@@ -25,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -39,6 +40,7 @@ import codesquard.app.filter.JwtAuthorizationFilter;
 import codesquard.app.filter.LogoutFilter;
 import codesquard.app.interceptor.LogoutInterceptor;
 
+@ActiveProfiles("test")
 @WebMvcTest(controllers = OauthRestController.class)
 class OauthRestControllerTest extends ControllerTestSupport {
 

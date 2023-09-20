@@ -12,9 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.test.context.ActiveProfiles;
 
 import codesquard.app.RegionTestSupport;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class RegionPaginationRepositoryTest {
 
