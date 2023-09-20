@@ -277,4 +277,54 @@ class MemberTownServiceTest {
 			assertThat(newSelectionMemberTown.isSelected()).isTrue();
 		});
 	}
+
+	@DisplayName("회원은 존재하지 않는 지역 등록번호로 동네 지역을 선택할 수 없다")
+	@Test
+	public void selectRegionWithNotExistRegionId() throws JsonProcessingException {
+		// given
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		List<Region> regions = regionRepository.saveAll(
+			List.of(createRegion("서울 송파구 가락동"), createRegion("서울 종로구 청운동")));
+		memberTownRepository.saveAll(List.of(
+			createMemberTown(member, regions.get(0), true),
+			createMemberTown(member, regions.get(1), false)));
+
+		Map<String, Object> requestBody = Map.of("selectedAddressId", 9999L);
+		RegionSelectionRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			RegionSelectionRequest.class);
+
+		// when
+		Throwable throwable = catchThrowable(() -> memberTownService.selectRegion(request, Principal.from(member)));
+
+		// then
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("주소를 찾지 못하였습니다.");
+	}
+
+	@DisplayName("회원은 회원의 동네로 등록되지 않은 동네지역을 선택할 수 없다")
+	@Test
+	public void selectRegionWithNotRegisteredRegionId() throws JsonProcessingException {
+		// given
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		List<Region> regions = regionRepository.saveAll(
+			List.of(createRegion("서울 송파구 가락동"), createRegion("서울 종로구 청운동"), createRegion("서울 종로구 신교동")));
+		memberTownRepository.saveAll(List.of(
+			createMemberTown(member, regions.get(0), true),
+			createMemberTown(member, regions.get(1), false)));
+
+		Map<String, Object> requestBody = Map.of("selectedAddressId", regions.get(2).getId());
+		RegionSelectionRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			RegionSelectionRequest.class);
+
+		// when
+		Throwable throwable = catchThrowable(() -> memberTownService.selectRegion(request, Principal.from(member)));
+
+		// then
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("회원이 등록한 동네만 선택할 수 있습니다.");
+	}
 }
