@@ -1,6 +1,7 @@
 package codesquard.app.api.oauth;
 
 import static codesquard.app.MemberTestSupport.*;
+import static codesquard.app.RegionTestSupport.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,6 +53,7 @@ import codesquard.app.domain.oauth.repository.OauthClientRepository;
 import codesquard.app.domain.region.Region;
 import codesquard.app.domain.region.RegionRepository;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class OauthServiceTest {
 
@@ -93,6 +97,7 @@ class OauthServiceTest {
 	@Test
 	public void signUp() throws IOException {
 		// given
+		regionRepository.save(createRegion("서울 송파구 가락동"));
 		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
@@ -289,7 +294,7 @@ class OauthServiceTest {
 
 		Region region = regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")).stream().findAny().orElseThrow();
 
-		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
+		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region, false);
 		memberTownRepository.save(memberTown);
 
 		String provider = "naver";
@@ -337,8 +342,9 @@ class OauthServiceTest {
 	@Test
 	public void login() throws JsonProcessingException {
 		// given
-		Member member = new Member("avatarUrlValue", "23Yong@gmail.com", "23Yong");
-		memberRepository.save(member);
+		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		memberTownRepository.save(new MemberTown("가락동", member, region, true));
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
@@ -361,7 +367,7 @@ class OauthServiceTest {
 			objectMapper.writeValueAsString(userProfileResponseBody), OauthUserProfileResponse.class);
 
 		LocalDateTime now = createNow();
-		// mocking
+
 		given(oauthClientRepository.findOneBy(anyString())).willReturn(oauthClient);
 		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
 			.willReturn(mockAccessTokenResponse);
@@ -372,13 +378,21 @@ class OauthServiceTest {
 		OauthLoginResponse response = oauthService.login(request, provider, code, now);
 
 		// then
-		assertThat(response)
-			.extracting("jwt.accessToken", "jwt.refreshToken", "user.loginId", "user.profileUrl")
-			.contains(
-				createExpectedAccessTokenBy(jwtProvider, member, now),
-				createExpectedRefreshTokenBy(jwtProvider, member, now),
-				"23Yong",
-				"avatarUrlValue");
+		assertAll(() -> {
+			assertThat(response)
+				.extracting("jwt.accessToken", "jwt.refreshToken", "user.loginId", "user.profileUrl")
+				.contains(
+					createExpectedAccessTokenBy(jwtProvider, member, now),
+					createExpectedRefreshTokenBy(jwtProvider, member, now),
+					"23Yong",
+					"avatarUrlValue");
+
+			assertThat(response.getUser().getAddresses())
+				.hasSize(1)
+				.extracting("fullAddressName", "addressName", "isSelected")
+				.containsExactlyInAnyOrder(Tuple.tuple("서울 송파구 가락동", "가락동", true));
+		});
+
 	}
 
 	@DisplayName("로그아웃을 수행한다")
@@ -406,8 +420,8 @@ class OauthServiceTest {
 	public void logoutWithExpireAccessToken() throws JsonProcessingException {
 		// given
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
-		LocalDateTime now = LocalDateTime.now().minusMinutes(5);
-		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
+		LocalDateTime tomorrow = LocalDateTime.now().minusDays(1);
+		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, tomorrow);
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("refreshToken", jwt.getRefreshToken());
