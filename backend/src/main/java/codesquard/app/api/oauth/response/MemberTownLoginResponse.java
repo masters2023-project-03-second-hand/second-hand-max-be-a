@@ -15,7 +15,6 @@ public class MemberTownLoginResponse {
 	private Long addressId;
 	private String fullAddressName;
 	private String addressName;
-	@JsonProperty("isSelected")
 	private boolean isSelected;
 
 	public static MemberTownLoginResponse from(MemberTown memberTown) {
@@ -24,5 +23,10 @@ public class MemberTownLoginResponse {
 			memberTown.getRegion().getName(),
 			memberTown.getName(),
 			memberTown.isSelected());
+	}
+
+	@JsonProperty("isSelected")
+	public boolean isSelected() {
+		return isSelected;
 	}
 }
