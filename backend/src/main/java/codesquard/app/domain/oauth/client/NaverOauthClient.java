@@ -69,12 +69,4 @@ public class NaverOauthClient extends OauthClient {
 		String profileImage = (String)responseMap.get("profile_image");
 		return new OauthUserProfileResponse(email, profileImage);
 	}
-
-	@Override
-	public OauthUserProfileResponse getUserProfileByAccessToken(OauthAccessTokenResponse accessTokenResponse) {
-		Map<String, Object> userProfileMap = getUserAttributes(getUserInfoUri(), accessTokenResponse);
-		log.debug("userProfileMap : {}", userProfileMap);
-		return createOauthUserProfileResponse(userProfileMap);
-	}
-
 }
