@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -156,5 +157,20 @@ class ItemControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("statusCode").value(equalTo(404)))
 			.andExpect(jsonPath("message").value(equalTo("상품을 찾을 수 없습니다.")))
 			.andExpect(jsonPath("data").value(equalTo(null)));
+	}
+
+	@DisplayName("상품을 삭제합니다.")
+	@Test
+	public void deleteItem() throws Exception {
+		// given
+		willDoNothing().given(itemService).deleteItem(
+			ArgumentMatchers.anyLong(),
+			ArgumentMatchers.any(Principal.class));
+
+		// when & then
+		mockMvc.perform(delete("/api/items/1"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("statusCode").value(equalTo(200)))
+			.andExpect(jsonPath("message").value(equalTo("상품 삭제가 완료되었습니다.")));
 	}
 }
