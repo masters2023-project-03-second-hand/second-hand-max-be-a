@@ -206,7 +206,7 @@ class MemberTownServiceTest {
 		memberRepository.save(member);
 
 		Region newRegion = regionRepository.save(createRegion("서울 송파구 가락동"));
-		MemberTown memberTown = MemberTown.notSelectedMemberTown(region, member);
+		MemberTown memberTown = MemberTown.notSelectedMemberTown(newRegion, member);
 		memberTownRepository.save(memberTown);
 
 		// when
