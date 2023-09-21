@@ -45,6 +45,7 @@ public class Principal {
 		return Principal.builder()
 			.memberId(member.getId())
 			.email(member.getEmail())
+			.loginId(member.getLoginId())
 			.build();
 	}
 
