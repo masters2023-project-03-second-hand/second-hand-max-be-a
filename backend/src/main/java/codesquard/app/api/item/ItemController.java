@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,5 +76,11 @@ public class ItemController {
 	public ApiResponse<Void> modifyItemStatus(@PathVariable Long itemId, @RequestBody ItemStatusModifyRequest request) {
 		itemService.findById(itemId, request.getStatus());
 		return ApiResponse.ok("상품 상태 변경에 성공하였습니다.", null);
+	}
+
+	@DeleteMapping("/{itemId}")
+	public ApiResponse<Void> deleteItem(@PathVariable Long itemId, @AuthPrincipal Principal principal) {
+		itemService.deleteItem(itemId, principal);
+		return ApiResponse.ok("상품 삭제가 완료되었습니다.", null);
 	}
 }

@@ -27,6 +27,7 @@ import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
 import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
+import codesquard.app.api.region.request.RegionSelectionRequest;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.oauth.support.Principal;
@@ -119,5 +120,41 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("data[*].field").value(containsInAnyOrder("addressId")))
 			.andExpect(jsonPath("data[*].defaultMessage")
 				.value(containsInAnyOrder("주소 정보는 필수 정보입니다.")));
+	}
+
+	@DisplayName("회원이 지역 등록번호를 가지고 회원의 동네를 선택한다")
+	@Test
+	public void selectRegion() throws Exception {
+		// given
+		Map<String, Object> requestBody = Map.of("selectedAddressId", 1L);
+
+		willDoNothing().given(memberTownService).selectRegion(
+			ArgumentMatchers.any(RegionSelectionRequest.class),
+			ArgumentMatchers.any(Principal.class));
+		// when & then
+		mockMvc.perform(put("/api/regions")
+				.content(objectMapper.writeValueAsString(requestBody))
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("statusCode").value(equalTo(200)))
+			.andExpect(jsonPath("message").value(equalTo("지역 선택을 완료하였습니다.")));
+	}
+
+	@DisplayName("회원이 지역 등록번호를 null을 전달하여 회원의 동네를 선택할 수 없다")
+	@Test
+	public void selectRegionWithSelectedAddressIdIsNull() throws Exception {
+		// given
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("selectedAddressId", null);
+
+		// when & then
+		mockMvc.perform(put("/api/regions")
+				.content(objectMapper.writeValueAsString(requestBody))
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("statusCode").value(equalTo(400)))
+			.andExpect(jsonPath("message").value(equalTo("유효하지 않은 입력형식입니다.")))
+			.andExpect(jsonPath("data[0].field").value(equalTo("selectedAddressId")))
+			.andExpect(jsonPath("data[0].defaultMessage").value(equalTo("지역 등록번호는 필수 정보입니다.")));
 	}
 }

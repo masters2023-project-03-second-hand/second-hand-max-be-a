@@ -11,16 +11,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.api.region.response.RegionItemResponse;
 import codesquard.app.api.region.response.RegionListResponse;
+import codesquard.app.domain.membertown.MemberTownRepository;
 import codesquard.app.domain.region.Region;
 import codesquard.app.domain.region.RegionPaginationRepository;
+import codesquard.app.domain.region.RegionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class RegionQueryService {
+public class RegionService {
 
 	private final RegionPaginationRepository regionPaginationRepository;
+	private final MemberTownRepository memberTownRepository;
+	private final RegionRepository regionRepository;
 
 	public RegionListResponse searchBySlice(int size, Long cursor, String region) {
 		Pageable pageable = PageRequest.ofSize(size);
