@@ -34,6 +34,9 @@ class InMemoryOauthClientRepositoryTest {
 				.extracting("clientId")
 				.isEqualTo("NLiiJeoRUwAoN3VtfjQh");
 			assertThat(oauthClient)
+				.extracting("redirectUri")
+				.isEqualTo("http://localhost:5173/my-account/oauth");
+			assertThat(oauthClient)
 				.extracting("tokenUri")
 				.isEqualTo("https://nid.naver.com/oauth2.0/token");
 			assertThat(oauthClient)

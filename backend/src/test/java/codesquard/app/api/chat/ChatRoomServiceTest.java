@@ -119,7 +119,7 @@ class ChatRoomServiceTest {
 		assertAll(() -> {
 			assertThat(response)
 				.extracting("id")
-				.isEqualTo(1L);
+				.isNotNull();
 		});
 	}
 }

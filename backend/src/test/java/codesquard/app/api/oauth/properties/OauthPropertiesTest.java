@@ -36,6 +36,9 @@ public class OauthPropertiesTest {
 				.extracting("clientId")
 				.isEqualTo("NLiiJeoRUwAoN3VtfjQh");
 			assertThat(naverOauthProvider)
+				.extracting("redirectUri")
+				.isEqualTo("http://localhost:5173/my-account/oauth");
+			assertThat(naverOauthProvider)
 				.extracting("tokenUri")
 				.isEqualTo("https://nid.naver.com/oauth2.0/token");
 			assertThat(naverOauthProvider)
