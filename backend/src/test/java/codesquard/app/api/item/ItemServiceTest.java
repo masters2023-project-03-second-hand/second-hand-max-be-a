@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.MemberTownTestSupport;
+import codesquard.app.MemberTownTestSupport;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
