@@ -43,8 +43,9 @@ public class ItemController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResponse<Void> register(@RequestPart("item") ItemRegisterRequest request,
 		@RequestPart("images") List<MultipartFile> itemImage,
+		@RequestPart("thumbnailImage") MultipartFile thumbnail,
 		@AuthPrincipal Principal principal) {
-		itemService.register(request, itemImage, principal.getMemberId());
+		itemService.register(request, itemImage, thumbnail, principal.getMemberId());
 		return ApiResponse.created("상품 등록이 완료되었습니다.", null);
 	}
 
