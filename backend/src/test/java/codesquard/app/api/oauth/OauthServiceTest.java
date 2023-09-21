@@ -294,7 +294,7 @@ class OauthServiceTest {
 
 		Region region = regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")).stream().findAny().orElseThrow();
 
-		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region, true);
+		MemberTown memberTown = MemberTown.selectedMemberTown(region, member);
 		memberTownRepository.save(memberTown);
 
 		String provider = "naver";

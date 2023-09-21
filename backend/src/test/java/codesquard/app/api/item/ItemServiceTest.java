@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.MemberTownTestSupport;
+import codesquard.app.MemberTownTestSupport;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
@@ -254,7 +255,7 @@ class ItemServiceTest {
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
 		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
-		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region, true));
+		memberTownRepository.save(MemberTown.selectedMemberTown(region, member));
 
 		Item item = Item.builder()
 			.title("빈티지 롤러 블레이드")
@@ -330,7 +331,7 @@ class ItemServiceTest {
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
 		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
-		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region, true));
+		memberTownRepository.save(MemberTown.selectedMemberTown(region, member));
 
 		Item item = Item.builder()
 			.title("빈티지 롤러 블레이드")

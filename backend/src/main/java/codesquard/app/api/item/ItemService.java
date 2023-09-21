@@ -3,6 +3,7 @@ package codesquard.app.api.item;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +73,7 @@ public class ItemService {
 		item.changeStatus(status);
 	}
 
+	@Cacheable
 	public ItemDetailResponse findDetailItemBy(Long itemId, Long loginMemberId) {
 		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
 		Item item = itemRepository.findById(itemId)
@@ -185,6 +187,10 @@ public class ItemService {
 			.map(Image::getImageUrl)
 			.forEach(imageService::deleteImage);
 
+		deleteAllRelatedItem(itemId);
+	}
+
+	private void deleteAllRelatedItem(Long itemId) {
 		imageRepository.deleteByItemId(itemId);
 		wishRepository.deleteByItemId(itemId);
 		chatRoomRepository.deleteByItemId(itemId);

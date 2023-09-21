@@ -63,7 +63,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 
 		Member member = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
 		Region region = new Region("서울 송파구 가락동");
-		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region, false);
+		MemberTown memberTown = MemberTown.notSelectedMemberTown(region, member);
 		MemberAddRegionResponse response = MemberAddRegionResponse.from(memberTown);
 
 		given(memberTownService.addMemberTown(
