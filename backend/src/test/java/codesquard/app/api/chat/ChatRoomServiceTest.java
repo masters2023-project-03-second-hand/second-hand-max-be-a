@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,11 @@ class ChatRoomServiceTest {
 
 	@Autowired
 	private ChatRoomService chatRoomService;
+
+	@BeforeEach
+	void cleanup() {
+		memberRepository.deleteAllInBatch();
+	}
 
 	@AfterEach
 	void tearDown() {
