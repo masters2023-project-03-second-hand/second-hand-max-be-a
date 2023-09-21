@@ -185,6 +185,10 @@ public class ItemService {
 			.map(Image::getImageUrl)
 			.forEach(imageService::deleteImage);
 
+		deleteAllRelatedItem(itemId);
+	}
+
+	private void deleteAllRelatedItem(Long itemId) {
 		imageRepository.deleteByItemId(itemId);
 		wishRepository.deleteByItemId(itemId);
 		chatRoomRepository.deleteByItemId(itemId);
