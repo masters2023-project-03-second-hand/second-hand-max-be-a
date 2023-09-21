@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatRoomCreateResponse {
+	
 	private Long id;
 
 	public static ChatRoomCreateResponse from(ChatRoom chatRoom) {
