@@ -40,7 +40,7 @@ public class MemberTown {
 	@JoinColumn(name = "region_id")
 	private Region region;
 
-	public MemberTown(String name, Member member, Region region, boolean isSelected) {
+	private MemberTown(String name, Member member, Region region, boolean isSelected) {
 		this.name = name;
 		this.member = member;
 		this.region = region;
@@ -57,6 +57,10 @@ public class MemberTown {
 
 	public static MemberTown selectedMemberTown(Region region, Member member) {
 		return new MemberTown(region.getShortAddress(), member, region, true);
+	}
+
+	public static MemberTown notSelectedMemberTown(Region region, Member member) {
+		return new MemberTown(region.getShortAddress(), member, region, false);
 	}
 
 	@Override

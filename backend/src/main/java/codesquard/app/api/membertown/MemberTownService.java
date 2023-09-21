@@ -43,7 +43,7 @@ public class MemberTownService {
 		Region region = getAddressIdBy(request.getAddressId());
 		memberTownValidator.validateAddMemberTown(memberTowns, region);
 
-		MemberTown town = new MemberTown(region.getShortAddress(), member, region, false);
+		MemberTown town = MemberTown.notSelectedMemberTown(region, member);
 		memberTownRepository.save(town);
 
 		return MemberAddRegionResponse.from(town);

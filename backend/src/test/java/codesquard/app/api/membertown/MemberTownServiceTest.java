@@ -147,7 +147,7 @@ class MemberTownServiceTest {
 			MemberTownAddRequest.class);
 
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
-		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region, false));
+		memberTownRepository.save(MemberTown.notSelectedMemberTown(region, member));
 
 		// when
 		Throwable throwable = catchThrowable(
@@ -206,7 +206,7 @@ class MemberTownServiceTest {
 		memberRepository.save(member);
 
 		Region newRegion = regionRepository.save(createRegion("서울 송파구 가락동"));
-		MemberTown memberTown = new MemberTown(newRegion.getShortAddress(), member, newRegion, false);
+		MemberTown memberTown = MemberTown.notSelectedMemberTown(region, member);
 		memberTownRepository.save(memberTown);
 
 		// when
@@ -227,7 +227,7 @@ class MemberTownServiceTest {
 		Member saveMember = memberRepository.save(member);
 
 		Region region = regionRepository.save(createRegion("서울 종로구 창성동"));
-		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region, false);
+		MemberTown memberTown = MemberTown.notSelectedMemberTown(region, member);
 		memberTownRepository.save(memberTown);
 
 		Map<String, Object> requestBody = new HashMap<>();
