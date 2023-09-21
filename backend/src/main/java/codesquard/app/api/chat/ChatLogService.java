@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 @Service
 public class ChatLogService {
-	
+
 	private final ChatLogRepository chatLogRepository;
 	private final ChatRoomRepository chatRoomRepository;
 
@@ -30,9 +30,9 @@ public class ChatLogService {
 	public ChatLogSendResponse sendMessage(ChatLogSendRequest request, Long chatRoomId, Principal sender) {
 		ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
 			.orElseThrow(() -> new RestApiException(ChatRoomErrorCode.NOT_FOUND_CHATROOM));
-		String receiver = chatRoom.getItem().getMember().getLoginId();
+		String seller = chatRoom.getItem().getMember().getLoginId();
 
-		ChatLog chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), receiver, LocalDateTime.now(),
+		ChatLog chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), seller, LocalDateTime.now(),
 			chatRoom);
 		ChatLog saveChatLog = chatLogRepository.save(chatLog);
 		return ChatLogSendResponse.from(saveChatLog);
