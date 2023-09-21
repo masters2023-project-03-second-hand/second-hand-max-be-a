@@ -18,14 +18,14 @@ import codesquard.app.domain.oauth.properties.OauthProperties;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class NaverOauthClient extends OauthClient {
+public class KakaoOauthClient extends OauthClient {
 
-	public NaverOauthClient(OauthProperties.Naver naver) {
-		super(naver.getClientId(),
-			naver.getClientSecret(),
-			naver.getTokenUri(),
-			naver.getUserInfoUri(),
-			naver.getRedirectUri());
+	public KakaoOauthClient(OauthProperties.Kakao kakao) {
+		super(kakao.getClientId(),
+			kakao.getClientSecret(),
+			kakao.getTokenUri(),
+			kakao.getUserInfoUri(),
+			kakao.getRedirectUri());
 	}
 
 	@Override
@@ -36,7 +36,6 @@ public class NaverOauthClient extends OauthClient {
 			.post()
 			.uri(getTokenUri())
 			.headers(header -> {
-				header.setBasicAuth(getClientId(), getClientSecret());
 				header.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 				header.setAccept(List.of(MediaType.APPLICATION_JSON));
 				header.setAcceptCharset(List.of(StandardCharsets.UTF_8));
@@ -57,24 +56,20 @@ public class NaverOauthClient extends OauthClient {
 	public MultiValueMap<String, String> createFormData(String authorizationCode) {
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 		formData.add("code", authorizationCode);
+		formData.add("client_id", getClientId());
+		formData.add("client_secret", getClientSecret());
 		formData.add("redirect_uri", getRedirectUri());
 		formData.add("grant_type", "authorization_code");
+
 		return formData;
 	}
 
 	@Override
 	public OauthUserProfileResponse createOauthUserProfileResponse(Map<String, Object> attributes) {
-		Map<String, Object> responseMap = (Map<String, Object>)attributes.get("response");
-		String email = (String)responseMap.get("email");
-		String profileImage = (String)responseMap.get("profile_image");
+		Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
+		Map<String, Object> profile = (Map<String, Object>)kakaoAccount.get("profile");
+		String email = (String)kakaoAccount.get("email");
+		String profileImage = (String)profile.get("profile_image_url");
 		return new OauthUserProfileResponse(email, profileImage);
 	}
-
-	@Override
-	public OauthUserProfileResponse getUserProfileByAccessToken(OauthAccessTokenResponse accessTokenResponse) {
-		Map<String, Object> userProfileMap = getUserAttributes(getUserInfoUri(), accessTokenResponse);
-		log.debug("userProfileMap : {}", userProfileMap);
-		return createOauthUserProfileResponse(userProfileMap);
-	}
-
 }

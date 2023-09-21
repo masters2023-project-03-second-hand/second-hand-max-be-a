@@ -1,22 +1,17 @@
 package codesquard.app.domain.oauth.client;
 
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import codesquard.app.api.errors.errorcode.OauthErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+@Getter
 @Slf4j
 public abstract class OauthClient {
 
@@ -35,46 +30,11 @@ public abstract class OauthClient {
 	}
 
 	// accessToken을 Oauth 서버로부터 발급받는다
-	public OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(String authorizationCode) {
-		MultiValueMap<String, String> formData = createFormData(redirectUri, authorizationCode);
+	public abstract OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(String authorizationCode);
 
-		OauthAccessTokenResponse response = WebClient.create()
-			.post()
-			.uri(tokenUri)
-			.headers(header -> {
-				header.setBasicAuth(clientId, clientSecret);
-				header.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-				header.setAccept(List.of(MediaType.APPLICATION_JSON));
-				header.setAcceptCharset(List.of(StandardCharsets.UTF_8));
-			})
-			.bodyValue(formData)
-			.retrieve() // ResponseEntity를 받아 디코딩
-			.bodyToMono(OauthAccessTokenResponse.class) // 주어진 타입으로 디코딩
-			.block();
+	public abstract MultiValueMap<String, String> createFormData(String authorizationCode);
 
-		if (Objects.requireNonNull(response).getAccessToken() == null) {
-			throw new RestApiException(OauthErrorCode.WRONG_AUTHORIZATION_CODE);
-		}
-
-		return response;
-	}
-
-	private MultiValueMap<String, String> createFormData(String redirectUri, String authorizationCode) {
-		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-		formData.add("code", authorizationCode);
-		formData.add("redirect_uri", redirectUri);
-		formData.add("grant_type", "authorization_code");
-		return formData;
-	}
-
-	// Oauth 리소스 서버로부터 유저의 프로필 가져온다
-	public OauthUserProfileResponse getUserProfileByAccessToken(OauthAccessTokenResponse accessTokenResponse) {
-		Map<String, Object> userProfileMap = getUserAttributes(userInfoUri, accessTokenResponse);
-		log.debug("userProfileMap : {}", userProfileMap);
-		return createOauthUserProfileResponse(userProfileMap);
-	}
-
-	private Map<String, Object> getUserAttributes(String userInfoUri, OauthAccessTokenResponse accessTokenResponse) {
+	public Map<String, Object> getUserAttributes(String userInfoUri, OauthAccessTokenResponse accessTokenResponse) {
 		return WebClient.create()
 			.get()
 			.uri(userInfoUri)
@@ -87,4 +47,11 @@ public abstract class OauthClient {
 	}
 
 	public abstract OauthUserProfileResponse createOauthUserProfileResponse(Map<String, Object> attributes);
+
+	// Oauth 리소스 서버로부터 유저의 프로필 가져온다
+	public OauthUserProfileResponse getUserProfileByAccessToken(OauthAccessTokenResponse accessTokenResponse) {
+		Map<String, Object> userProfileMap = getUserAttributes(userInfoUri, accessTokenResponse);
+		log.debug("userProfileMap : {}", userProfileMap);
+		return createOauthUserProfileResponse(userProfileMap);
+	}
 }

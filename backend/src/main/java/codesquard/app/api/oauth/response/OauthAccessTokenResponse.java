@@ -2,12 +2,11 @@ package codesquard.app.api.oauth.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class OauthAccessTokenResponse {
 
 	@JsonProperty("access_token")
