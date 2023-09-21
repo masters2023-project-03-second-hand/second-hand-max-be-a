@@ -1,8 +1,12 @@
 package codesquard.app.api.oauth;
 
+import static codesquard.app.domain.membertown.MemberTown.*;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,12 +71,27 @@ public class OauthService {
 		Member saveMember = memberRepository.save(member);
 		log.debug("회원 엔티티 저장 결과 : {}", saveMember);
 
-		List<Region> regions = regionRepository.findAllById(request.getAddressIds());
-		List<MemberTown> memberTowns = MemberTown.createMemberTowns(regions, member);
-		memberTownRepository.saveAll(memberTowns);
-		log.debug("회원 동네 저장 결과 : {}", memberTowns);
+		saveMemberTowns(request.getAddressIds(), member);
 
 		return OauthSignUpResponse.from(saveMember);
+	}
+
+	private void saveMemberTowns(List<Long> addressIds, Member member) {
+		List<Region> regions = regionRepository.findAllById(addressIds);
+		Region selectedRegion = regions.get(0); // 제일 앞의 지역 선택
+		List<Region> notSelectedRegion = regions.stream()
+			.skip(1)
+			.collect(Collectors.toUnmodifiableList()); // 선택된 동네를 제외한 나머지 동네
+
+		MemberTown selectedMemberTown = selectedMemberTown(selectedRegion, member);
+		List<MemberTown> notSelectedMemberTowns = createMemberTowns(notSelectedRegion, member);
+
+		List<MemberTown> memberTowns = new ArrayList<>();
+		memberTowns.add(selectedMemberTown);
+		memberTowns.addAll(notSelectedMemberTowns);
+		memberTownRepository.saveAll(memberTowns);
+
+		log.debug("회원 동네 저장 결과 : memberTowns={}", memberTowns);
 	}
 
 	private void validateDuplicateLoginId(String loginId) {

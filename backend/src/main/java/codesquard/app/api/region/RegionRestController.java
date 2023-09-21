@@ -14,13 +14,13 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class RegionRestController {
 
-	private final RegionQueryService regionQueryService;
+	private final RegionService regionService;
 
 	@GetMapping
 	public ApiResponse<RegionListResponse> findAll(
 		@RequestParam(value = "size", defaultValue = "10", required = false) int size,
 		@RequestParam(value = "cursor", required = false) Long cursor,
 		@RequestParam(value = "region", required = false) String region) {
-		return ApiResponse.ok("주소 목록 조회에 성공하였습니다.", regionQueryService.searchBySlice(size, cursor, region));
+		return ApiResponse.ok("주소 목록 조회에 성공하였습니다.", regionService.searchBySlice(size, cursor, region));
 	}
 }

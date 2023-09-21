@@ -21,6 +21,7 @@ import codesquard.app.api.item.response.ItemResponse;
 import codesquard.app.api.item.response.ItemResponses;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.category.CategoryRepository;
+import codesquard.app.domain.chat.ChatRoomRepository;
 import codesquard.app.domain.image.Image;
 import codesquard.app.domain.image.ImageRepository;
 import codesquard.app.domain.item.Item;
@@ -30,6 +31,7 @@ import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.domain.pagination.PaginationUtils;
+import codesquard.app.domain.wish.WishRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +46,8 @@ public class ItemService {
 	private final ImageService imageService;
 	private final CategoryRepository categoryRepository;
 	private final ItemPaginationRepository itemPaginationRepository;
+	private final WishRepository wishRepository;
+	private final ChatRoomRepository chatRoomRepository;
 
 	@Transactional
 	public void register(ItemRegisterRequest request, List<MultipartFile> itemImage, Long memberId) {
@@ -171,5 +175,25 @@ public class ItemService {
 	private Item findItemBy(Long itemId) {
 		return itemRepository.findById(itemId)
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+	}
+
+	@Transactional
+	public void deleteItem(Long itemId, Principal writer) {
+		Item item = findItemBy(itemId);
+		item.validateSeller(writer.getMemberId());
+
+		List<Image> images = imageRepository.findAllByItemId(itemId);
+		images.stream()
+			.map(Image::getImageUrl)
+			.forEach(imageService::deleteImage);
+
+		deleteAllRelatedItem(itemId);
+	}
+
+	private void deleteAllRelatedItem(Long itemId) {
+		imageRepository.deleteByItemId(itemId);
+		wishRepository.deleteByItemId(itemId);
+		chatRoomRepository.deleteByItemId(itemId);
+		itemRepository.deleteById(itemId);
 	}
 }

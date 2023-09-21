@@ -1,8 +1,9 @@
 package codesquard.app.api.membertown;
 
 import static codesquard.app.MemberTestSupport.*;
+import static codesquard.app.MemberTownTestSupport.*;
 import static codesquard.app.RegionTestSupport.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
 import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
+import codesquard.app.api.region.request.RegionSelectionRequest;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.member.MemberRepository;
 import codesquard.app.domain.membertown.MemberTown;
@@ -78,7 +80,7 @@ class MemberTownServiceTest {
 		List<MemberTown> memberTowns = memberTownRepository.findAll();
 		assertAll(() -> {
 			assertThat(response.getName()).isEqualTo("가락동");
-			assertThat(memberTowns).hasSize(1);
+			assertThat(memberTowns.size()).isEqualTo(1);
 		});
 	}
 
@@ -145,7 +147,7 @@ class MemberTownServiceTest {
 			MemberTownAddRequest.class);
 
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
-		memberTownRepository.save(new MemberTown(region.getShortAddress(), member, region));
+		memberTownRepository.save(MemberTown.notSelectedMemberTown(region, member));
 
 		// when
 		Throwable throwable = catchThrowable(
@@ -204,7 +206,7 @@ class MemberTownServiceTest {
 		memberRepository.save(member);
 
 		Region newRegion = regionRepository.save(createRegion("서울 송파구 가락동"));
-		MemberTown memberTown = new MemberTown(newRegion.getShortAddress(), member, newRegion);
+		MemberTown memberTown = MemberTown.notSelectedMemberTown(newRegion, member);
 		memberTownRepository.save(memberTown);
 
 		// when
@@ -225,7 +227,7 @@ class MemberTownServiceTest {
 		Member saveMember = memberRepository.save(member);
 
 		Region region = regionRepository.save(createRegion("서울 종로구 창성동"));
-		MemberTown memberTown = new MemberTown(region.getShortAddress(), member, region);
+		MemberTown memberTown = MemberTown.notSelectedMemberTown(region, member);
 		memberTownRepository.save(memberTown);
 
 		Map<String, Object> requestBody = new HashMap<>();
@@ -242,5 +244,87 @@ class MemberTownServiceTest {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("동네는 최소 1개 이상 선택해야 해요. 새로운 동네를 등록한 후 삭제해주세요.");
+	}
+
+	@DisplayName("회원이 자신이 등록한 동네 지역을 선택한다")
+	@Test
+	public void selectRegion() throws JsonProcessingException {
+		// given
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		List<Region> regions = regionRepository.saveAll(
+			List.of(createRegion("서울 송파구 가락동"), createRegion("서울 종로구 청운동")));
+		memberTownRepository.saveAll(List.of(
+			createMemberTown(member, regions.get(0), true),
+			createMemberTown(member, regions.get(1), false)));
+
+		Map<String, Object> requestBody = Map.of("selectedAddressId", regions.get(1).getId());
+		RegionSelectionRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			RegionSelectionRequest.class);
+
+		// when
+		memberTownService.selectRegion(request, Principal.from(member));
+
+		// then
+		assertAll(() -> {
+			MemberTown oldSelectionMemberTown = memberTownRepository.findMemberTownByMemberIdAndRegionId(member.getId(),
+					regions.get(0).getId())
+				.orElseThrow();
+			assertThat(oldSelectionMemberTown.isSelected()).isFalse();
+
+			MemberTown newSelectionMemberTown = memberTownRepository.findMemberTownByMemberIdAndRegionId(member.getId(),
+					regions.get(1).getId())
+				.orElseThrow();
+			assertThat(newSelectionMemberTown.isSelected()).isTrue();
+		});
+	}
+
+	@DisplayName("회원은 존재하지 않는 지역 등록번호로 동네 지역을 선택할 수 없다")
+	@Test
+	public void selectRegionWithNotExistRegionId() throws JsonProcessingException {
+		// given
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		List<Region> regions = regionRepository.saveAll(
+			List.of(createRegion("서울 송파구 가락동"), createRegion("서울 종로구 청운동")));
+		memberTownRepository.saveAll(List.of(
+			createMemberTown(member, regions.get(0), true),
+			createMemberTown(member, regions.get(1), false)));
+
+		Map<String, Object> requestBody = Map.of("selectedAddressId", 9999L);
+		RegionSelectionRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			RegionSelectionRequest.class);
+
+		// when
+		Throwable throwable = catchThrowable(() -> memberTownService.selectRegion(request, Principal.from(member)));
+
+		// then
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("주소를 찾지 못하였습니다.");
+	}
+
+	@DisplayName("회원은 회원의 동네로 등록되지 않은 동네지역을 선택할 수 없다")
+	@Test
+	public void selectRegionWithNotRegisteredRegionId() throws JsonProcessingException {
+		// given
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		List<Region> regions = regionRepository.saveAll(
+			List.of(createRegion("서울 송파구 가락동"), createRegion("서울 종로구 청운동"), createRegion("서울 종로구 신교동")));
+		memberTownRepository.saveAll(List.of(
+			createMemberTown(member, regions.get(0), true),
+			createMemberTown(member, regions.get(1), false)));
+
+		Map<String, Object> requestBody = Map.of("selectedAddressId", regions.get(2).getId());
+		RegionSelectionRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			RegionSelectionRequest.class);
+
+		// when
+		Throwable throwable = catchThrowable(() -> memberTownService.selectRegion(request, Principal.from(member)));
+
+		// then
+		assertThat(throwable)
+			.isInstanceOf(RestApiException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("회원이 등록한 동네만 선택할 수 있습니다.");
 	}
 }

@@ -33,8 +33,8 @@ VALUES ('https://nid.naver.com/user2/api/route?m=routePcProfileModification',
         'dragonbead95@naver.com',
         'bruni');
 
-INSERT INTO member_town(name, member_id, region_id)
-VALUES ('청운동', 1, 1);
+INSERT INTO member_town(name, member_id, region_id, is_selected)
+VALUES ('청운동', 1, 1, true);
 
 INSERT INTO item(chat_count,
                  content,
