@@ -17,29 +17,31 @@ import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
-import codesquard.app.api.chat.response.ChatRoomCreateResponse;
+import codesquard.app.api.chat.request.ChatLogSendRequest;
+import codesquard.app.api.chat.response.ChatLogSendResponse;
 import codesquard.app.domain.oauth.support.Principal;
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = ChatRoomRestController.class)
-class ChatRoomRestControllerTest extends ControllerTestSupport {
+@WebMvcTest(controllers = ChatLogRestController.class)
+class ChatLogRestControllerTest extends ControllerTestSupport {
 
 	private MockMvc mockMvc;
 
 	@Autowired
-	private ChatRoomRestController chatRoomRestController;
+	private ChatLogRestController chatLogRestController;
 
 	@MockBean
-	private ChatRoomService chatRoomService;
+	private ChatLogService chatLogService;
 
 	@BeforeEach
 	public void setup() {
-		mockMvc = MockMvcBuilders.standaloneSetup(chatRoomRestController)
+		mockMvc = MockMvcBuilders.standaloneSetup(chatLogRestController)
 			.setControllerAdvice(globalExceptionHandler)
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
 			.alwaysDo(print())
@@ -51,26 +53,38 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 		given(authPrincipalArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(principal);
 	}
 
-	@DisplayName("채팅방 생성을 요청한다")
+	@DisplayName("구매자가 판매자에게 채팅 메시지를 전송합니다.")
 	@Test
-	public void createChatRoom() throws Exception {
+	public void sendMessage() throws Exception {
 		// given
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("message", "롤러 블레이드 삽니다.");
+
 		Map<String, Object> responseBody = new HashMap<>();
 		responseBody.put("id", 1L);
+		responseBody.put("message", "롤러 블레이드 삽니다.");
+		responseBody.put("sender", "23Yong");
+		responseBody.put("receiver", "bruni");
 
-		ChatRoomCreateResponse response = objectMapper.readValue(objectMapper.writeValueAsString(responseBody),
-			ChatRoomCreateResponse.class);
+		ChatLogSendResponse response = objectMapper.readValue(objectMapper.writeValueAsString(responseBody),
+			ChatLogSendResponse.class);
 
-		given(chatRoomService.createChatRoom(
+		given(chatLogService.sendMessage(
+			ArgumentMatchers.any(ChatLogSendRequest.class),
 			ArgumentMatchers.anyLong(),
 			ArgumentMatchers.any(Principal.class)))
 			.willReturn(response);
 
 		// when & then
-		mockMvc.perform(post("/api/items/1/chats"))
+		mockMvc.perform(post("/api/chats/1")
+				.content(objectMapper.writeValueAsString(requestBody))
+				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("statusCode").value(equalTo(201)))
-			.andExpect(jsonPath("message").value(equalTo("채팅방 생성을 완료하였습니다.")))
-			.andExpect(jsonPath("data.id").value(equalTo(1)));
+			.andExpect(jsonPath("message").value(equalTo("메시지 전송이 완료되었습니다.")))
+			.andExpect(jsonPath("data.id").value(equalTo(1)))
+			.andExpect(jsonPath("data.message").value(equalTo("롤러 블레이드 삽니다.")))
+			.andExpect(jsonPath("data.sender").value(equalTo("23Yong")))
+			.andExpect(jsonPath("data.receiver").value(equalTo("bruni")));
 	}
 }

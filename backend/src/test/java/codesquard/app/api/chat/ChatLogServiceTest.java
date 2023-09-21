@@ -5,23 +5,29 @@ import static codesquard.app.MemberTownTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
 import static java.time.LocalDateTime.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import codesquard.app.CategoryTestSupport;
 import codesquard.app.RegionTestSupport;
-import codesquard.app.api.chat.response.ChatRoomCreateResponse;
+import codesquard.app.api.chat.request.ChatLogSendRequest;
+import codesquard.app.api.chat.response.ChatLogSendResponse;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.category.CategoryRepository;
+import codesquard.app.domain.chat.ChatLogRepository;
+import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.chat.ChatRoomRepository;
 import codesquard.app.domain.image.Image;
 import codesquard.app.domain.image.ImageRepository;
@@ -36,7 +42,7 @@ import codesquard.app.domain.region.RegionRepository;
 
 @ActiveProfiles("test")
 @SpringBootTest
-class ChatRoomServiceTest {
+class ChatLogServiceTest {
 
 	@Autowired
 	private MemberRepository memberRepository;
@@ -57,18 +63,20 @@ class ChatRoomServiceTest {
 	private ItemRepository itemRepository;
 
 	@Autowired
+	private ChatLogRepository chatLogRepository;
+
+	@Autowired
 	private ChatRoomRepository chatRoomRepository;
 
 	@Autowired
-	private ChatRoomService chatRoomService;
+	private ChatLogService chatLogService;
 
-	@BeforeEach
-	void cleanup() {
-		memberRepository.deleteAllInBatch();
-	}
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@AfterEach
 	void tearDown() {
+		chatLogRepository.deleteAllInBatch();
 		chatRoomRepository.deleteAllInBatch();
 		imageRepository.deleteAllInBatch();
 		itemRepository.deleteAllInBatch();
@@ -78,9 +86,9 @@ class ChatRoomServiceTest {
 		categoryRepository.deleteAllInBatch();
 	}
 
-	@DisplayName("구매자가 한 상품에 대한 채팅방을 생성한다")
+	@DisplayName("채팅 메시지를 전송한다")
 	@Test
-	public void createChatRoom() {
+	public void sendMessage() throws JsonProcessingException {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue1", "23Yong@gmail.com", "23Yong"));
 		Member buyer = memberRepository.save(createMember("avatarUrlValue2", "bruni@gmail.com", "bruni"));
@@ -112,14 +120,20 @@ class ChatRoomServiceTest {
 			new Image("imageUrlValue2", saveItem, false));
 		imageRepository.saveAll(images);
 
+		ChatRoom chatRoom = chatRoomRepository.save(new ChatRoom(now(), buyer, item));
+
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("message", "롤러블레이드 사고 싶습니다.");
+		ChatLogSendRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
+			ChatLogSendRequest.class);
+
 		// when
-		ChatRoomCreateResponse response = chatRoomService.createChatRoom(saveItem.getId(), Principal.from(buyer));
+		ChatLogSendResponse response = chatLogService.sendMessage(request, chatRoom.getId(),
+			Principal.from(buyer));
 
 		// then
-		assertAll(() -> {
-			assertThat(response)
-				.extracting("id")
-				.isEqualTo(1L);
-		});
+		assertThat(response)
+			.extracting("message", "sender", "receiver")
+			.containsExactlyInAnyOrder("롤러블레이드 사고 싶습니다.", "bruni", "23Yong");
 	}
 }

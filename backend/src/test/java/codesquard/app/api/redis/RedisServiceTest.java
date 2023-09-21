@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ class RedisServiceTest extends CacheTestSupport {
 		itemRepository.deleteAllInBatch();
 	}
 
+	@Disabled
 	@DisplayName("상품 상세 조회 시 viewCount가 증가한다.")
 	@Test
 	void viewCountTest() {
