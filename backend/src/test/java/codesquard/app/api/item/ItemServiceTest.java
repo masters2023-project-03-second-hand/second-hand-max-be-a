@@ -115,13 +115,15 @@ class ItemServiceTest {
 		given(imageUploader.uploadImageToS3(any(), anyString())).willReturn("url");
 		Category category = supportRepository.save(new Category("식품", "~~~~"));
 		Member member = supportRepository.save(new Member("avatar", "pie@pie", "pieeeeeee"));
-
+		MultipartFile thumbnail =
+			new MockMultipartFile("test-thumbnail", "test-thumbnail.png", MediaType.IMAGE_PNG_VALUE,
+				"image-content".getBytes(StandardCharsets.UTF_8));
 		List<MultipartFile> multipartFiles = getMultipartFiles();
 		ItemRegisterRequest request = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 
 		// when
-		itemService.register(request, multipartFiles, member.getId());
+		itemService.register(request, multipartFiles, thumbnail, member.getId());
 		Item item = supportRepository.findAll(Item.class).get(0);
 
 		// then
@@ -249,7 +251,7 @@ class ItemServiceTest {
 
 	@DisplayName("회원은 상품 정보 수정시 새로운 썸네일 이미지를 두고 수정한다")
 	@Test
-	public void modifyItemWithNewThumnail() throws IOException {
+	public void modifyItemWithNewThumbnail() throws IOException {
 		// given
 		Category category = categoryRepository.save(findByName("스포츠/레저"));
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
@@ -449,6 +451,7 @@ class ItemServiceTest {
 
 		// when
 		ItemDetailResponse response = itemService.findDetailItemBy(item.getId(), member.getId());
+
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
 			softAssertions.assertThat(response)

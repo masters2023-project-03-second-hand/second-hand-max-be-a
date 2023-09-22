@@ -50,13 +50,12 @@ public class ItemService {
 	private final ChatRoomRepository chatRoomRepository;
 
 	@Transactional
-	public void register(ItemRegisterRequest request, List<MultipartFile> itemImage, Long memberId) {
+	public void register(ItemRegisterRequest request, List<MultipartFile> itemImage,
+		MultipartFile thumbnail, Long memberId) {
 		List<String> serverFileUrls = imageService.uploadImages(itemImage);
+		String thumbnailUrl = imageService.uploadImage(thumbnail);
 		Member writer = new Member(memberId);
-		String thumbnailUrl = serverFileUrls.get(0);
-		Item item = request.toEntity(writer, thumbnailUrl);
-		Item saveItem = itemRepository.save(item);
-
+		Item saveItem = itemRepository.save(request.toEntity(writer, thumbnailUrl));
 		List<Image> images = Image.createImages(serverFileUrls, saveItem);
 		imageRepository.saveAll(images);
 	}
