@@ -1,5 +1,6 @@
 package codesquard.app.api.item;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -106,6 +107,9 @@ public class ItemService {
 		log.debug("상품 수정 서비스의 이미지 테이블 저장 결과 : {}", saveImages);
 
 		List<String> deleteImageUrls = request.getDeleteImageUrls();
+		if (deleteImageUrls == null) {
+			deleteImageUrls = new ArrayList<>();
+		}
 		int deleteImageSize = deleteImages(itemId, deleteImageUrls);
 		log.debug("이미지 테이블의 삭제 결과 : 삭제 개수={}", deleteImageSize);
 
