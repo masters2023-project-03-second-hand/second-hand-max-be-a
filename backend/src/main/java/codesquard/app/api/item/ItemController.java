@@ -42,7 +42,7 @@ public class ItemController {
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResponse<Void> register(@RequestPart("item") ItemRegisterRequest request,
-		@RequestPart("images") List<MultipartFile> itemImage,
+		@RequestPart(value = "images", required = false) List<MultipartFile> itemImage,
 		@RequestPart("thumbnailImage") MultipartFile thumbnail,
 		@AuthPrincipal Principal principal) {
 		itemService.register(request, itemImage, thumbnail, principal.getMemberId());
