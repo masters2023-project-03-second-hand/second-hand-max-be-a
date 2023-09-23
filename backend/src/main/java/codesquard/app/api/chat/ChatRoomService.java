@@ -1,7 +1,5 @@
 package codesquard.app.api.chat;
 
-import java.time.LocalDateTime;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +34,7 @@ public class ChatRoomService {
 		Item item = findItemBy(itemId);
 		Member senderMember = findMemberBy(sender.getMemberId());
 
-		ChatRoom chatRoom = new ChatRoom(LocalDateTime.now(), senderMember, item);
+		ChatRoom chatRoom = new ChatRoom(senderMember, item);
 
 		ChatRoom saveChatRoom = chatRoomRepository.save(chatRoom);
 		log.debug("채팅방 저장 결과 : chatRoom={}", saveChatRoom);
