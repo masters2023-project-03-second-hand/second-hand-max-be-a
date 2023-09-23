@@ -32,7 +32,6 @@ class CategoryQueryServiceTest {
 	@Test
 	public void findAll() {
 		// given
-		categoryRepository.deleteAllInBatch();
 		categoryRepository.saveAll(getCategories());
 
 		// when
