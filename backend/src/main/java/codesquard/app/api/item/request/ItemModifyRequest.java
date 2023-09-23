@@ -1,5 +1,6 @@
 package codesquard.app.api.item.request;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
@@ -40,6 +41,13 @@ public class ItemModifyRequest {
 			.region(region)
 			.status(status)
 			.build();
+	}
+
+	public List<String> getDeleteImageUrls() {
+		if (this.deleteImageUrls == null) {
+			return Collections.emptyList();
+		}
+		return deleteImageUrls;
 	}
 
 	@Override

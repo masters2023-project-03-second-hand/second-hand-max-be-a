@@ -1,6 +1,5 @@
 package codesquard.app.api.item;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -72,9 +71,6 @@ public class ItemController {
 		@Valid @RequestPart("item") ItemModifyRequest request,
 		@RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
 		@AuthPrincipal Principal principal) {
-		if (addImages == null) {
-			addImages = new ArrayList<>();
-		}
 		itemService.modifyItem(itemId, request, addImages, thumbnailImage, principal);
 		return ApiResponse.ok("상품 수정을 완료하였습니다.", null);
 	}
