@@ -1,7 +1,5 @@
 package codesquard.app.api.oauth;
 
-import static codesquard.app.domain.membertown.MemberTown.*;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,8 +81,8 @@ public class OauthService {
 			.skip(1)
 			.collect(Collectors.toUnmodifiableList()); // 선택된 동네를 제외한 나머지 동네
 
-		MemberTown selectedMemberTown = selectedMemberTown(selectedRegion, member);
-		List<MemberTown> notSelectedMemberTowns = createMemberTowns(notSelectedRegion, member);
+		MemberTown selectedMemberTown = MemberTown.selectedMemberTown(selectedRegion, member);
+		List<MemberTown> notSelectedMemberTowns = MemberTown.createMemberTowns(notSelectedRegion, member);
 
 		List<MemberTown> memberTowns = new ArrayList<>();
 		memberTowns.add(selectedMemberTown);
