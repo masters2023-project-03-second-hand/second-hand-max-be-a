@@ -8,11 +8,10 @@ import java.io.IOException;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 public class ImageTestSupport {
 
-	public static MultipartFile createMultipartFile(String path) throws IOException {
+	public static MockMultipartFile createMultipartFile(String path) throws IOException {
 		File file = new ClassPathResource(path).getFile();
 		String filename = file.getName().split("\\.")[0];
 		String originalFilename = file.getName();

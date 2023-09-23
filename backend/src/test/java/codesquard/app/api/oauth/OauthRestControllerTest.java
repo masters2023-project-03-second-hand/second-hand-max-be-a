@@ -1,5 +1,6 @@
 package codesquard.app.api.oauth;
 
+import static codesquard.app.ImageTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -88,7 +89,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 			requestJson.getBytes(StandardCharsets.UTF_8));
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
-				.file(createProfile("cat.png"))
+				.file(createMultipartFile("cat.png"))
 				.file(mockSignupData)
 				.param("code", "1234"))
 			.andExpect(status().isCreated())
@@ -109,7 +110,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
-				.file(createProfile("cat.png"))
+				.file(createMultipartFile("cat.png"))
 				.file(mockSignupData)
 				.param("code", "1234"))
 			.andExpect(status().isBadRequest())
@@ -134,7 +135,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(multipart("/api/auth/naver/signup")
-				.file(createProfile("cat.png"))
+				.file(createMultipartFile("cat.png"))
 				.file(mockSignupData)
 				.param("code", "1234"))
 			.andExpect(status().isBadRequest())

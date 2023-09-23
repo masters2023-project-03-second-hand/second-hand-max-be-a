@@ -1,5 +1,6 @@
 package codesquard.app.api.oauth;
 
+import static codesquard.app.ImageTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.RegionTestSupport.*;
 import static org.assertj.core.api.Assertions.*;
@@ -127,7 +128,7 @@ class OauthServiceTest {
 		String provider = "naver";
 		String code = "1234";
 		// when
-		OauthSignUpResponse response = oauthService.signUp(createProfile("cat.png"), request, provider, code);
+		OauthSignUpResponse response = oauthService.signUp(createMultipartFile("cat.png"), request, provider, code);
 
 		// then
 		Member findMember = memberRepository.findMemberByLoginId("23Yong")
@@ -162,7 +163,7 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
 		// then
 
 		assertThat(throwable)
@@ -208,7 +209,7 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
 
 		// then
 
@@ -237,7 +238,7 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
 
 		// then
 		assertThat(throwable)
@@ -275,7 +276,7 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
 
 		// then
 		assertThat(throwable)
@@ -299,7 +300,7 @@ class OauthServiceTest {
 
 		String provider = "naver";
 		String code = "1234";
-		MockMultipartFile profile = createProfile("cat.png");
+		MockMultipartFile profile = createMultipartFile("cat.png");
 
 		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
