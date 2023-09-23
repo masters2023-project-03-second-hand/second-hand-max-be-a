@@ -15,8 +15,6 @@ import javax.persistence.ManyToOne;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
-import codesquard.app.api.errors.errorcode.ItemErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.member.Member;
 import lombok.AllArgsConstructor;
@@ -121,23 +119,10 @@ public class Item {
 	public void wishCancel() {
 		this.wishCount--;
 	}
-
+	
 	@Override
 	public String toString() {
 		return String.format("%s, %s(id=%d, title=%s, price=%d, status=%s, region=%s, viewCount=%d)",
 			"상품", this.getClass().getSimpleName(), id, title, price, status, region, viewCount);
-	}
-
-	public void validateSeller(Long memberId) {
-		if (!member.getId().equals(memberId)) {
-			throw new RestApiException(ItemErrorCode.ITEM_FORBIDDEN);
-		}
-	}
-
-	public boolean equalThumnailImageUrl(String requestThumnailImage) {
-		if (thumbnailUrl == null) {
-			return false;
-		}
-		return thumbnailUrl.equals(requestThumnailImage);
 	}
 }

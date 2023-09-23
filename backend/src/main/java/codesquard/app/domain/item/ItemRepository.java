@@ -3,6 +3,7 @@ package codesquard.app.domain.item;
 import static codesquard.app.domain.item.QItem.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
@@ -70,4 +71,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
 	@Query("select item.viewCount from Item item where item.id =:itemId")
 	Long findViewCountById(@Param("itemId") Long itemId);
+
+	Optional<Item> findItemByIdAndMemberId(Long itemId, Long memberId);
 }
