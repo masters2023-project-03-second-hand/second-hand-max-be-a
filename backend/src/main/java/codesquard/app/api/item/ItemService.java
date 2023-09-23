@@ -172,14 +172,13 @@ public class ItemService {
 
 	private Item findItemByItemIdAndMemberId(Long itemId, Long memberId) {
 		return itemRepository.findItemByIdAndMemberId(itemId, memberId)
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_FORBIDDEN));
+			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 	}
 
 	@Transactional
 	public void deleteItem(Long itemId, Principal writer) {
 		Item item = findItemByItemIdAndMemberId(itemId, writer.getMemberId());
-
-		List<Image> images = imageRepository.findAllByItemId(itemId);
+		List<Image> images = imageRepository.findAllByItemId(item.getId());
 		images.stream()
 			.map(Image::getImageUrl)
 			.forEach(imageService::deleteImage);
