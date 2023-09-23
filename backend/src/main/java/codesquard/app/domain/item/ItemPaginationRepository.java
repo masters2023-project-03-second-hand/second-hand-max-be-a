@@ -25,7 +25,7 @@ public class ItemPaginationRepository {
 				item.id.as("itemId"),
 				item.thumbnailUrl,
 				item.title,
-				item.region,
+				item.region.as("tradingRegion"),
 				item.createdAt,
 				item.price,
 				item.status,

@@ -23,6 +23,9 @@ services:
       - backend_net
     environment:
       - NODE_ENV=prod
+      - VITE_APP_BASE_URL=http://localhost:8080/api
+      - VITE_APP_OAUTH_URL=https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=a1bc0451582fb5371039f8cd515a584c&redirect_uri=http://localhost:5173/my-account/oauth
+      - VITE_APP_OAUTH_PROVIDER=kakao
   db:
     container_name: second_hand_db
     image: mysql:latest
