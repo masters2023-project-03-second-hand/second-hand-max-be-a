@@ -5,7 +5,9 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,24 +28,30 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class RedisService {
 
+	private static final String LOGOUT = "logout";
+	private static final String REFRESH_TOKEN_PREFIX = "RT:";
+	private static final Pattern REFRESH_TOKEN_PATTERN = Pattern.compile("RT:*");
+	private static final String ITEM_ID_PREFIX = "itemId: ";
+	private static final Pattern ITEM_ID_PATTERN = Pattern.compile("itemId:*");
+
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final ItemRepository itemRepository;
 
 	public String findEmailByRefreshTokenValue(String refreshToken) {
-		Set<String> keys = redisTemplate.keys("RT:*");
+		Set<String> keys = redisTemplate.keys(REFRESH_TOKEN_PATTERN.pattern());
 		if (keys == null) {
 			throw new RestApiException(JwtTokenErrorCode.EMPTY_TOKEN);
 		}
 		return keys.stream()
 			.filter(key -> Objects.equals(redisTemplate.opsForValue().get(key), refreshToken))
 			.findAny()
-			.map(email -> email.replace("RT:", ""))
+			.map(email -> email.replace(REFRESH_TOKEN_PREFIX, Strings.EMPTY))
 			.orElseThrow(() -> new RestApiException(JwtTokenErrorCode.INVALID_TOKEN));
 	}
 
 	public void banAccessToken(String accessToken, long expiration) {
 		redisTemplate.opsForValue()
-			.set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+			.set(accessToken, LOGOUT, expiration, TimeUnit.MILLISECONDS);
 	}
 
 	public boolean delete(String key) {
@@ -66,14 +74,14 @@ public class RedisService {
 	}
 
 	public void validateAlreadyLogout(String token) {
-		String value = String.valueOf(redisTemplate.opsForValue().get(token));
-		if (Objects.equals(value, "logout")) {
+		String logout = (String)redisTemplate.opsForValue().get(token);
+		if (LOGOUT.equals(logout)) {
 			throw new RestApiException(OauthErrorCode.NOT_LOGIN_STATE);
 		}
 	}
 
 	public void addViewCount(Long itemId) {
-		String key = "itemId: " + itemId;
+		String key = ITEM_ID_PREFIX + itemId;
 		ValueOperations<String, Object> value = redisTemplate.opsForValue();
 		if (value.get(key) != null) {
 			value.increment(key);
@@ -85,7 +93,7 @@ public class RedisService {
 	@Transactional
 	@Scheduled(cron = "0 0/1 * * * ?")
 	public void deleteViewCountCache() {
-		Set<String> keys = redisTemplate.keys("itemId:*");
+		Set<String> keys = redisTemplate.keys(ITEM_ID_PATTERN.pattern());
 		Iterator<String> iterator = keys.iterator();
 		while (iterator.hasNext()) {
 			String data = iterator.next();
