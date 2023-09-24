@@ -33,11 +33,11 @@ public class ChatLog {
 	@JoinColumn(name = "chat_room_id")
 	private ChatRoom chatRoom;
 
-	public ChatLog(String message, String sender, String receiver, LocalDateTime createdAt, ChatRoom chatRoom) {
+	public ChatLog(String message, String sender, String receiver, ChatRoom chatRoom) {
 		this.message = message;
 		this.sender = sender;
 		this.receiver = receiver;
-		this.createdAt = createdAt;
+		this.createdAt = LocalDateTime.now();
 		this.chatRoom = chatRoom;
 	}
 }

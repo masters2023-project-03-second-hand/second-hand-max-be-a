@@ -49,8 +49,8 @@ public class Principal {
 			.build();
 	}
 
-	public String createRedisKey() {
-		return "RT:" + email;
+	public boolean isSeller(Member member) {
+		return memberId.equals(member.getId());
 	}
 
 	@Override

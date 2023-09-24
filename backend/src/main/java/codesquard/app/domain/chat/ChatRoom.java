@@ -42,6 +42,10 @@ public class ChatRoom {
 		this.item = item;
 	}
 
+	public String getBuyerLoginId() {
+		return buyer.getLoginId();
+	}
+
 	@Override
 	public String toString() {
 		return String.format("%s, %s(id=%d, buyerLoginId=%s, itemTitle=%s)", "회원", this.getClass().getSimpleName(), id,
