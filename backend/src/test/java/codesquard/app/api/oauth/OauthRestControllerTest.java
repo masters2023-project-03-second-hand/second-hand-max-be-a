@@ -58,8 +58,8 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		mockMvc = MockMvcBuilders.standaloneSetup(oauthRestController)
 			.setControllerAdvice(globalExceptionHandler)
 			.addFilters(
-				new JwtAuthorizationFilter(jwtProvider, authenticationContext, objectMapper, redisService),
-				new LogoutFilter(redisService, objectMapper)
+				new JwtAuthorizationFilter(jwtProvider, authenticationContext, objectMapper, oauthRedisService),
+				new LogoutFilter(oauthRedisService, objectMapper)
 			)
 			.addMappedInterceptors(new String[] {"/api/auth/logout"}, new LogoutInterceptor())
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)

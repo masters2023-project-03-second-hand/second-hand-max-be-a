@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import codesquard.app.api.errors.errorcode.ErrorCode;
 import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
-import codesquard.app.api.redis.RedisService;
+import codesquard.app.api.redis.OauthRedisService;
 import codesquard.app.api.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LogoutFilter extends OncePerRequestFilter {
 
-	private final RedisService redisService;
+	private final OauthRedisService redisService;
 	private final ObjectMapper objectMapper;
 
 	private static final AntPathMatcher pathMatcher = new AntPathMatcher();

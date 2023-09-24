@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import codesquard.app.api.errors.errorcode.ErrorCode;
 import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
-import codesquard.app.api.redis.RedisService;
+import codesquard.app.api.redis.OauthRedisService;
 import codesquard.app.api.response.ApiResponse;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.oauth.support.AuthenticationContext;
@@ -43,7 +43,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	private final JwtProvider jwtProvider;
 	private final AuthenticationContext authenticationContext;
 	private final ObjectMapper objectMapper;
-	private final RedisService redisService;
+	private final OauthRedisService redisService;
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {

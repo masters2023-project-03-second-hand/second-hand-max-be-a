@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
+import codesquard.app.api.errors.errorcode.RegionErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageService;
 import codesquard.app.api.oauth.request.OauthLoginRequest;
@@ -23,7 +23,7 @@ import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
-import codesquard.app.api.redis.RedisService;
+import codesquard.app.api.redis.OauthRedisService;
 import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
@@ -49,7 +49,7 @@ public class OauthService {
 	private final RegionRepository regionRepository;
 	private final ImageService imageService;
 	private final JwtProvider jwtProvider;
-	private final RedisService redisService;
+	private final OauthRedisService redisService;
 
 	public OauthSignUpResponse signUp(MultipartFile profile, OauthSignUpRequest request, String provider,
 		String authorizationCode) {
@@ -75,11 +75,12 @@ public class OauthService {
 	}
 
 	private void saveMemberTowns(List<Long> addressIds, Member member) {
-		List<Region> regions = regionRepository.findAllById(addressIds);
-		Region selectedRegion = regions.get(0); // 제일 앞의 지역 선택
-		List<Region> notSelectedRegion = regions.stream()
-			.skip(1)
-			.collect(Collectors.toUnmodifiableList()); // 선택된 동네를 제외한 나머지 동네
+		int otherRegionStartIdx = 1;
+		int frontRegion = 0;
+		Region selectedRegion = regionRepository.findById(addressIds.get(frontRegion))
+			.orElseThrow(() -> new RestApiException(RegionErrorCode.NOT_FOUND_REGION));
+		List<Region> notSelectedRegion = regionRepository.findAllById(
+			addressIds.subList(otherRegionStartIdx, addressIds.size()));
 
 		MemberTown selectedMemberTown = MemberTown.selectedMemberTown(selectedRegion, member);
 		List<MemberTown> notSelectedMemberTowns = MemberTown.createMemberTowns(notSelectedRegion, member);
@@ -131,7 +132,7 @@ public class OauthService {
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 		log.debug("로그인 서비스 요청 중 jwt 객체 생성 : {}", jwt);
 
-		redisService.saveRefreshToken(member, jwt);
+		redisService.saveRefreshToken(member.createRedisKey(), jwt);
 
 		return OauthLoginResponse.of(jwt, member, memberTowns);
 	}
@@ -152,23 +153,28 @@ public class OauthService {
 	}
 
 	private void deleteRefreshTokenBy(String refreshToken) {
+		String email;
 		try {
-			String email = redisService.findEmailByRefreshTokenValue(refreshToken);
+			email = redisService.findEmailBy(refreshToken);
 			log.debug("리프레시 토큰 값에 따른 이메일 조회 결과 : email={}", email);
-			boolean result = redisService.delete(String.format("RT:%s", email));
-			log.debug("리프레쉬 토큰 삭제 결과 : {}", result);
 		} catch (RestApiException e) {
 			log.error("리프레시 토큰에 따른 이메일 없음 : {}", e.getErrorCode().getMessage());
+			return;
 		}
+
+		boolean result = redisService.deleteRefreshToken(String.format("RT:%s", email));
+		log.debug("리프레쉬 토큰 삭제 결과 : {}", result);
 	}
 
 	private void banAccessToken(String accessToken) {
+		long expiration;
 		try {
-			long expiration = ((Integer)jwtProvider.getClaims(accessToken).get("exp")).longValue();
-			redisService.banAccessToken(accessToken, expiration);
+			expiration = ((Integer)jwtProvider.getClaims(accessToken).get("exp")).longValue();
 		} catch (RestApiException e) {
 			log.error("토큰 에러 : {}", accessToken);
+			return;
 		}
+		redisService.banAccessToken(accessToken, expiration);
 
 	}
 
@@ -178,7 +184,7 @@ public class OauthService {
 		jwtProvider.validateToken(refreshToken);
 		log.debug("refreshToken is valid token : {}", refreshToken);
 
-		String email = redisService.findEmailByRefreshTokenValue(refreshToken);
+		String email = redisService.findEmailBy(refreshToken);
 		log.debug("findEmailByRefreshToken 결과 : email={}", email);
 		Member member = memberRepository.findMemberByEmail(email)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
