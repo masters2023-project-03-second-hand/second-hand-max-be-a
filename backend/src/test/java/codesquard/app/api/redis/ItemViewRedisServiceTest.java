@@ -25,10 +25,10 @@ import codesquard.app.domain.member.Member;
 import codesquard.support.SupportRepository;
 
 @ActiveProfiles("test")
-class RedisServiceTest extends CacheTestSupport {
+class ItemViewRedisServiceTest extends CacheTestSupport {
 
 	@SpyBean
-	private RedisService redisService;
+	private ItemViewRedisService itemViewRedisService;
 
 	@Autowired
 	private SupportRepository supportRepository;
@@ -51,13 +51,13 @@ class RedisServiceTest extends CacheTestSupport {
 			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 		Member member = supportRepository.save(new Member("avatar", "pie@pie", "pieeeeeee"));
 		Item item = supportRepository.save(request1.toEntity(member, "thumbnail"));
-		redisService.addViewCount(item.getId());
-		redisService.addViewCount(item.getId());
+		itemViewRedisService.addViewCount(item.getId());
+		itemViewRedisService.addViewCount(item.getId());
 
 		// when
 		await().atMost(2, TimeUnit.MINUTES).untilAsserted(
 			() -> {
-				verify(redisService, atLeast(2
+				verify(itemViewRedisService, atLeast(2
 				)).deleteViewCountCache();
 			}
 		);
