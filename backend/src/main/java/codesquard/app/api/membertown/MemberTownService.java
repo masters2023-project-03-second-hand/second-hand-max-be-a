@@ -77,12 +77,12 @@ public class MemberTownService {
 		validateExistRegion(request.getSelectedAddressId());
 		validateRegisteredMemberTown(request.getSelectedAddressId(), principal.getMemberId());
 
-		// 기존 선택된 회원 동네 선택을 false로 변경합니다.
-		int result = memberTownRepository.changeIsSelectToFalse(principal.getMemberId());
+		Long regionId = memberTownRepository.findRegionIdByMemberIdAndIsSelected(
+			principal.getMemberId(), true);
+		int result = memberTownRepository.changeIsSelect(false, regionId, principal.getMemberId());
 		log.debug("지역 선택 해제 결과 : result={}", result);
 
-		// 새로 선택한 회원 동네 지역을 true로 변경한다
-		result = memberTownRepository.changeIsSelectToTrue(request.getSelectedAddressId(), principal.getMemberId());
+		result = memberTownRepository.changeIsSelect(true, request.getSelectedAddressId(), principal.getMemberId());
 		log.debug("지역 선택 활성화 결과 : result={}", result);
 	}
 
