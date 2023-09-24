@@ -3,6 +3,7 @@ package codesquard.app.domain.item;
 import java.util.Arrays;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
@@ -17,6 +18,7 @@ public enum ItemStatus {
 	SOLD_OUT("판매완료"),
 	RESERVED("예약중");
 
+	@JsonValue
 	private final String status;
 
 	@JsonCreator

@@ -56,9 +56,14 @@ public class ItemService {
 		String thumbnailUrl = imageService.uploadImage(thumbnail);
 		Member writer = new Member(memberId);
 		Item saveItem = itemRepository.save(request.toEntity(writer, thumbnailUrl));
-		List<String> serverFileUrls = imageService.uploadImages(itemImages);
-		List<Image> images = Image.createImages(serverFileUrls, saveItem);
-		imageRepository.saveAll(images);
+		Image saveThumbnailUrl = imageRepository.save(Image.thumbnail(thumbnailUrl, saveItem.getId()));
+		log.debug("썸네일 저장 결과 : {}", saveThumbnailUrl);
+
+		if (itemImages != null) {
+			List<String> serverFileUrls = imageService.uploadImages(itemImages);
+			List<Image> images = Image.createImages(serverFileUrls, saveItem);
+			imageRepository.saveAll(images);
+		}
 	}
 
 	public ItemResponses findAll(String region, int size, Long cursor, Long categoryId) {
