@@ -3,6 +3,8 @@ package codesquard.app.api.errors.handler;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -36,6 +38,25 @@ public class GlobalExceptionHandler {
 					Map<String, String> errors = new HashMap<>();
 					errors.put("field", error.getField());
 					errors.put("defaultMessage", error.getDefaultMessage());
+					return errors;
+				}).distinct()
+		);
+		return ResponseEntity.badRequest().body(body);
+	}
+
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<ApiResponse<Object>> handleConstraintViolationException(
+		ConstraintViolationException exception) {
+		log.error("ConstraintViolationException 발생 : {}", exception.toString());
+		ApiResponse<Object> body = ApiResponse.of(
+			HttpStatus.BAD_REQUEST,
+			"유효하지 않은 입력형식입니다.",
+			exception.getConstraintViolations().stream()
+				.map(error -> {
+					Map<String, String> errors = new HashMap<>();
+
+					errors.put("field", error.getPropertyPath().toString());
+					errors.put("defaultMessage", error.getMessage());
 					return errors;
 				}).distinct()
 		);

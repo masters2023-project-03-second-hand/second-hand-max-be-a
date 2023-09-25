@@ -3,9 +3,8 @@ package codesquard.app.api.chat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.validation.constraints.PositiveOrZero;
-
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import codesquard.app.annotation.MessageIndex;
 import codesquard.app.api.chat.request.ChatLogSendRequest;
 import codesquard.app.api.chat.response.ChatLogListResponse;
 import codesquard.app.api.chat.response.ChatLogSendResponse;
@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Validated
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @RestController
@@ -43,20 +44,18 @@ public class ChatLogRestController {
 		@AuthPrincipal Principal sender) {
 		ChatLogSendResponse response = chatLogService.sendMessage(request, chatRoomId, sender);
 
-		this.chatRequests.forEach((key, value) ->
-			key.setResult(chatLogService.readMessages(chatRoomId, value, sender)));
+		this.chatRequests.forEach((key, messageIndex) ->
+			key.setResult(chatLogService.readMessages(chatRoomId, messageIndex, sender)));
 		return ApiResponse.created("메시지 전송이 완료되었습니다.", response);
 	}
 
 	@GetMapping("/chats/{chatRoomId}")
 	public DeferredResult<ChatLogListResponse> readMessages(
 		@PathVariable Long chatRoomId,
-		@PositiveOrZero(message = "messageIndex는 0이상이어야 합니다.")
-		@RequestParam(required = false, defaultValue = "0") int messageIndex,
+		@RequestParam(required = false, defaultValue = "0") @MessageIndex int messageIndex,
 		@AuthPrincipal Principal principal) {
 		log.info("메시지 읽기 요청 : chatRoomId={}, messageIndex={}, 요청한 아이디={}", chatRoomId, messageIndex,
 			principal.getLoginId());
-
 		DeferredResult<ChatLogListResponse> deferredResult = new DeferredResult<>(1000L);
 		this.chatRequests.put(deferredResult, messageIndex);
 

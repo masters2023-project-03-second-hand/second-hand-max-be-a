@@ -56,8 +56,8 @@ public class ChatLogService {
 		Item item = findItemBy(chatRoom);
 
 		String chatPartnerName = getChatPartnerName(principal, item, chatRoom);
-		List<ChatLog> chatLogs = chatLogRepository.findAllByChatRoomIdOrderByCreatedAtAsc(
-			chatRoomId);
+		List<ChatLog> chatLogs = chatLogRepository.findAllByChatRoomIdOrderByCreatedAtAsc(chatRoomId);
+		log.debug("메시지 읽기에서 채팅 로그 결과 : chatLogs.size={}", chatLogs.size());
 		List<ChatLog> chatLogsAfterIndex = chatLogs.subList(messageIndex, chatLogs.size());
 
 		List<ChatLogMessageResponse> chats = IntStream.range(0, chatLogsAfterIndex.size())
