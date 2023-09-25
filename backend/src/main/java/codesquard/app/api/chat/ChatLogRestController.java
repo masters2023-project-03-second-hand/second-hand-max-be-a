@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class ChatLogRestController {
 
-	private final Map<DeferredResult<ChatLogListResponse>, Integer> chatRequests = new ConcurrentHashMap<>();
+	private final Map<DeferredResult<ApiResponse<ChatLogListResponse>>, Integer> chatRequests = new ConcurrentHashMap<>();
 
 	private final ChatLogService chatLogService;
 
@@ -45,18 +45,19 @@ public class ChatLogRestController {
 		ChatLogSendResponse response = chatLogService.sendMessage(request, chatRoomId, sender);
 
 		this.chatRequests.forEach((key, messageIndex) ->
-			key.setResult(chatLogService.readMessages(chatRoomId, messageIndex, sender)));
+			key.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.",
+				chatLogService.readMessages(chatRoomId, messageIndex, sender))));
 		return ApiResponse.created("메시지 전송이 완료되었습니다.", response);
 	}
 
 	@GetMapping("/chats/{chatRoomId}")
-	public DeferredResult<ChatLogListResponse> readMessages(
+	public DeferredResult<ApiResponse<ChatLogListResponse>> readMessages(
 		@PathVariable Long chatRoomId,
 		@RequestParam(required = false, defaultValue = "0") @MessageIndex int messageIndex,
 		@AuthPrincipal Principal principal) {
 		log.info("메시지 읽기 요청 : chatRoomId={}, messageIndex={}, 요청한 아이디={}", chatRoomId, messageIndex,
 			principal.getLoginId());
-		DeferredResult<ChatLogListResponse> deferredResult = new DeferredResult<>(10000L);
+		DeferredResult<ApiResponse<ChatLogListResponse>> deferredResult = new DeferredResult<>(10000L);
 		this.chatRequests.put(deferredResult, messageIndex);
 
 		deferredResult.onCompletion(() -> chatRequests.remove(deferredResult));
@@ -66,7 +67,7 @@ public class ChatLogRestController {
 		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, messageIndex, principal);
 
 		if (!response.isEmptyChat()) {
-			deferredResult.setResult(response);
+			deferredResult.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.", response));
 		}
 		return deferredResult;
 	}

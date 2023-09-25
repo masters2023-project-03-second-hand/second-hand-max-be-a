@@ -2,11 +2,8 @@ package codesquard.app.api.chat;
 
 import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
-import static java.nio.charset.StandardCharsets.*;
 import static java.time.LocalDateTime.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -21,7 +18,6 @@ import java.util.Objects;
 
 import javax.servlet.AsyncListener;
 
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -140,31 +136,25 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 			ArgumentMatchers.anyInt(),
 			ArgumentMatchers.any(Principal.class)
 		)).willReturn(response);
-
 		int chatRoomId = 1;
+
 		// when
 		MvcResult asyncListener = mockMvc.perform(get("/api/chats/" + chatRoomId))
 			.andExpect(request().asyncStarted())
 			.andReturn();
 
-		String contentAsString = mockMvc.perform(asyncDispatch(asyncListener))
-			.andReturn()
-			.getResponse()
-			.getContentAsString(UTF_8);
-
-		ChatLogListResponse chatLogListResponse = objectMapper.readValue(contentAsString, ChatLogListResponse.class);
-
-		//then
-		assertAll(
-			() -> assertThat(chatLogListResponse.getChatPartnerName()).isEqualTo("carlynne"),
-			() -> assertThat(chatLogListResponse.getItem().getTitle()).isEqualTo("빈티지 롤러 블레이드"),
-			() -> assertThat(chatLogListResponse.getItem().getThumbnailUrl()).isEqualTo("thumbnailUrl"),
-			() -> assertThat(chatLogListResponse.getItem().getPrice()).isEqualTo(200000),
-			() -> assertThat(chatLogListResponse.getChat()).hasSize(1),
-			() -> assertThat(chatLogListResponse.getChat())
-				.extracting("messageIndex", "message", "me")
-				.containsExactlyInAnyOrder(Tuple.tuple(0, "안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.", false))
-		);
+		// then
+		mockMvc.perform(asyncDispatch(asyncListener))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("statusCode").value(equalTo(200)))
+			.andExpect(jsonPath("message").value(equalTo("채팅 메시지 목록 조회가 완료되었습니다.")))
+			.andExpect(jsonPath("data.chatPartnerName").value(equalTo("carlynne")))
+			.andExpect(jsonPath("data.item.title").value(equalTo("빈티지 롤러 블레이드")))
+			.andExpect(jsonPath("data.item.thumbnailUrl").value(equalTo("thumbnailUrl")))
+			.andExpect(jsonPath("data.item.price").value(equalTo(200000)))
+			.andExpect(jsonPath("data.chat[*].messageIndex").value(containsInAnyOrder(0)))
+			.andExpect(jsonPath("data.chat[*].message").value(containsInAnyOrder("안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.")))
+			.andExpect(jsonPath("data.chat[*].isMe").value(containsInAnyOrder(true)));
 	}
 
 	@DisplayName("회원은 채팅 메시지 목록 요청시 messageIndex를 음수로 보낼수 없다")

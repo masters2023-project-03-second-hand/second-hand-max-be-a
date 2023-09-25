@@ -1,5 +1,7 @@
 package codesquard.app.api.chat.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import codesquard.app.domain.chat.ChatLog;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.AccessLevel;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatLogMessageResponse {
 	private int messageIndex;
+	@JsonProperty("isMe")
 	private boolean isMe;
 	private String message;
 
