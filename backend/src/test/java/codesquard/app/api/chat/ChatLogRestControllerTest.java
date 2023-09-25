@@ -128,7 +128,7 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 			.build();
 		ChatLogItemResponse itemResponse = ChatLogItemResponse.from(item);
 		ChatRoom chatRoom = new ChatRoom(buyer, item);
-		ChatLog chatLog = new ChatLog("안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.", "23Yong", "carlynne", chatRoom);
+		ChatLog chatLog = new ChatLog("안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.", "23Yong", "carlynne", chatRoom, false);
 		ChatLogMessageResponse messageResponse = ChatLogMessageResponse.from(0, chatLog, Principal.from(buyer));
 		ChatLogListResponse response = new ChatLogListResponse("carlynne", itemResponse, List.of(messageResponse));
 		given(chatLogService.readMessages(
