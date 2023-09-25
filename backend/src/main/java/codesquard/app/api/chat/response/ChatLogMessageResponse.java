@@ -14,13 +14,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatLogMessageResponse {
 	private int messageIndex;
-	@JsonProperty("isMe")
 	private boolean isMe;
 	private String message;
 
 	public static ChatLogMessageResponse from(int messageIndex, ChatLog chatLog, Principal principal) {
 		boolean isMe = chatLog.isSender(principal.getLoginId());
 		return new ChatLogMessageResponse(messageIndex, isMe, chatLog.getMessage());
+	}
+
+	@JsonProperty("isMe")
+	public boolean isMe() {
+		return isMe;
 	}
 
 	@Override
