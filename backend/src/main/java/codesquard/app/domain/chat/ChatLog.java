@@ -28,17 +28,19 @@ public class ChatLog {
 	private String sender;
 	private String receiver;
 	private LocalDateTime createdAt;
+	private boolean isRead;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "chat_room_id")
 	private ChatRoom chatRoom;
 
-	public ChatLog(String message, String sender, String receiver, ChatRoom chatRoom) {
+	public ChatLog(String message, String sender, String receiver, ChatRoom chatRoom, boolean isRead) {
 		this.message = message;
 		this.sender = sender;
 		this.receiver = receiver;
 		this.createdAt = LocalDateTime.now();
 		this.chatRoom = chatRoom;
+		this.isRead = isRead;
 	}
 
 	public boolean isSender(String loginId) {

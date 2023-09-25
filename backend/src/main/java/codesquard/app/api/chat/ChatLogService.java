@@ -44,9 +44,10 @@ public class ChatLogService {
 
 		ChatLog chatLog;
 		if (sender.isSeller(seller)) {
-			chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), chatRoom.getBuyerLoginId(), chatRoom);
+			chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), chatRoom.getBuyerLoginId(), chatRoom,
+				false);
 		} else {
-			chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), seller.getLoginId(), chatRoom);
+			chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), seller.getLoginId(), chatRoom, false);
 		}
 
 		return ChatLogSendResponse.from(chatLogRepository.save(chatLog));
