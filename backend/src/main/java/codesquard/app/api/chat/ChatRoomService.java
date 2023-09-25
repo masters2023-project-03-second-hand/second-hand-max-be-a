@@ -79,7 +79,7 @@ public class ChatRoomService {
 				chatRoom,
 				chatRoom.getItem(),
 				chatRoom.getBuyer(),
-				chatLogRepository.findChatLogByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
+				chatLogRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
 					.orElseThrow(() -> new RestApiException(ChatLogErrorCode.NOT_FOUND_CHAT_LOG)),
 				newMessageMap.get(chatRoom.getId())))
 			.collect(Collectors.toUnmodifiableList());

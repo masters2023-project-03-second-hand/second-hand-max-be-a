@@ -9,5 +9,5 @@ public interface ChatLogRepository extends JpaRepository<ChatLog, Long> {
 
 	List<ChatLog> findAllByChatRoomIdOrderByCreatedAtAsc(Long chatRoomId);
 
-	Optional<ChatLog> findChatLogByChatRoomIdOrderByCreatedAtDesc(Long chatRoomId);
+	Optional<ChatLog> findFirstByChatRoomIdOrderByCreatedAtDesc(Long chatRoomId);
 }
