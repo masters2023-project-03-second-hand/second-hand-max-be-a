@@ -176,7 +176,7 @@ class ChatRoomServiceTest {
 			false));
 
 		// when
-		ChatRoomListResponse response = chatRoomService.readAllChatRoom(10, 3L, Principal.from(seller));
+		ChatRoomListResponse response = chatRoomService.readAllChatRoom(10, null, Principal.from(seller));
 
 		// then
 		assertAll(
