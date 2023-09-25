@@ -21,4 +21,10 @@ public class ChatLogListResponse {
 	public boolean isEmptyChat() {
 		return chat.isEmpty();
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(chatPartnerName=%s, item=%s, chat=%s)", "채팅 메시지 목록 응답",
+			this.getClass().getSimpleName(), chatPartnerName, item, chat);
+	}
 }

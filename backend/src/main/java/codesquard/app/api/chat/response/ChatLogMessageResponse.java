@@ -19,4 +19,10 @@ public class ChatLogMessageResponse {
 		boolean isMe = chatLog.isSender(principal.getLoginId());
 		return new ChatLogMessageResponse(messageIndex, isMe, chatLog.getMessage());
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(messageIndex=%d, isMe=%s, message=%s)", "채팅 메시지 응답",
+			this.getClass().getSimpleName(), messageIndex, isMe, message);
+	}
 }
