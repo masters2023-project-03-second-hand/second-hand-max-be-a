@@ -1,5 +1,6 @@
 package codesquard.app.api.chat;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -58,8 +59,11 @@ public class ChatLogService {
 		String chatPartnerName = getChatPartnerName(principal, item, chatRoom);
 		List<ChatLog> chatLogs = chatLogRepository.findAllByChatRoomIdOrderByCreatedAtAsc(chatRoomId);
 		log.debug("메시지 읽기에서 채팅 로그 결과 : chatLogs.size={}", chatLogs.size());
-		List<ChatLog> chatLogsAfterIndex = chatLogs.subList(messageIndex, chatLogs.size());
+		if (messageIndex > chatLogs.size()) {
+			return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), Collections.emptyList());
+		}
 
+		List<ChatLog> chatLogsAfterIndex = chatLogs.subList(messageIndex, chatLogs.size());
 		List<ChatLogMessageResponse> chats = IntStream.range(0, chatLogsAfterIndex.size())
 			.mapToObj(idx -> {
 				ChatLog chatLog = chatLogsAfterIndex.get(idx);

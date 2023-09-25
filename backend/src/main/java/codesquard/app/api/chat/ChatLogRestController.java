@@ -56,7 +56,7 @@ public class ChatLogRestController {
 		@AuthPrincipal Principal principal) {
 		log.info("메시지 읽기 요청 : chatRoomId={}, messageIndex={}, 요청한 아이디={}", chatRoomId, messageIndex,
 			principal.getLoginId());
-		DeferredResult<ChatLogListResponse> deferredResult = new DeferredResult<>(1000L);
+		DeferredResult<ChatLogListResponse> deferredResult = new DeferredResult<>(10000L);
 		this.chatRequests.put(deferredResult, messageIndex);
 
 		deferredResult.onCompletion(() -> chatRequests.remove(deferredResult));
