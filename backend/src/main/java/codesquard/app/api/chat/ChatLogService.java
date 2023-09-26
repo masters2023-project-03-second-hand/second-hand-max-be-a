@@ -40,13 +40,14 @@ public class ChatLogService {
 	@Transactional
 	public ChatLogSendResponse sendMessage(ChatLogSendRequest request, Long chatRoomId, Principal sender) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
+		Member buyer = chatRoom.getBuyer();
 		Member seller = chatRoom.getItem().getMember();
 
 		ChatLog chatLog;
-		if (sender.isSeller(seller)) {
-			chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), chatRoom.getBuyerLoginId(), chatRoom);
-		} else {
+		if (sender.isBuyer(buyer)) {
 			chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), seller.getLoginId(), chatRoom);
+		} else {
+			chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), chatRoom.getBuyerLoginId(), chatRoom);
 		}
 
 		return ChatLogSendResponse.from(chatLogRepository.save(chatLog));

@@ -53,6 +53,10 @@ public class Principal {
 		return memberId.equals(member.getId());
 	}
 
+	public boolean isBuyer(Member member) {
+		return memberId.equals(member.getId());
+	}
+
 	@Override
 	public String toString() {
 		return String.format("%s, %s(id=%d, email=%s, loginId=%s)", "Principal", this.getClass().getSimpleName(),
