@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import codesquard.app.domain.oauth.support.Principal;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -41,6 +42,13 @@ public class ChatLog {
 		this.createdAt = LocalDateTime.now();
 		this.chatRoom = chatRoom;
 		this.isRead = isRead;
+	}
+
+	public static ChatLog createBySender(String message, Principal sender, ChatRoom chatRoom) {
+		if (sender.isBuyer(chatRoom.getBuyer())) {
+			return new ChatLog(message, sender.getLoginId(), chatRoom.getSellerLoginId(), chatRoom, false);
+		}
+		return new ChatLog(message, sender.getLoginId(), chatRoom.getBuyerLoginId(), chatRoom, false);
 	}
 
 	public boolean isSender(String loginId) {
