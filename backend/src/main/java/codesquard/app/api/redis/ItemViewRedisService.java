@@ -24,21 +24,21 @@ public class ItemViewRedisService {
 	private static final String ITEM_ID_PREFIX = "itemId: ";
 	private static final Pattern ITEM_ID_PATTERN = Pattern.compile("itemId:*");
 
-	private final RedisTemplate<String, Long> redisTemplate;
+	private final RedisTemplate<String, String> redisTemplate;
 	private final ItemRepository itemRepository;
 
-	public Long get(String key) {
+	public String get(String key) {
 		return redisTemplate.opsForValue().get(key);
 	}
 
 	public void addViewCount(Long itemId) {
 		String key = ITEM_ID_PREFIX + itemId;
-		ValueOperations<String, Long> value = redisTemplate.opsForValue();
+		ValueOperations<String, String> value = redisTemplate.opsForValue();
 		if (value.get(key) != null) {
 			value.increment(key);
 			return;
 		}
-		value.set(key, 1L, Duration.ofMinutes(1));
+		value.set(key, "1", Duration.ofMinutes(1));
 	}
 
 	@Transactional
@@ -49,7 +49,7 @@ public class ItemViewRedisService {
 
 		for (String key : keys) {
 			Long itemId = Long.parseLong(key.split(" ")[1]);
-			Long viewCount = Optional.ofNullable(redisTemplate.opsForValue().get(key)).orElse(0L);
+			Long viewCount = Long.valueOf(Optional.ofNullable(redisTemplate.opsForValue().get(key)).orElse("0"));
 			Long originViewCount = itemRepository.findViewCountById(itemId);
 			itemRepository.addViewCountFromRedis(itemId, originViewCount + viewCount);
 			redisTemplate.delete(key);
