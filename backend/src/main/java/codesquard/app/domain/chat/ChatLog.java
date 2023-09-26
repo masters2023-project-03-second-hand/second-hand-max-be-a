@@ -40,4 +40,8 @@ public class ChatLog {
 		this.createdAt = LocalDateTime.now();
 		this.chatRoom = chatRoom;
 	}
+
+	public boolean isSender(String loginId) {
+		return sender.equals(loginId);
+	}
 }
