@@ -36,9 +36,11 @@ public class ItemViewRedisService {
 		ValueOperations<String, Long> value = redisTemplate.opsForValue();
 		if (value.get(key) != null) {
 			value.increment(key);
+			log.debug("조회수 증가 : key={}, value={}", key, value.get(key));
 			return;
 		}
 		value.set(key, 1L, Duration.ofMinutes(1));
+		log.debug("조회수 증가 : key={}, value={}", key, value.get(key));
 	}
 
 	@Transactional
