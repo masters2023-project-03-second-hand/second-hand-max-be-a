@@ -76,7 +76,7 @@ class ItemViewRedisServiceTest extends CacheTestSupport {
 		itemViewRedisService.addViewCount(1L);
 		itemViewRedisService.addViewCount(1L);
 		// then
-		Long viewCount = itemViewRedisService.get("itemId: 1");
+		Long viewCount = Long.valueOf(itemViewRedisService.get("itemId: 1"));
 		assertThat(viewCount).isEqualTo(1L);
 	}
 }

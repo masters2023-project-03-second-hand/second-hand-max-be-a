@@ -51,7 +51,7 @@ public class ItemViewRedisService {
 
 		for (String key : keys) {
 			Long itemId = Long.parseLong(key.split(" ")[1]);
-			Long viewCount = Optional.ofNullable(redisTemplate.opsForValue().get(key)).orElse(0L);
+			Long viewCount = Long.valueOf(Optional.ofNullable(redisTemplate.opsForValue().get(key)).orElse("0"));
 			Long originViewCount = itemRepository.findViewCountById(itemId);
 			itemRepository.addViewCountFromRedis(itemId, originViewCount + viewCount);
 			redisTemplate.delete(key);
