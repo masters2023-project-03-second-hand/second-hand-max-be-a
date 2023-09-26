@@ -7,7 +7,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.api.errors.handler.GlobalExceptionHandler;
-import codesquard.app.api.redis.RedisService;
+import codesquard.app.api.redis.ItemViewRedisService;
+import codesquard.app.api.redis.OauthRedisService;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.oauth.support.AuthPrincipalArgumentResolver;
 import codesquard.app.domain.oauth.support.AuthenticationContext;
@@ -27,7 +28,10 @@ public abstract class ControllerTestSupport {
 	protected RedisTemplate<String, Object> redisTemplate;
 
 	@MockBean
-	protected RedisService redisService;
+	protected OauthRedisService oauthRedisService;
+
+	@MockBean
+	protected ItemViewRedisService itemViewRedisService;
 
 	@MockBean
 	protected AuthenticationContext authenticationContext;

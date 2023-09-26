@@ -1,7 +1,7 @@
 package codesquard.app.api.item;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -58,7 +58,7 @@ public class ItemService {
 		Item saveItem = itemRepository.save(request.toEntity(writer, thumbnailUrl));
 		Image saveThumbnailUrl = imageRepository.save(Image.thumbnail(thumbnailUrl, saveItem.getId()));
 		log.debug("썸네일 저장 결과 : {}", saveThumbnailUrl);
-		
+
 		if (itemImages != null) {
 			List<String> serverFileUrls = imageService.uploadImages(itemImages);
 			List<Image> images = Image.createImages(serverFileUrls, saveItem);
@@ -101,9 +101,8 @@ public class ItemService {
 		log.info("상품 수정 서비스 요청 : itemId={}, request={}, writer={}", itemId, request, writer.getLoginId());
 		log.info("상품 수정 서비스 요청 : addImages={}, thumnailFile={}", addImages, thumbnailFile);
 
-		Item item = findItemBy(itemId);
+		Item item = findItemByItemIdAndMemberId(itemId, writer.getMemberId());
 		log.debug("상품 수정 서비스의 상품 조회 결과 : {}", item);
-		item.validateSeller(writer.getMemberId());
 
 		List<String> addImageUrls = imageService.uploadImages(addImages);
 		log.debug("상품 수정 서비스의 S3 이미지 추가 결과 : {}", addImageUrls);
@@ -112,9 +111,8 @@ public class ItemService {
 		log.debug("상품 수정 서비스의 이미지 테이블 저장 결과 : {}", saveImages);
 
 		List<String> deleteImageUrls = request.getDeleteImageUrls();
-		if (deleteImageUrls == null) {
-			deleteImageUrls = new ArrayList<>();
-		}
+		log.debug("상품 수정 서비스시 이미지 삭제 URL 리스트 : deleteImageUrls={}", deleteImageUrls);
+
 		int deleteImageSize = deleteImages(itemId, deleteImageUrls);
 		log.debug("이미지 테이블의 삭제 결과 : 삭제 개수={}", deleteImageSize);
 
@@ -135,14 +133,14 @@ public class ItemService {
 	}
 
 	private String updateThumnail(Item item, MultipartFile thumbnailFile, String thumbnailUrl) {
-		if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
+		if (thumbnailFile == null) {
+			return item.getThumbnailUrl();
+		}
+		if (!thumbnailFile.isEmpty()) {
 			String thumbnail = updateNewThumnail(item.getId(), thumbnailFile);
 			return updateThumbnailStatus(thumbnail, item);
 		}
-		if (thumbnailUrl != null) {
-			return updateThumbnailStatus(thumbnailUrl, item);
-		}
-		return item.getThumbnailUrl();
+		return updateThumbnailStatus(thumbnailUrl, item);
 	}
 
 	private String updateNewThumnail(Long itemId, MultipartFile thumbnailFile) {
@@ -155,16 +153,13 @@ public class ItemService {
 	}
 
 	private String updateThumbnailStatus(String changeThumbnail, Item item) {
-		if (changeThumbnail == null) {
-			return null;
-		}
+		Optional.ofNullable(changeThumbnail).ifPresent(thumbnail -> {
+			int result = imageRepository.updateThumnailToFalseByItemIdAndThumbnailIsTrue(item.getId());
+			log.debug("기존 이미지 썸네일 표시 변경 결과 : result={}", result);
 
-		int result = imageRepository.updateThumnailToFalseByItemIdAndThumbnailIsTrue(item.getId());
-		log.debug("기존 이미지 썸네일 표시 변경 결과 : result={}", result);
-
-		result = imageRepository.updateThumbnailByItemIdAndImageUrl(item.getId(), changeThumbnail, true);
-		log.debug("요청 이미지 썸네일 표시 변경 결과 : result={}", result);
-
+			result = imageRepository.updateThumbnailByItemIdAndImageUrl(item.getId(), thumbnail, true);
+			log.debug("요청 이미지 썸네일 표시 변경 결과 : result={}", result);
+		});
 		return changeThumbnail;
 	}
 
@@ -180,17 +175,15 @@ public class ItemService {
 		deleteImageUrls.forEach(imageService::deleteImage);
 	}
 
-	private Item findItemBy(Long itemId) {
-		return itemRepository.findById(itemId)
+	private Item findItemByItemIdAndMemberId(Long itemId, Long memberId) {
+		return itemRepository.findItemByIdAndMemberId(itemId, memberId)
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 	}
 
 	@Transactional
 	public void deleteItem(Long itemId, Principal writer) {
-		Item item = findItemBy(itemId);
-		item.validateSeller(writer.getMemberId());
-
-		List<Image> images = imageRepository.findAllByItemId(itemId);
+		Item item = findItemByItemIdAndMemberId(itemId, writer.getMemberId());
+		List<Image> images = imageRepository.findAllByItemId(item.getId());
 		images.stream()
 			.map(Image::getImageUrl)
 			.forEach(imageService::deleteImage);

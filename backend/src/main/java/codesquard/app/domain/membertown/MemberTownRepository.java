@@ -19,12 +19,14 @@ public interface MemberTownRepository extends JpaRepository<MemberTown, Long> {
 	void deleteMemberTownByMemberIdAndRegionId(Long memberId, Long regionId);
 
 	@Modifying
-	@Query("update MemberTown memberTown set memberTown.isSelected = false where memberTown.isSelected = true and memberTown.member.id = :memberId")
-	int changeIsSelectToFalse(@Param("memberId") Long memberId);
-
-	@Modifying
-	@Query("update MemberTown memberTown set memberTown.isSelected = true where memberTown.region.id = :regionId and memberTown.member.id = :memberId")
-	int changeIsSelectToTrue(
+	@Query("update MemberTown memberTown set memberTown.isSelected = :isSelected where memberTown.region.id = :regionId and memberTown.member.id = :memberId")
+	int changeIsSelect(
+		@Param("isSelected") boolean isSelected,
 		@Param("regionId") Long regionId,
 		@Param("memberId") Long memberId);
+
+	@Query("select memberTown.region.id from MemberTown memberTown where memberTown.member.id = :memberId and memberTown.isSelected = :isSelected")
+	Long findRegionIdByMemberIdAndIsSelected(
+		@Param("memberId") Long memberId,
+		@Param("isSelected") boolean isSelected);
 }

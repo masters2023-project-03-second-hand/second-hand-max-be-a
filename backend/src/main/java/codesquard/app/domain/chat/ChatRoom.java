@@ -36,10 +36,14 @@ public class ChatRoom {
 	@JoinColumn(name = "item_id")
 	private Item item;
 
-	public ChatRoom(LocalDateTime createdAt, Member buyer, Item item) {
-		this.createdAt = createdAt;
+	public ChatRoom(Member buyer, Item item) {
+		this.createdAt = LocalDateTime.now();
 		this.buyer = buyer;
 		this.item = item;
+	}
+
+	public String getBuyerLoginId() {
+		return buyer.getLoginId();
 	}
 
 	@Override

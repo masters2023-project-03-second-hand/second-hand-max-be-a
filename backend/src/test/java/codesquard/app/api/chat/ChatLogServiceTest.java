@@ -120,7 +120,7 @@ class ChatLogServiceTest {
 			new Image("imageUrlValue2", saveItem, false));
 		imageRepository.saveAll(images);
 
-		ChatRoom chatRoom = chatRoomRepository.save(new ChatRoom(now(), buyer, item));
+		ChatRoom chatRoom = chatRoomRepository.save(new ChatRoom(buyer, item));
 
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("message", "롤러블레이드 사고 싶습니다.");

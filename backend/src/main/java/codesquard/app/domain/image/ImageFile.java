@@ -3,7 +3,9 @@ package codesquard.app.domain.image;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -39,6 +41,9 @@ public class ImageFile {
 	}
 
 	public static List<ImageFile> from(List<MultipartFile> files) {
+		files = Optional.ofNullable(files)
+			.orElseGet(Collections::emptyList);
+
 		List<ImageFile> imageFiles = new ArrayList<>();
 		for (MultipartFile multipartFile : files) {
 			if (!multipartFile.isEmpty()) {

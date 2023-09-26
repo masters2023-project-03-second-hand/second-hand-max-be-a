@@ -1,5 +1,6 @@
 package codesquard.app.api.oauth;
 
+import static codesquard.app.ImageTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.RegionTestSupport.*;
 import static org.assertj.core.api.Assertions.*;
@@ -40,7 +41,7 @@ import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
-import codesquard.app.api.redis.RedisService;
+import codesquard.app.api.redis.OauthRedisService;
 import codesquard.app.domain.jwt.Jwt;
 import codesquard.app.domain.jwt.JwtProvider;
 import codesquard.app.domain.member.Member;
@@ -81,7 +82,7 @@ class OauthServiceTest {
 	private ImageService imageService;
 
 	@Autowired
-	private RedisService redisService;
+	private OauthRedisService redisService;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -127,7 +128,7 @@ class OauthServiceTest {
 		String provider = "naver";
 		String code = "1234";
 		// when
-		OauthSignUpResponse response = oauthService.signUp(createProfile("cat.png"), request, provider, code);
+		OauthSignUpResponse response = oauthService.signUp(createMultipartFile("cat.png"), request, provider, code);
 
 		// then
 		Member findMember = memberRepository.findMemberByLoginId("23Yong")
@@ -162,7 +163,7 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
 		// then
 
 		assertThat(throwable)
@@ -208,7 +209,7 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
 
 		// then
 
@@ -237,7 +238,7 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
 
 		// then
 		assertThat(throwable)
@@ -275,7 +276,7 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createProfile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
 
 		// then
 		assertThat(throwable)
@@ -299,7 +300,7 @@ class OauthServiceTest {
 
 		String provider = "naver";
 		String code = "1234";
-		MockMultipartFile profile = createProfile("cat.png");
+		MockMultipartFile profile = createMultipartFile("cat.png");
 
 		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
@@ -439,7 +440,7 @@ class OauthServiceTest {
 		OauthLogoutRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			OauthLogoutRequest.class);
 
-		redisService.saveRefreshToken(member, jwt);
+		redisService.saveRefreshToken(member.createRedisKey(), jwt);
 		// when
 		oauthService.logout(jwt.getAccessToken(), request);
 
@@ -456,7 +457,7 @@ class OauthServiceTest {
 
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 
-		redisService.saveRefreshToken(member, jwt);
+		redisService.saveRefreshToken(member.createRedisKey(), jwt);
 		memberRepository.save(member);
 
 		Map<String, Object> requestBody = new HashMap<>();
@@ -483,7 +484,7 @@ class OauthServiceTest {
 
 		Jwt jwt = jwtProvider.createJwtBasedOnMember(member, now);
 
-		redisService.saveRefreshToken(member, jwt);
+		redisService.saveRefreshToken(member.createRedisKey(), jwt);
 		memberRepository.save(member);
 
 		Map<String, Object> requestBody = new HashMap<>();

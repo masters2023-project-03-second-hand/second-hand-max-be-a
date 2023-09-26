@@ -35,7 +35,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.MemberTownTestSupport;
-import codesquard.app.MemberTownTestSupport;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
@@ -197,7 +196,7 @@ class ItemServiceTest {
 			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
-			new Image("imageUrlValue1", saveItem, false),
+			new Image("imageUrlValue1", saveItem, true),
 			new Image("imageUrlValue2", saveItem, false));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
@@ -612,7 +611,7 @@ class ItemServiceTest {
 		assertThat(throwable)
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
-			.isEqualTo("상품에 대한 권한이 없습니다.");
+			.isEqualTo("상품을 찾을 수 없습니다.");
 
 	}
 }

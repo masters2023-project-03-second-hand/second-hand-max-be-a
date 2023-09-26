@@ -29,7 +29,6 @@ public abstract class OauthClient {
 		this.redirectUri = redirectUri;
 	}
 
-	// accessToken을 Oauth 서버로부터 발급받는다
 	public abstract OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(String authorizationCode);
 
 	public abstract MultiValueMap<String, String> createFormData(String authorizationCode);
@@ -48,7 +47,6 @@ public abstract class OauthClient {
 
 	public abstract OauthUserProfileResponse createOauthUserProfileResponse(Map<String, Object> attributes);
 
-	// Oauth 리소스 서버로부터 유저의 프로필 가져온다
 	public OauthUserProfileResponse getUserProfileByAccessToken(OauthAccessTokenResponse accessTokenResponse) {
 		Map<String, Object> userProfileMap = getUserAttributes(userInfoUri, accessTokenResponse);
 		log.debug("userProfileMap : {}", userProfileMap);
