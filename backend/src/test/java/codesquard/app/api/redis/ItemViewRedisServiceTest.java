@@ -66,4 +66,17 @@ class ItemViewRedisServiceTest extends CacheTestSupport {
 		Optional<Item> saveItem = itemRepository.findById(item.getId());
 		assertThat(saveItem.get().getViewCount()).isEqualTo(2);
 	}
+
+	@DisplayName("회원이 두번째로 상품 상세 조회시 뷰 카운트는 증가하지 않는다")
+	@Test
+	public void addViewCount() {
+		// given
+
+		// when
+		itemViewRedisService.addViewCount(1L);
+		itemViewRedisService.addViewCount(1L);
+		// then
+		Long viewCount = itemViewRedisService.get("itemId: 1");
+		assertThat(viewCount).isEqualTo(1L);
+	}
 }
