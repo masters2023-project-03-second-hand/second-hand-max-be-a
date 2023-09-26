@@ -2,6 +2,7 @@ package codesquard.app.api.redis;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.awaitility.Awaitility.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
@@ -16,12 +17,14 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 
 import codesquard.app.CacheTestSupport;
+import codesquard.app.MemberTestSupport;
 import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
+import codesquard.app.domain.oauth.support.Principal;
 import codesquard.support.SupportRepository;
 
 @ActiveProfiles("test")
@@ -50,9 +53,10 @@ class ItemViewRedisServiceTest extends CacheTestSupport {
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 		Member member = supportRepository.save(new Member("avatar", "pie@pie", "pieeeeeee"));
+		Principal principal = Principal.from(member);
 		Item item = supportRepository.save(request1.toEntity(member, "thumbnail"));
-		itemViewRedisService.addViewCount(item.getId());
-		itemViewRedisService.addViewCount(item.getId());
+		itemViewRedisService.addViewCount(item.getId(), principal);
+		itemViewRedisService.addViewCount(item.getId(), principal);
 
 		// when
 		await().atMost(2, TimeUnit.MINUTES).untilAsserted(
@@ -71,12 +75,18 @@ class ItemViewRedisServiceTest extends CacheTestSupport {
 	@Test
 	public void addViewCount() {
 		// given
-
+		Member member = MemberTestSupport.createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
+		Principal principal = Principal.from(member);
 		// when
-		itemViewRedisService.addViewCount(1L);
-		itemViewRedisService.addViewCount(1L);
+		itemViewRedisService.addViewCount(1L, principal);
+		itemViewRedisService.addViewCount(1L, principal);
 		// then
 		Long viewCount = Long.valueOf(itemViewRedisService.get("itemId: 1"));
-		assertThat(viewCount).isEqualTo(1L);
+		String itemViewValue = itemViewRedisService.get(principal.createItemViewKey("itemId: 1"));
+		assertAll(
+			() -> assertThat(viewCount).isEqualTo(1L),
+			() -> assertThat(itemViewValue).isEqualTo("true")
+		);
+
 	}
 }

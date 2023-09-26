@@ -60,7 +60,7 @@ public class ItemController {
 	@GetMapping("/{itemId}")
 	public ApiResponse<ItemDetailResponse> findDetailItem(@PathVariable Long itemId,
 		@AuthPrincipal Principal principal) {
-		itemViewRedisService.addViewCount(itemId);
+		itemViewRedisService.addViewCount(itemId, principal);
 		ItemDetailResponse response = itemService.findDetailItemBy(itemId, principal.getMemberId());
 		return ApiResponse.ok("상품 상세 조회에 성공하였습니다.", response);
 	}

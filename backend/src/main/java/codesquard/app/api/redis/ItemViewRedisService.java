@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import codesquard.app.domain.item.ItemRepository;
+import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,14 +32,30 @@ public class ItemViewRedisService {
 		return redisTemplate.opsForValue().get(key);
 	}
 
-	public void addViewCount(Long itemId) {
+	public void addViewCount(Long itemId, Principal principal) {
 		String key = ITEM_ID_PREFIX + itemId;
-		ValueOperations<String, String> value = redisTemplate.opsForValue();
-		if (value.get(key) != null) {
-			value.increment(key);
+		String itemViewKey = principal.createItemViewKey(key);
+		if (!isFirstItemView(itemViewKey)) {
 			return;
 		}
+		ValueOperations<String, String> value = redisTemplate.opsForValue();
+		value.set(itemViewKey, "true", Duration.ofDays(1L));
+
+		if (value.get(key) != null) {
+			value.increment(key);
+			log.debug("상품 게시글 조회수 증가 결과 : key={}, value={}", key, value.get(key));
+			return;
+		}
+
 		value.set(key, "1", Duration.ofMinutes(1));
+		log.debug("상품 게시글 조회수 증가 결과 : key={}, value={}", key, value.get(key));
+	}
+
+	private boolean isFirstItemView(String key) {
+		if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+			return false;
+		}
+		return true;
 	}
 
 	@Transactional
