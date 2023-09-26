@@ -44,7 +44,7 @@ public class ChatLog {
 		this.isRead = isRead;
 	}
 
-	public static ChatLog createBySender(String message, Principal sender, ChatRoom chatRoom) {
+	public static ChatLog createBySender(String message, ChatRoom chatRoom, Principal sender) {
 		if (sender.isBuyer(chatRoom.getBuyer())) {
 			return new ChatLog(message, sender.getLoginId(), chatRoom.getSellerLoginId(), chatRoom, false);
 		}

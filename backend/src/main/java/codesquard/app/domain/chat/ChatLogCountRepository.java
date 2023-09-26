@@ -22,7 +22,7 @@ public class ChatLogCountRepository {
 	private final JPAQueryFactory queryFactory;
 
 	/**
-	 *
+	 * 각각의 채팅방별 읽지 않은 메시지 개수를 가져옵니다.
 	 * @return Map<Long, Long> : key=채팅방 등록번호, value=채팅방에 읽지 않은 메시지 개수
 	 */
 	public Map<Long, Long> countNewMessage(String loginId) {
@@ -34,10 +34,12 @@ public class ChatLogCountRepository {
 			.groupBy(chatLog.chatRoom.id)
 			.fetch();
 
+		int chatRoomIdIdx = 0;
+		int unreadMessageCountIdx = 1;
 		return results.stream()
 			.collect(Collectors.toMap(
-				tuple -> tuple.get(0, Long.class), // chatRoomId
-				tuple -> tuple.get(1, Long.class) // newMessageCount
+				tuple -> tuple.get(chatRoomIdIdx, Long.class),            // chatRoomId
+				tuple -> tuple.get(unreadMessageCountIdx, Long.class)    // newMessageCount
 			));
 	}
 

@@ -2,6 +2,7 @@ package codesquard.app.api.chat;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
@@ -69,24 +70,29 @@ public class ChatRoomService {
 	}
 
 	public ChatRoomListResponse readAllChatRoom(int size, Long cursor, Principal principal) {
+		Map<Long, Long> newMessageMap = chatLogCountRepository.countNewMessage(principal.getLoginId());
+		log.debug("채팅방 목록 조회 : newMessageMap={}", newMessageMap);
+
 		Pageable pageable = PageRequest.ofSize(size);
 		Slice<ChatRoom> slice = chatRoomPaginationRepository.searchBySlice(cursor, pageable);
 
-		Map<Long, Long> newMessageMap = chatLogCountRepository.countNewMessage(principal.getLoginId());
-		log.debug("채팅방 목록 조회 : newMessageMap={}", newMessageMap);
 		List<ChatRoomItemResponse> contents = slice.getContent().stream()
-			.map(chatRoom -> ChatRoomItemResponse.of(
-				chatRoom,
-				chatRoom.getItem(),
-				chatRoom.getBuyer(),
-				chatLogRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
-					.orElseThrow(() -> new RestApiException(ChatLogErrorCode.NOT_FOUND_CHAT_LOG)),
-				newMessageMap.get(chatRoom.getId())))
+			.map(getChatRoomItemResponseMapper(newMessageMap))
 			.collect(Collectors.toUnmodifiableList());
 		boolean hasNext = slice.hasNext();
 		Long nextCursor = getNextCursor(contents, hasNext);
 
 		return new ChatRoomListResponse(contents, hasNext, nextCursor);
+	}
+
+	private Function<ChatRoom, ChatRoomItemResponse> getChatRoomItemResponseMapper(Map<Long, Long> newMessageMap) {
+		return chatRoom -> ChatRoomItemResponse.of(
+			chatRoom,
+			chatRoom.getItem(),
+			chatRoom.getBuyer(),
+			chatLogRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
+				.orElseThrow(() -> new RestApiException(ChatLogErrorCode.NOT_FOUND_CHAT_LOG)),
+			newMessageMap.get(chatRoom.getId()));
 	}
 
 	private Long getNextCursor(List<ChatRoomItemResponse> contents, boolean hasNext) {

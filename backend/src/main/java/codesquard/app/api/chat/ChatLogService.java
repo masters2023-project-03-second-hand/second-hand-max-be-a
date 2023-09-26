@@ -39,7 +39,7 @@ public class ChatLogService {
 	@Transactional
 	public ChatLogSendResponse sendMessage(ChatLogSendRequest request, Long chatRoomId, Principal sender) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
-		ChatLog chatLog = ChatLog.createBySender(request.getMessage(), sender, chatRoom);
+		ChatLog chatLog = ChatLog.createBySender(request.getMessage(), chatRoom, sender);
 		return ChatLogSendResponse.from(chatLogRepository.save(chatLog));
 	}
 
