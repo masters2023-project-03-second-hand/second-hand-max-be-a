@@ -22,9 +22,9 @@ public class WishItemController {
 	private final WishItemService wishItemService;
 
 	@PostMapping("/{itemId}")
-	public ApiResponse<Void> wishStatus(@PathVariable Long itemId, @RequestParam WishStatus status,
+	public ApiResponse<Void> wishStatus(@PathVariable Long itemId, @RequestParam WishStatus wish,
 		@AuthPrincipal Principal principal) {
-		wishItemService.changeWishStatus(itemId, principal.getMemberId(), status);
+		wishItemService.changeWishStatus(itemId, principal.getMemberId(), wish);
 		return ApiResponse.ok("관심상품 변경이 완료되었습니다.", null);
 	}
 
