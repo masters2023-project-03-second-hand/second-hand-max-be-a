@@ -24,6 +24,7 @@ import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
+import codesquard.app.api.membertown.response.MemberTownListResponse;
 import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
 import codesquard.app.api.region.request.RegionSelectionRequest;
 import codesquard.app.domain.member.Member;
@@ -331,5 +332,20 @@ class MemberTownServiceTest {
 			.isInstanceOf(RestApiException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("회원이 등록한 동네만 선택할 수 있습니다.");
+	}
+
+	@DisplayName("회원은 자신의 회원 동네를 조회할 수 있다")
+	@Test
+	public void readAll() throws JsonProcessingException {
+		// given
+		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		List<Region> regions = regionRepository.saveAll(List.of(createRegion("서울 송파구 가락동")));
+		memberTownRepository.saveAll(List.of(createMemberTown(member, regions.get(0), true)));
+
+		// when
+		MemberTownListResponse response = memberTownService.readAll(Principal.from(member));
+
+		// then
+		assertThat(response.getAddresses().size()).isEqualTo(1);
 	}
 }

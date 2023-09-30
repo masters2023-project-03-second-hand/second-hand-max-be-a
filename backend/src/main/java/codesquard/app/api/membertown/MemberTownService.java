@@ -1,6 +1,7 @@
 package codesquard.app.api.membertown;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,8 @@ import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
+import codesquard.app.api.membertown.response.MemberTownItemResponse;
+import codesquard.app.api.membertown.response.MemberTownListResponse;
 import codesquard.app.api.membertown.response.MemberTownRemoveResponse;
 import codesquard.app.api.region.request.RegionSelectionRequest;
 import codesquard.app.domain.member.Member;
@@ -107,5 +110,14 @@ public class MemberTownService {
 		if (regionRepository.findById(regionId).isEmpty()) {
 			throw new RestApiException(RegionErrorCode.NOT_FOUND_REGION);
 		}
+	}
+
+	@Transactional(readOnly = true)
+	public MemberTownListResponse readAll(Principal principal) {
+		List<MemberTownItemResponse> itemResponses = memberTownRepository.findAllByMemberId(principal.getMemberId())
+			.stream()
+			.map(MemberTownItemResponse::from)
+			.collect(Collectors.toUnmodifiableList());
+		return new MemberTownListResponse(itemResponses);
 	}
 }
