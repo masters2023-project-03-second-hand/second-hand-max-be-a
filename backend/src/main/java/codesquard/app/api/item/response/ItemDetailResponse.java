@@ -3,8 +3,6 @@ package codesquard.app.api.item.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
 import lombok.AccessLevel;
@@ -15,9 +13,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemDetailResponse {
-
-	@JsonProperty("isSeller")
-	private boolean isSeller;
+	
+	private Boolean isSeller;
 	private List<String> imageUrls;
 	private String seller;
 	private String status;
@@ -64,5 +61,13 @@ public class ItemDetailResponse {
 			.viewCount(item.getViewCount())
 			.price(item.getPrice())
 			.build();
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+			"ItemDetailResponse{isSeller=%s, imageUrls=%s, seller='%s', status='%s', title='%s', categoryName='%s', createdAt=%s, content='%s', chatCount=%d, wishCount=%d, viewCount=%d, price=%d}",
+			isSeller, imageUrls, seller, status, title, categoryName, createdAt, content, chatCount, wishCount,
+			viewCount, price);
 	}
 }

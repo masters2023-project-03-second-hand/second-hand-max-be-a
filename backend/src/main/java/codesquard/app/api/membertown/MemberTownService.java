@@ -59,6 +59,8 @@ public class MemberTownService {
 		Member member = findMemberBy(principal);
 		memberTownRepository.deleteMemberTownByMemberIdAndRegionId(member.getId(), region.getId());
 
+		// TODO: 남은 회원 동네 선택 처리
+
 		return MemberTownRemoveResponse.create(region.getName());
 	}
 
