@@ -22,7 +22,6 @@ import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.chat.ChatRoomRepository;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemRepository;
-import codesquard.app.domain.member.Member;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,16 +39,7 @@ public class ChatLogService {
 	@Transactional
 	public ChatLogSendResponse sendMessage(ChatLogSendRequest request, Long chatRoomId, Principal sender) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
-		Member buyer = chatRoom.getBuyer();
-		Member seller = chatRoom.getItem().getMember();
-
-		ChatLog chatLog;
-		if (sender.isBuyer(buyer)) {
-			chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), seller.getLoginId(), chatRoom);
-		} else {
-			chatLog = new ChatLog(request.getMessage(), sender.getLoginId(), chatRoom.getBuyerLoginId(), chatRoom);
-		}
-
+		ChatLog chatLog = ChatLog.createBySender(request.getMessage(), chatRoom, sender);
 		return ChatLogSendResponse.from(chatLogRepository.save(chatLog));
 	}
 

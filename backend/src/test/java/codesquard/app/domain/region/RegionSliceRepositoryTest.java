@@ -18,7 +18,7 @@ import codesquard.app.RegionTestSupport;
 
 @ActiveProfiles("test")
 @SpringBootTest
-class RegionPaginationRepositoryTest {
+class RegionSliceRepositoryTest {
 
 	@Autowired
 	private RegionRepository regionRepository;

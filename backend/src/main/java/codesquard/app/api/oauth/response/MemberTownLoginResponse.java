@@ -1,7 +1,5 @@
 package codesquard.app.api.oauth.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import codesquard.app.domain.membertown.MemberTown;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,7 +13,7 @@ public class MemberTownLoginResponse {
 	private Long addressId;
 	private String fullAddressName;
 	private String addressName;
-	private boolean isSelected;
+	private Boolean isSelected;
 
 	public static MemberTownLoginResponse from(MemberTown memberTown) {
 		return new MemberTownLoginResponse(
@@ -23,10 +21,5 @@ public class MemberTownLoginResponse {
 			memberTown.getRegion().getName(),
 			memberTown.getName(),
 			memberTown.isSelected());
-	}
-
-	@JsonProperty("isSelected")
-	public boolean isSelected() {
-		return isSelected;
 	}
 }

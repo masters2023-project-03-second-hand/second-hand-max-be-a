@@ -30,7 +30,9 @@ import codesquard.app.api.response.ApiResponse;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/items")
 @RequiredArgsConstructor
@@ -60,8 +62,9 @@ public class ItemController {
 	@GetMapping("/{itemId}")
 	public ApiResponse<ItemDetailResponse> findDetailItem(@PathVariable Long itemId,
 		@AuthPrincipal Principal principal) {
-		itemViewRedisService.addViewCount(itemId);
+		itemViewRedisService.addViewCount(itemId, principal);
 		ItemDetailResponse response = itemService.findDetailItemBy(itemId, principal.getMemberId());
+		log.debug("상품 상세 조회 결과 : {}", response);
 		return ApiResponse.ok("상품 상세 조회에 성공하였습니다.", response);
 	}
 
