@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import codesquard.app.domain.oauth.support.Principal;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,17 +29,26 @@ public class ChatLog {
 	private String sender;
 	private String receiver;
 	private LocalDateTime createdAt;
+	private boolean isRead;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "chat_room_id")
 	private ChatRoom chatRoom;
 
-	public ChatLog(String message, String sender, String receiver, ChatRoom chatRoom) {
+	public ChatLog(String message, String sender, String receiver, ChatRoom chatRoom, boolean isRead) {
 		this.message = message;
 		this.sender = sender;
 		this.receiver = receiver;
 		this.createdAt = LocalDateTime.now();
 		this.chatRoom = chatRoom;
+		this.isRead = isRead;
+	}
+
+	public static ChatLog createBySender(String message, ChatRoom chatRoom, Principal sender) {
+		if (sender.isBuyer(chatRoom.getBuyer())) {
+			return new ChatLog(message, sender.getLoginId(), chatRoom.getSellerLoginId(), chatRoom, false);
+		}
+		return new ChatLog(message, sender.getLoginId(), chatRoom.getBuyerLoginId(), chatRoom, false);
 	}
 
 	public boolean isSender(String loginId) {
