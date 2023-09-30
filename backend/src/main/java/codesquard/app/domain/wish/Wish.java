@@ -36,9 +36,9 @@ public class Wish {
 	private Item item;
 	private LocalDateTime createdAt;
 
-	public Wish(Member member, Item item, LocalDateTime createdAt) {
+	public Wish(Member member, Item item) {
 		this.member = member;
 		this.item = item;
-		this.createdAt = createdAt;
+		this.createdAt = LocalDateTime.now();
 	}
 }
