@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class MemberTownService {
@@ -35,6 +35,7 @@ public class MemberTownService {
 	private final RegionRepository regionRepository;
 	private final MemberTownValidator memberTownValidator;
 
+	@Transactional
 	public MemberAddRegionResponse addMemberTown(Principal principal, MemberTownAddRequest request) {
 		log.info("회원 동네 추가 서비스 요청 : 회원아이디={}, 추가할 동네 등록번호={}", principal.getLoginId(), request.getAddressId());
 
@@ -49,6 +50,7 @@ public class MemberTownService {
 		return MemberAddRegionResponse.from(town);
 	}
 
+	@Transactional
 	public MemberTownRemoveResponse removeMemberTown(Principal principal, MemberTownRemoveRequest request) {
 		log.info("회원 동네 삭제 서비스 요청 : 회원아이디={}, 삭제할 동네 등록번호={}", principal.getLoginId(), request.getAddressId());
 
@@ -59,9 +61,16 @@ public class MemberTownService {
 		Member member = findMemberBy(principal);
 		memberTownRepository.deleteMemberTownByMemberIdAndRegionId(member.getId(), region.getId());
 
-		// TODO: 남은 회원 동네 선택 처리
+		changeIsSelectedWithRemainMemberTown(principal);
 
 		return MemberTownRemoveResponse.create(region.getName());
+	}
+
+	private void changeIsSelectedWithRemainMemberTown(Principal principal) {
+		MemberTown remainMemberTown = memberTownRepository.findAllByMemberId(principal.getMemberId()).stream()
+			.findAny()
+			.orElseThrow(() -> new RestApiException(MemberTownErrorCode.NOT_FOUND_MEMBER_TOWN));
+		remainMemberTown.changeIsSelected(true);
 	}
 
 	private Region getAddressIdBy(Long addressId) {

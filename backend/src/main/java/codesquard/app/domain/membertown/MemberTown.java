@@ -63,6 +63,10 @@ public class MemberTown {
 		return new MemberTown(region.getShortAddress(), member, region, false);
 	}
 
+	public void changeIsSelected(boolean selected) {
+		this.isSelected = selected;
+	}
+
 	@Override
 	public String toString() {
 		return String.format("%s, %s(id=%d, name=%s, isSelected=%s)", "회원동네", this.getClass().getSimpleName(), id, name,

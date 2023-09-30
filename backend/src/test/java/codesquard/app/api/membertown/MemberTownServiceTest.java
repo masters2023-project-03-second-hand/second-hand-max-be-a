@@ -184,11 +184,16 @@ class MemberTownServiceTest {
 		MemberTownRemoveResponse response = memberTownService.removeMemberTown(Principal.from(saveMember), request);
 
 		// then
-		assertAll(() -> {
-			assertThat(response.getAddress()).isEqualTo("서울 송파구 가락동");
-			assertThat(memberTownRepository.findMemberTownByMemberIdAndName(saveMember.getId(), "가락동")
-				.isEmpty()).isTrue();
-		});
+		assertAll(
+			() -> assertThat(response.getAddress()).isEqualTo("서울 송파구 가락동"),
+			() -> assertThat(memberTownRepository.findMemberTownByMemberIdAndName(saveMember.getId(), "가락동")
+				.isEmpty()).isTrue(),
+			() -> {
+				MemberTown remainMemberTown = memberTownRepository.findMemberTownByMemberIdAndName(saveMember.getId(),
+					"궁정동").orElseThrow();
+				assertThat(remainMemberTown.isSelected()).isTrue();
+			}
+		);
 	}
 
 	@DisplayName("등록되지 않은 주소 이름을 가지고 회원의 동네를 제거할 수 없다")
