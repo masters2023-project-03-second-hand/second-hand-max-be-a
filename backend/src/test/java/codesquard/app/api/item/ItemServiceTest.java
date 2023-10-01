@@ -445,7 +445,7 @@ class ItemServiceTest {
 			new Image("imageUrlValue2", saveItem, false));
 		imageRepository.saveAll(images);
 
-		Wish wish = new Wish(member, item, now());
+		Wish wish = new Wish(member, item);
 		wishRepository.save(wish);
 
 		// when

@@ -1,5 +1,7 @@
 package codesquard.app.domain.wish;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface WishRepository extends JpaRepository<Wish, Long> {
@@ -9,4 +11,6 @@ public interface WishRepository extends JpaRepository<Wish, Long> {
 	int countWishByItemId(Long itemId);
 
 	boolean existsByMemberIdAndItemId(Long memberId, Long itemId);
+
+	List<Wish> findAllByMemberId(Long memberId);
 }
