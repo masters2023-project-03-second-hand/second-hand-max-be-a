@@ -29,8 +29,9 @@ public class KakaoOauthClient extends OauthClient {
 	}
 
 	@Override
-	public OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(String authorizationCode) {
-		MultiValueMap<String, String> formData = createFormData(authorizationCode);
+	public OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(String authorizationCode,
+		String redirectUrl) {
+		MultiValueMap<String, String> formData = createFormData(authorizationCode, redirectUrl);
 
 		log.info("formData : {}", formData);
 
@@ -70,12 +71,12 @@ public class KakaoOauthClient extends OauthClient {
 	}
 
 	@Override
-	public MultiValueMap<String, String> createFormData(String authorizationCode) {
+	public MultiValueMap<String, String> createFormData(String authorizationCode, String redirectUrl) {
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 		formData.add("code", authorizationCode);
 		formData.add("client_id", getClientId());
 		formData.add("client_secret", getClientSecret());
-		formData.add("redirect_uri", getRedirectUri());
+		formData.add("redirect_uri", redirectUrl);
 		formData.add("grant_type", "authorization_code");
 		return formData;
 	}

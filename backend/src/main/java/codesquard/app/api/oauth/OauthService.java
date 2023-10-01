@@ -52,12 +52,13 @@ public class OauthService {
 	private final OauthRedisService redisService;
 
 	public OauthSignUpResponse signUp(MultipartFile profile, OauthSignUpRequest request, String provider,
-		String authorizationCode) {
+		String authorizationCode, String redirectUrl) {
 		log.info("{}, provider : {}, authorizationCode : {}", request, provider,
 			authorizationCode);
 		validateDuplicateLoginId(request.getLoginId());
 
-		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, authorizationCode);
+		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, authorizationCode,
+			redirectUrl);
 		validateMultipleSignUp(userProfileResponse.getEmail());
 
 		Optional<MultipartFile> optionalProfile = Optional.ofNullable(profile);
@@ -105,11 +106,12 @@ public class OauthService {
 		}
 	}
 
-	private OauthUserProfileResponse getOauthUserProfileResponse(String provider, String authorizationCode) {
+	private OauthUserProfileResponse getOauthUserProfileResponse(String provider, String authorizationCode,
+		String redirectUrl) {
 		OauthClient oauthClient = oauthClientRepository.findOneBy(provider);
 
 		OauthAccessTokenResponse accessTokenResponse =
-			oauthClient.exchangeAccessTokenByAuthorizationCode(authorizationCode);
+			oauthClient.exchangeAccessTokenByAuthorizationCode(authorizationCode, redirectUrl);
 		log.debug("{}", accessTokenResponse);
 
 		OauthUserProfileResponse userProfileResponse =
@@ -118,10 +120,11 @@ public class OauthService {
 		return userProfileResponse;
 	}
 
-	public OauthLoginResponse login(OauthLoginRequest request, String provider, String code, LocalDateTime now) {
+	public OauthLoginResponse login(OauthLoginRequest request, String provider, String code, LocalDateTime now,
+		String redirectUrl) {
 		log.info("{}, provider : {}, code : {}", request, provider, code);
 
-		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, code);
+		OauthUserProfileResponse userProfileResponse = getOauthUserProfileResponse(provider, code, redirectUrl);
 
 		Member member = getLoginMember(request, userProfileResponse);
 		log.debug("로그인 서비스 요청 중 회원 객체 생성 : {}", member);

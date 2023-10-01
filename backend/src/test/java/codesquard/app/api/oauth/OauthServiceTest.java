@@ -119,7 +119,7 @@ class OauthServiceTest {
 			objectMapper.writeValueAsString(userProfileResponseBody), OauthUserProfileResponse.class);
 
 		given(oauthClientRepository.findOneBy(anyString())).willReturn(oauthClient);
-		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
+		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString(), anyString()))
 			.willReturn(mockAccessTokenResponse);
 		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.willReturn(mockUserProfileResponse);
@@ -128,7 +128,8 @@ class OauthServiceTest {
 		String provider = "naver";
 		String code = "1234";
 		// when
-		OauthSignUpResponse response = oauthService.signUp(createMultipartFile("cat.png"), request, provider, code);
+		OauthSignUpResponse response = oauthService.signUp(createMultipartFile("cat.png"), request, provider, code,
+			"http://localhost:5173/my-account/oauth");
 
 		// then
 		Member findMember = memberRepository.findMemberByLoginId("23Yong")
@@ -163,7 +164,7 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code, null));
 		// then
 
 		assertThat(throwable)
@@ -200,7 +201,7 @@ class OauthServiceTest {
 			objectMapper.writeValueAsString(userProfileResponseBody), OauthUserProfileResponse.class);
 
 		given(oauthClientRepository.findOneBy(anyString())).willReturn(oauthClient);
-		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
+		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString(), anyString()))
 			.willReturn(mockAccessTokenResponse);
 		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.willReturn(mockUserProfileResponse);
@@ -209,7 +210,8 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code,
+				"http://localhost:5173/my-account/oauth"));
 
 		// then
 
@@ -238,7 +240,7 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code, null));
 
 		// then
 		assertThat(throwable)
@@ -267,7 +269,7 @@ class OauthServiceTest {
 			objectMapper.readValue(objectMapper.writeValueAsString(responseBody), OauthAccessTokenResponse.class);
 
 		given(oauthClientRepository.findOneBy(anyString())).willReturn(oauthClient);
-		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
+		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString(), anyString()))
 			.willReturn(mockAccessTokenResponse);
 		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.willThrow(new RestApiException(OauthErrorCode.WRONG_AUTHORIZATION_CODE));
@@ -276,7 +278,8 @@ class OauthServiceTest {
 		String code = "1234";
 		// when
 		Throwable throwable = catchThrowable(
-			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code));
+			() -> oauthService.signUp(createMultipartFile("cat.png"), request, provider, code,
+				"http://localhost:5173/my-account/oauth"));
 
 		// then
 		assertThat(throwable)
@@ -324,13 +327,13 @@ class OauthServiceTest {
 
 		given(oauthClientRepository.findOneBy(anyString()))
 			.willReturn(oauthClient);
-		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
+		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString(), anyString()))
 			.willReturn(mockAccessTokenResponse);
 		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.willReturn(mockUserProfileResponse);
 
 		// when
-		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code));
+		Throwable throwable = catchThrowable(() -> oauthService.signUp(profile, request, provider, code, null));
 
 		// then
 		assertThat(throwable)
@@ -369,13 +372,14 @@ class OauthServiceTest {
 		LocalDateTime now = createNow();
 		// mocking
 		given(oauthClientRepository.findOneBy(anyString())).willReturn(oauthClient);
-		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString()))
+		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString(), anyString()))
 			.willReturn(mockAccessTokenResponse);
 		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
 			.willReturn(mockUserProfileResponse);
 
 		// when
-		OauthLoginResponse response = oauthService.login(request, provider, code, now);
+		OauthLoginResponse response = oauthService.login(request, provider, code, now,
+			"http://localhost:5173/my-account/oauth");
 
 		// then
 		assertThat(response)

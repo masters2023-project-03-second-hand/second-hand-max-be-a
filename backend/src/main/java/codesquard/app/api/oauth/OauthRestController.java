@@ -45,11 +45,13 @@ public class OauthRestController {
 	public ApiResponse<OauthSignUpResponse> signUp(
 		@PathVariable String provider,
 		@RequestParam String code,
+		@RequestParam String redirectUrl,
 		@RequestPart(value = "profile", required = false) MultipartFile profile,
 		@Valid @RequestPart(value = "signupData") OauthSignUpRequest request) {
-		log.info("provider : {}, code : {}, profile : {}, {}", provider, code, profile, request);
+		log.info("provider : {}, code : {}, requestUrl : {}, profile : {}, request : {}", provider, code, redirectUrl,
+			profile, request);
 
-		oauthService.signUp(profile, request, provider, code);
+		oauthService.signUp(profile, request, provider, code, redirectUrl);
 		return ApiResponse.created("회원가입에 성공하였습니다.", null);
 	}
 
@@ -57,8 +59,9 @@ public class OauthRestController {
 	public ApiResponse<OauthLoginResponse> login(
 		@PathVariable String provider,
 		@RequestParam String code,
+		@RequestParam String redirectUrl,
 		@Validated(ValidationSequence.class) @RequestBody OauthLoginRequest request) {
-		OauthLoginResponse response = oauthService.login(request, provider, code, LocalDateTime.now());
+		OauthLoginResponse response = oauthService.login(request, provider, code, LocalDateTime.now(), redirectUrl);
 		return ApiResponse.of(OK, "로그인에 성공하였습니다.", response);
 	}
 

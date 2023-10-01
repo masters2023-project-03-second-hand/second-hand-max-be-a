@@ -29,9 +29,10 @@ public abstract class OauthClient {
 		this.redirectUri = redirectUri;
 	}
 
-	public abstract OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(String authorizationCode);
+	public abstract OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(String authorizationCode,
+		String redirectUrl);
 
-	public abstract MultiValueMap<String, String> createFormData(String authorizationCode);
+	public abstract MultiValueMap<String, String> createFormData(String authorizationCode, String redirectUrl);
 
 	public Map<String, Object> getUserAttributes(String userInfoUri, OauthAccessTokenResponse accessTokenResponse) {
 		return WebClient.create()

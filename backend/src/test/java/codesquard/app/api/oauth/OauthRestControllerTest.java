@@ -78,7 +78,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		responseBody.put("loginId", "23Yong");
 		OauthSignUpResponse response = objectMapper.readValue(objectMapper.writeValueAsString(responseBody),
 			OauthSignUpResponse.class);
-		given(oauthService.signUp(any(), any(OauthSignUpRequest.class), anyString(), anyString()))
+		given(oauthService.signUp(any(), any(OauthSignUpRequest.class), anyString(), anyString(), anyString()))
 			.willReturn(response);
 
 		Map<String, Object> requestBody = new HashMap<>();
@@ -91,7 +91,8 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		mockMvc.perform(multipart("/api/auth/naver/signup")
 				.file(createMultipartFile("cat.png"))
 				.file(mockSignupData)
-				.param("code", "1234"))
+				.param("code", "1234")
+				.param("redirectUrl", "http://localhost:5173/my-account/oauth"))
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(201)));
 	}
@@ -112,7 +113,8 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		mockMvc.perform(multipart("/api/auth/naver/signup")
 				.file(createMultipartFile("cat.png"))
 				.file(mockSignupData)
-				.param("code", "1234"))
+				.param("code", "1234")
+				.param("redirectUrl", "http://localhost:5173/my-account/oauth"))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(400)))
 			.andExpect(jsonPath("message").value(Matchers.equalTo("유효하지 않은 입력형식입니다.")))
@@ -137,7 +139,8 @@ class OauthRestControllerTest extends ControllerTestSupport {
 		mockMvc.perform(multipart("/api/auth/naver/signup")
 				.file(createMultipartFile("cat.png"))
 				.file(mockSignupData)
-				.param("code", "1234"))
+				.param("code", "1234")
+				.param("redirectUrl", "http://localhost:5173/my-account/oauth"))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("statusCode").value(Matchers.equalTo(400)))
 			.andExpect(jsonPath("message").value(Matchers.equalTo("유효하지 않은 입력형식입니다.")))
