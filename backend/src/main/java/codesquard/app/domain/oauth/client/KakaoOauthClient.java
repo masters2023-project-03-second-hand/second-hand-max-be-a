@@ -44,9 +44,10 @@ public class KakaoOauthClient extends OauthClient {
 			.exchangeToMono(clientResponse -> {
 				log.info("statusCode : {}", clientResponse.statusCode());
 				if (clientResponse.statusCode().is4xxClientError() || clientResponse.statusCode().is5xxServerError()) {
-					String block = clientResponse.bodyToMono(String.class).block();
-					log.info("block : {}", block);
-					throw new IllegalStateException("error");
+					return clientResponse.bodyToMono(String.class).handle((s, sink) -> {
+						log.info("s : {}", s);
+						sink.error(new IllegalStateException("error"));
+					});
 				}
 				return clientResponse.bodyToMono(OauthAccessTokenResponse.class);
 			}).block();
