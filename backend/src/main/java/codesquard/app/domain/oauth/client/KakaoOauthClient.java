@@ -32,6 +32,8 @@ public class KakaoOauthClient extends OauthClient {
 	public OauthAccessTokenResponse exchangeAccessTokenByAuthorizationCode(String authorizationCode) {
 		MultiValueMap<String, String> formData = createFormData(authorizationCode);
 
+		log.info("formData : {}", formData);
+
 		OauthAccessTokenResponse response = WebClient.create()
 			.post()
 			.uri(getTokenUri())
@@ -75,7 +77,6 @@ public class KakaoOauthClient extends OauthClient {
 		formData.add("client_secret", getClientSecret());
 		formData.add("redirect_uri", getRedirectUri());
 		formData.add("grant_type", "authorization_code");
-
 		return formData;
 	}
 
