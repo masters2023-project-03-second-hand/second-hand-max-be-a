@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.EntityManager;
 
@@ -148,7 +149,7 @@ class WishItemServiceTest {
 		List<ItemResponse> contents = responses.getContents();
 		assertAll(
 			() -> assertThat(contents).hasSize(2),
-			() -> assertThat(contents.get(0).getTitle()).isEqualTo("노트북"),
+			() -> assertThat(Objects.requireNonNull(contents).get(0).getTitle()).isEqualTo("노트북"),
 			() -> assertThat(responses.getPaging().isHasNext()).isTrue(),
 			() -> assertThat(responses.getPaging().getNextCursor()).isEqualTo(item2.getId())
 		);
@@ -188,6 +189,8 @@ class WishItemServiceTest {
 	public void readWishCategories() {
 		// given
 		List<Category> categories = categoryRepository.saveAll(List.of(findByName("스포츠/레저"), findByName("가구/인테리어")));
+		Category sport = categories.get(0);
+		Category furniture = categories.get(1);
 		List<Member> members = memberRepository.saveAll(List.of(
 			createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"),
 			createMember("avatarUrlValue", "bruni@gmail.com", "bruni")));
@@ -202,9 +205,9 @@ class WishItemServiceTest {
 			createMemberTown(buyer, regions.get(0), true),
 			createMemberTown(buyer, regions.get(0), true)));
 		Item item1 = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
-			"가락동", seller, categories.get(0));
+			"가락동", seller, sport);
 		Item item2 = createItem("빈티지 의자", "의자 팝니다.", 80000L, ON_SALE,
-			"가락동", seller, categories.get(1));
+			"가락동", seller, furniture);
 		itemRepository.saveAll(List.of(item1, item2));
 		wishRepository.saveAll(List.of(new Wish(buyer, item1), new Wish(buyer, item2)));
 		Principal principal = Principal.from(buyer);
@@ -216,7 +219,8 @@ class WishItemServiceTest {
 		assertThat(response)
 			.extracting("categories").asList()
 			.extracting("categoryId", "categoryName")
-			.containsExactlyInAnyOrder(Tuple.tuple(1L, "스포츠/레저"), Tuple.tuple(2L, "가구/인테리어"));
+			.containsExactlyInAnyOrder(Tuple.tuple(sport.getId(), sport.getName()),
+				Tuple.tuple(furniture.getId(), furniture.getName()));
 
 	}
 }
