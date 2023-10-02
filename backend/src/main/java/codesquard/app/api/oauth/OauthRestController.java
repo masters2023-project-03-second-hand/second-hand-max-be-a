@@ -59,7 +59,7 @@ public class OauthRestController {
 	public ApiResponse<OauthLoginResponse> login(
 		@PathVariable String provider,
 		@RequestParam String code,
-		@RequestParam String redirectUrl,
+		@RequestParam(value = "redirectUrl", required = false) String redirectUrl,
 		@Validated(ValidationSequence.class) @RequestBody OauthLoginRequest request) {
 		OauthLoginResponse response = oauthService.login(request, provider, code, LocalDateTime.now(), redirectUrl);
 		return ApiResponse.of(OK, "로그인에 성공하였습니다.", response);
