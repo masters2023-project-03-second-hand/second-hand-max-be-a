@@ -166,6 +166,7 @@ class ItemServiceTest {
 		assertAll(
 			() -> assertThat(contents.size()).isEqualTo(2),
 			() -> assertThat(contents.get(0).getTitle()).isEqualTo("노트북"),
+			() -> assertThat(contents.get(0).getSellerId()).isEqualTo("pieeeeeee"),
 			() -> assertThat(all.getPaging().isHasNext()).isTrue(),
 			() -> assertThat(all.getPaging().getNextCursor()).isEqualTo(item.getId()));
 	}

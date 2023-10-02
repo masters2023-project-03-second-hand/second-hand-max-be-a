@@ -17,4 +17,5 @@ public class ItemResponse {
 	private ItemStatus status;
 	private Long chatCount;
 	private Long wishCount;
+	private String sellerId;
 }
