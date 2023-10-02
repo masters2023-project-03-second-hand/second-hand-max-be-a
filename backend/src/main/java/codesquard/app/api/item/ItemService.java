@@ -53,20 +53,29 @@ public class ItemService {
 	@Transactional
 	public void register(ItemRegisterRequest request, List<MultipartFile> itemImages,
 		MultipartFile thumbnail, Long memberId) {
+		log.info("상품 등록 서비스 요청 : request={}", request);
+
 		String thumbnailUrl = imageService.uploadImage(thumbnail);
+		log.info("S3 썸네일 저장 결과 URL : {}", thumbnailUrl);
+
 		Member writer = new Member(memberId);
-		Item saveItem = itemRepository.save(request.toEntity(writer, thumbnailUrl));
-		Image saveThumbnailUrl = imageRepository.save(Image.thumbnail(thumbnailUrl, saveItem.getId()));
-		log.debug("썸네일 저장 결과 : {}", saveThumbnailUrl);
+		Item item = itemRepository.save(request.toEntity(writer, thumbnailUrl));
+		log.info("상품 저장 결과 : {}", item);
+
+		Image saveThumbnailUrl = imageRepository.save(Image.thumbnail(thumbnailUrl, item.getId()));
+		log.info("썸네일 저장 결과 : {}", saveThumbnailUrl);
 
 		if (itemImages != null) {
 			List<String> serverFileUrls = imageService.uploadImages(itemImages);
-			List<Image> images = Image.createImages(serverFileUrls, saveItem);
-			imageRepository.saveAll(images);
+			log.info("S3 일반 이미지 저장 결과 URL : {}", serverFileUrls);
+
+			List<Image> images = imageRepository.saveAll(Image.createImages(serverFileUrls, item));
+			log.info("일반 이미지 저장 결과 : {}", images);
 		}
 	}
 
 	public ItemResponses findAll(String region, int size, Long cursor, Long categoryId) {
+		log.info("상품 목록 조회 서비스 요청 : region={}, size={}, cursor={}, categoryId={}", region, size, cursor, categoryId);
 		Slice<ItemResponse> itemResponses = itemPaginationRepository.findByIdAndRegion(cursor, region, size,
 			categoryId);
 		return PaginationUtils.getItemResponses(itemResponses);
@@ -84,18 +93,16 @@ public class ItemService {
 	@Cacheable
 	public ItemDetailResponse findDetailItemBy(Long itemId, Long loginMemberId) {
 		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
+
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
-		List<String> imageUrls = mapToImageUrls(item);
-		Member seller = item.getMember();
-		return ItemDetailResponse.of(item, seller, loginMemberId, imageUrls);
-	}
 
-	private List<String> mapToImageUrls(Item item) {
-		List<Image> images = imageRepository.findAllByItemId(item.getId());
-		return images.stream()
+		List<Image> images = imageRepository.findAllByItemId(itemId);
+		List<String> imageUrls = images.stream()
 			.map(Image::getImageUrl)
 			.collect(Collectors.toUnmodifiableList());
+
+		return ItemDetailResponse.of(item, loginMemberId, imageUrls);
 	}
 
 	@Transactional
@@ -105,29 +112,27 @@ public class ItemService {
 		log.info("상품 수정 서비스 요청 : addImages={}, thumnailFile={}", addImages, thumbnailFile);
 
 		Item item = findItemByItemIdAndMemberId(itemId, writer.getMemberId());
-		log.debug("상품 수정 서비스의 상품 조회 결과 : {}", item);
+		log.info("상품 수정 서비스의 상품 조회 결과 : {}", item);
 
 		List<String> addImageUrls = imageService.uploadImages(addImages);
-		log.debug("상품 수정 서비스의 S3 이미지 추가 결과 : {}", addImageUrls);
+		log.info("상품 수정 서비스의 S3 이미지 추가 결과 : {}", addImageUrls);
 
 		List<Image> saveImages = imageRepository.saveAll(Image.createImages(addImageUrls, new Item(itemId)));
-		log.debug("상품 수정 서비스의 이미지 테이블 저장 결과 : {}", saveImages);
+		log.info("상품 수정 서비스의 이미지 테이블 저장 결과 : {}", saveImages);
 
 		List<String> deleteImageUrls = request.getDeleteImageUrls();
-		log.debug("상품 수정 서비스시 이미지 삭제 URL 리스트 : deleteImageUrls={}", deleteImageUrls);
 
 		int deleteImageSize = deleteImages(itemId, deleteImageUrls);
-		log.debug("이미지 테이블의 삭제 결과 : 삭제 개수={}", deleteImageSize);
+		log.info("이미지 테이블의 삭제 결과 : 삭제 개수={}", deleteImageSize);
 
 		deleteImagesFromS3(deleteImageUrls);
 
 		Category category = findCategoryBy(request.getCategoryId());
-		log.debug("상품 수정 서비스의 카테고리 조회 결과 : {}", category);
 
 		String thumbnailUrl = updateThumnail(item, thumbnailFile, request.getThumnailImage());
-		log.debug("썸네일 갱신 결과 : thumbnailUrl={}", thumbnailUrl);
 
 		item.change(category, request.toEntity(), thumbnailUrl);
+		log.info("상품 수정 결과 : {}", item);
 	}
 
 	private Category findCategoryBy(Long categoryId) {
@@ -136,6 +141,10 @@ public class ItemService {
 	}
 
 	private String updateThumnail(Item item, MultipartFile thumbnailFile, String thumbnailUrl) {
+		// 썸네일 업데이트
+		// 1. 상품 게시글 수정시 수정하고자 하는 썸네일 파일이 없다면 기존 상품 게시글의 썸네일을 사용합니다.
+		// 2. 상품 게시글 수정시 수정하고자 하는 썸네일 파일이 있다면 썸네일 사진을 교체합니다.
+		// 3. 상품 게시글 수정시 수정하고자 하는 썸네일 파일이 기존 이미지 사진들중 하나인 경우
 		if (thumbnailFile == null) {
 			return item.getThumbnailUrl();
 		}
@@ -148,20 +157,20 @@ public class ItemService {
 
 	private String updateNewThumnail(Long itemId, MultipartFile thumbnailFile) {
 		String thumnailImageUrl = imageService.uploadImage(thumbnailFile);
-		log.debug("썸네일 이미지 S3 업로드 결과 : thumnailImageUrl={}", thumnailImageUrl);
+		log.info("썸네일 이미지 S3 업로드 결과 : thumnailImageUrl={}", thumnailImageUrl);
 
 		Image thumbnail = imageRepository.save(Image.thumbnail(thumnailImageUrl, itemId));
-		log.debug("썸네일 이미지 테이블 저장 결과 : image={}", thumbnail);
+		log.info("썸네일 이미지 테이블 저장 결과 : image={}", thumbnail);
 		return thumnailImageUrl;
 	}
 
 	private String updateThumbnailStatus(String changeThumbnail, Item item) {
 		Optional.ofNullable(changeThumbnail).ifPresent(thumbnail -> {
 			int result = imageRepository.updateThumnailToFalseByItemIdAndThumbnailIsTrue(item.getId());
-			log.debug("기존 이미지 썸네일 표시 변경 결과 : result={}", result);
+			log.info("기존 이미지 썸네일 표시 변경 결과 : result={}", result);
 
 			result = imageRepository.updateThumbnailByItemIdAndImageUrl(item.getId(), thumbnail, true);
-			log.debug("요청 이미지 썸네일 표시 변경 결과 : result={}", result);
+			log.info("요청 이미지 썸네일 표시 변경 결과 : result={}", result);
 		});
 		return changeThumbnail;
 	}
