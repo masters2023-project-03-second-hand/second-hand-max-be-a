@@ -27,12 +27,13 @@ public class WishPaginationRepository {
 				item.id.as("itemId"),
 				item.thumbnailUrl,
 				item.title,
-				item.region,
+				item.region.as("tradingRegion"),
 				item.createdAt,
 				item.price,
 				item.status,
 				item.wishCount,
-				item.chatCount))
+				item.chatCount,
+				item.member.loginId.as("sellerId")))
 			.from(wish)
 			.join(wish.item, item)
 			.on(wish.item.id.eq(item.id))
