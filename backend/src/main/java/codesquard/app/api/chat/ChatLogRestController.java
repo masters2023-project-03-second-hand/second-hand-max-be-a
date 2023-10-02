@@ -32,7 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class ChatLogRestController {
 
-	private final Map<DeferredResult<ApiResponse<ChatLogListResponse>>, Integer> chatRequests = new ConcurrentHashMap<>();
+	private final Map<DeferredResult<ApiResponse<ChatLogListResponse>>, Integer> chatRequests =
+		new ConcurrentHashMap<>();
 
 	private final ChatLogService chatLogService;
 
@@ -44,9 +45,11 @@ public class ChatLogRestController {
 		@AuthPrincipal Principal sender) {
 		ChatLogSendResponse response = chatLogService.sendMessage(request, chatRoomId, sender);
 
+		Long cursor = null;
+		int size = 10;
 		this.chatRequests.forEach((key, messageIndex) ->
 			key.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.",
-				chatLogService.readMessages(chatRoomId, messageIndex, sender))));
+				chatLogService.readMessages(chatRoomId, messageIndex, sender, cursor, size))));
 		return ApiResponse.created("메시지 전송이 완료되었습니다.", response);
 	}
 
@@ -54,9 +57,11 @@ public class ChatLogRestController {
 	public DeferredResult<ApiResponse<ChatLogListResponse>> readMessages(
 		@PathVariable Long chatRoomId,
 		@RequestParam(required = false, defaultValue = "0") @MessageIndex int messageIndex,
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(required = false, defaultValue = "10") int size,
 		@AuthPrincipal Principal principal) {
-		log.info("메시지 읽기 요청 : chatRoomId={}, messageIndex={}, 요청한 아이디={}", chatRoomId, messageIndex,
-			principal.getLoginId());
+		log.info("메시지 읽기 요청 : chatRoomId={}, messageIndex={}, cursor={}, size={}, 요청한 아이디={}", chatRoomId, messageIndex,
+			cursor, size, principal.getLoginId());
 		DeferredResult<ApiResponse<ChatLogListResponse>> deferredResult = new DeferredResult<>(10000L);
 		this.chatRequests.put(deferredResult, messageIndex);
 
@@ -64,7 +69,7 @@ public class ChatLogRestController {
 		deferredResult.onTimeout(() -> deferredResult.setErrorResult(
 			ApiResponse.of(HttpStatus.REQUEST_TIMEOUT, "새로운 채팅 메시지가 존재하지 않습니다.", null)));
 
-		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, messageIndex, principal);
+		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, messageIndex, principal, cursor, size);
 
 		if (!response.isEmptyChat()) {
 			deferredResult.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.", response));

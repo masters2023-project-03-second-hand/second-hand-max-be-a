@@ -5,11 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@ToString
 public class OauthAccessTokenResponse {
 
 	@JsonProperty("access_token")
