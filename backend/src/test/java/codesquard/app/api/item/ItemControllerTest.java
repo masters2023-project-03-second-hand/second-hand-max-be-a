@@ -80,7 +80,7 @@ class ItemControllerTest extends ControllerTestSupport {
 			.build();
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 
-		ItemDetailResponse response = ItemDetailResponse.of(item, seller.getId(), imageUrls);
+		ItemDetailResponse response = ItemDetailResponse.of(item, seller.getId(), imageUrls, false);
 		given(itemService.findDetailItemBy(any(), any())).willReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/1"))
@@ -98,7 +98,8 @@ class ItemControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("data.chatCount").value(equalTo(0)))
 			.andExpect(jsonPath("data.wishCount").value(equalTo(0)))
 			.andExpect(jsonPath("data.viewCount").value(equalTo(0)))
-			.andExpect(jsonPath("data.price").value(equalTo(200000)));
+			.andExpect(jsonPath("data.price").value(equalTo(200000)))
+			.andExpect(jsonPath("data.isInWishList").value(equalTo(false)));
 	}
 
 	@DisplayName("구매자가 상품의 상세한 내용을 조회합니다.")
@@ -123,7 +124,7 @@ class ItemControllerTest extends ControllerTestSupport {
 		Long loginMemberId = 9999L;
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 
-		ItemDetailResponse response = ItemDetailResponse.of(item, loginMemberId, imageUrls);
+		ItemDetailResponse response = ItemDetailResponse.of(item, loginMemberId, imageUrls, false);
 		given(itemService.findDetailItemBy(any(), any())).willReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/1"))
@@ -141,7 +142,8 @@ class ItemControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("data.chatCount").value(equalTo(0)))
 			.andExpect(jsonPath("data.wishCount").value(equalTo(0)))
 			.andExpect(jsonPath("data.viewCount").value(equalTo(0)))
-			.andExpect(jsonPath("data.price").value(equalTo(200000)));
+			.andExpect(jsonPath("data.price").value(equalTo(200000)))
+			.andExpect(jsonPath("data.isInWishList").value(equalTo(false)));
 	}
 
 	@DisplayName("구매자가 상품의 상세한 내용을 조회합니다.")

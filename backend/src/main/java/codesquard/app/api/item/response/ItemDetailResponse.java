@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemDetailResponse {
-	
+
 	private Boolean isSeller;
 	private List<String> imageUrls;
 	private String seller;
@@ -26,11 +26,12 @@ public class ItemDetailResponse {
 	private Long wishCount;
 	private Long viewCount;
 	private Long price;
+	private Boolean isInWishList;
 
 	@Builder(access = AccessLevel.PRIVATE)
 	private ItemDetailResponse(boolean isSeller, List<String> imageUrls, String seller, String status, String title,
 		String categoryName, LocalDateTime createdAt, String content, Long chatCount, Long wishCount, Long viewCount,
-		Long price) {
+		Long price, Boolean isInWishList) {
 		this.isSeller = isSeller;
 		this.imageUrls = imageUrls;
 		this.seller = seller;
@@ -43,9 +44,10 @@ public class ItemDetailResponse {
 		this.wishCount = wishCount;
 		this.viewCount = viewCount;
 		this.price = price;
+		this.isInWishList = isInWishList;
 	}
 
-	public static ItemDetailResponse of(Item item, Long loginMemberId, List<String> imageUrls) {
+	public static ItemDetailResponse of(Item item, Long loginMemberId, List<String> imageUrls, boolean isInWishList) {
 		Member seller = item.getMember();
 		boolean isSeller = seller.equalId(loginMemberId);
 		return ItemDetailResponse.builder()
@@ -61,6 +63,7 @@ public class ItemDetailResponse {
 			.wishCount(item.getWishCount())
 			.viewCount(item.getViewCount())
 			.price(item.getPrice())
+			.isInWishList(isInWishList)
 			.build();
 	}
 

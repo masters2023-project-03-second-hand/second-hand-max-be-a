@@ -102,7 +102,9 @@ public class ItemService {
 			.map(Image::getImageUrl)
 			.collect(Collectors.toUnmodifiableList());
 
-		return ItemDetailResponse.of(item, loginMemberId, imageUrls);
+		boolean isInWishList = wishRepository.existsByMemberIdAndItemId(loginMemberId, itemId);
+
+		return ItemDetailResponse.of(item, loginMemberId, imageUrls, isInWishList);
 	}
 
 	@Transactional
