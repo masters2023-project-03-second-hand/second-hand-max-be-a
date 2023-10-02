@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +72,7 @@ public class WishItemService {
 		return PaginationUtils.getItemResponses(itemResponses);
 	}
 
+	@Cacheable("wishCategories")
 	public WishCategoryListResponse readWishCategories(Principal principal) {
 		List<Wish> wishes = wishRepository.findAllByMemberId(principal.getMemberId());
 		List<Category> categories = wishes.stream()

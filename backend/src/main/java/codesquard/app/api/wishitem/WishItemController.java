@@ -14,7 +14,9 @@ import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.domain.wish.WishStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/wishes")
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class WishItemController {
 
 	@GetMapping("/categories")
 	public ApiResponse<WishCategoryListResponse> readWishCategories(@AuthPrincipal Principal principal) {
+		log.info("관심 상품들의 카테고리 목록 요청 : {}", principal);
 		return ApiResponse.ok("관심상품의 카테고리 목록 조회를 완료하였습니다.", wishItemService.readWishCategories(principal));
 	}
 }

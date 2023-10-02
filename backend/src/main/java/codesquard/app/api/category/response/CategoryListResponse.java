@@ -1,5 +1,6 @@
 package codesquard.app.api.category.response;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CategoryListResponse {
+public class CategoryListResponse implements Serializable {
 
 	private List<CategoryItemResponse> categories;
 

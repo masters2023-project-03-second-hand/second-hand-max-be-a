@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,7 +89,6 @@ public class ItemService {
 		log.info("상품 상태 변경 결과 : item={}", item);
 	}
 
-	@Cacheable(cacheNames = "detailItem")
 	public ItemDetailResponse findDetailItemBy(Long itemId, Long loginMemberId) {
 		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
 

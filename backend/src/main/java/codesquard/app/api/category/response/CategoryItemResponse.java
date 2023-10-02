@@ -1,5 +1,7 @@
 package codesquard.app.api.category.response;
 
+import java.io.Serializable;
+
 import codesquard.app.domain.category.Category;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class CategoryItemResponse {
+public class CategoryItemResponse implements Serializable {
 
 	private Long id;
 	private String imageUrl;

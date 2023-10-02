@@ -1,14 +1,17 @@
 package codesquard.app.config;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.http.CacheControl;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.mvc.WebContentInterceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,6 +41,13 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addInterceptor(new LogoutInterceptor())
 			.excludePathPatterns("/api/*")
 			.addPathPatterns("/api/auth/logout");
+
+		WebContentInterceptor webCacheContentInterceptor = new WebContentInterceptor();
+		webCacheContentInterceptor.addCacheMapping(
+			CacheControl.maxAge(3600, TimeUnit.SECONDS).noTransform().mustRevalidate(),
+			"/api/categories", "/api/wishes/categories");
+
+		registry.addInterceptor(webCacheContentInterceptor);
 	}
 
 	@Override

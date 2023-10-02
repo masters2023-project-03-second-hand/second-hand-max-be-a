@@ -1,5 +1,6 @@
 package codesquard.app.api.item.response;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ItemDetailResponse {
+public class ItemDetailResponse implements Serializable {
 
 	private Boolean isSeller;
 	private List<String> imageUrls;
