@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ItemViewRedisService {
 
-	private static final String ITEM_ID_PREFIX = "itemId: ";
+	public static final String ITEM_ID_PREFIX = "itemId: ";
 	private static final Pattern ITEM_ID_PATTERN = Pattern.compile("itemId:*");
 
 	private final RedisTemplate<String, String> redisTemplate;
@@ -52,10 +52,7 @@ public class ItemViewRedisService {
 	}
 
 	private boolean isFirstItemView(String key) {
-		if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
-			return false;
-		}
-		return true;
+		return !Boolean.TRUE.equals(redisTemplate.hasKey(key));
 	}
 
 	@Transactional

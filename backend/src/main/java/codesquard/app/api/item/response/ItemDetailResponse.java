@@ -45,7 +45,8 @@ public class ItemDetailResponse {
 		this.price = price;
 	}
 
-	public static ItemDetailResponse of(Item item, Member seller, Long loginMemberId, List<String> imageUrls) {
+	public static ItemDetailResponse of(Item item, Long loginMemberId, List<String> imageUrls) {
+		Member seller = item.getMember();
 		boolean isSeller = seller.equalId(loginMemberId);
 		return ItemDetailResponse.builder()
 			.isSeller(isSeller)
