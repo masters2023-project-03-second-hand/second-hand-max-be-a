@@ -423,8 +423,7 @@ class ItemServiceTest {
 	public void findDetailItemBySeller() {
 		// given
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
-		categoryRepository.saveAll(getCategories());
-		Category category = findByName("스포츠/레저");
+		Category category = categoryRepository.save(findByName("스포츠/레저"));
 		Item item = Item.builder()
 			.title("빈티지 롤러 블레이드")
 			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")

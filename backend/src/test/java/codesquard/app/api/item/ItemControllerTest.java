@@ -80,7 +80,7 @@ class ItemControllerTest extends ControllerTestSupport {
 			.build();
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 
-		ItemDetailResponse response = ItemDetailResponse.of(item, seller, seller.getId(), imageUrls);
+		ItemDetailResponse response = ItemDetailResponse.of(item, seller.getId(), imageUrls);
 		given(itemService.findDetailItemBy(any(), any())).willReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/1"))
@@ -123,7 +123,7 @@ class ItemControllerTest extends ControllerTestSupport {
 		Long loginMemberId = 9999L;
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 
-		ItemDetailResponse response = ItemDetailResponse.of(item, seller, loginMemberId, imageUrls);
+		ItemDetailResponse response = ItemDetailResponse.of(item, loginMemberId, imageUrls);
 		given(itemService.findDetailItemBy(any(), any())).willReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/1"))
