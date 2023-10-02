@@ -72,10 +72,13 @@ public class ItemService {
 		return PaginationUtils.getItemResponses(itemResponses);
 	}
 
-	public void findById(Long itemId, ItemStatus status) {
+	@Transactional
+	public void changeItemStatus(Long itemId, ItemStatus status) {
+		log.info("상품 상태 변경 서비스 요청 : itemId={}, status={}", itemId, status);
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
 		item.changeStatus(status);
+		log.info("상품 상태 변경 결과 : item={}", item);
 	}
 
 	@Cacheable
