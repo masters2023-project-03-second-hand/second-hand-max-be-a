@@ -173,7 +173,7 @@ class ChatRoomServiceTest {
 			buyer.getLoginId(),
 			seller.getLoginId(),
 			chatRoom,
-			false));
+			1));
 
 		// when
 		ChatRoomListResponse response = chatRoomService.readAllChatRoom(10, null, Principal.from(seller));

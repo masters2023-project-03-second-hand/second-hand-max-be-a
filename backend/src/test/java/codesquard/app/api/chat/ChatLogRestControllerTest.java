@@ -5,6 +5,7 @@ import static codesquard.app.domain.item.ItemStatus.*;
 import static java.time.LocalDateTime.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.anyLong;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -88,9 +89,9 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 			ChatLogSendResponse.class);
 
 		given(chatLogService.sendMessage(
-			ArgumentMatchers.any(ChatLogSendRequest.class),
-			ArgumentMatchers.anyLong(),
-			ArgumentMatchers.any(Principal.class)))
+			any(ChatLogSendRequest.class),
+			anyLong(),
+			any(Principal.class)))
 			.willReturn(response);
 
 		// when & then
@@ -128,13 +129,16 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 			.build();
 		ChatLogItemResponse itemResponse = ChatLogItemResponse.from(item);
 		ChatRoom chatRoom = new ChatRoom(buyer, item);
-		ChatLog chatLog = new ChatLog("안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.", "23Yong", "carlynne", chatRoom, false);
+		ChatLog chatLog = new ChatLog("안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.", "23Yong", "carlynne", chatRoom, 1);
 		ChatLogMessageResponse messageResponse = ChatLogMessageResponse.from(0, chatLog, Principal.from(buyer));
-		ChatLogListResponse response = new ChatLogListResponse("carlynne", itemResponse, List.of(messageResponse));
+		ChatLogListResponse response = new ChatLogListResponse("carlynne", itemResponse, List.of(messageResponse),
+			false, null);
 		given(chatLogService.readMessages(
 			ArgumentMatchers.anyLong(),
 			ArgumentMatchers.anyInt(),
-			ArgumentMatchers.any(Principal.class)
+			ArgumentMatchers.any(Principal.class),
+			ArgumentMatchers.isNull(),
+			ArgumentMatchers.anyInt()
 		)).willReturn(response);
 		int chatRoomId = 1;
 
@@ -178,11 +182,13 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 	public void readMessagesWithTimeout() throws Exception {
 		// given
 		ChatLogItemResponse itemResponse = null;
-		ChatLogListResponse response = new ChatLogListResponse("carlynne", itemResponse, List.of());
+		ChatLogListResponse response = new ChatLogListResponse("carlynne", itemResponse, List.of(), false, null);
 		given(chatLogService.readMessages(
 			ArgumentMatchers.anyLong(),
 			ArgumentMatchers.anyInt(),
-			ArgumentMatchers.any(Principal.class)
+			ArgumentMatchers.any(Principal.class),
+			ArgumentMatchers.isNull(),
+			ArgumentMatchers.anyInt()
 		)).willReturn(response);
 		int chatRoomId = 1;
 

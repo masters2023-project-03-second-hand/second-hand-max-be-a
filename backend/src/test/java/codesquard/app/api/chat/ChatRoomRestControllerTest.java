@@ -106,7 +106,7 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 			.category(CategoryTestSupport.findByName("스포츠/레저"))
 			.build();
 		ChatRoom chatRoom = new ChatRoom(buyer, item);
-		ChatLog chatLog = new ChatLog("안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.", "carlynne", "23Yong", chatRoom, false);
+		ChatLog chatLog = new ChatLog("안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.", "carlynne", "23Yong", chatRoom, 1);
 		Long newMessageCount = 1L;
 
 		List<ChatRoomItemResponse> contents = List.of(

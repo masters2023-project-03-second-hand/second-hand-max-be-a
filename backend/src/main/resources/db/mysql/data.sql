@@ -120,22 +120,22 @@ VALUES (now(), 3, 2);
 INSERT INTO chat_room(created_at, item_id, member_id)
 VALUES (now(), 1, 2);
 
-INSERT INTO chat_log(created_at, message, receiver, sender, is_read, chat_room_id)
-VALUES (now(), '안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.', 'bruni', 'carlynne', false, 1),
-       (now(), '좋아요. 깍아서 15만원에 드릴게요.', 'carlynne', 'bruni', false, 1),
-       (now(), '택배비 포함인가요?', 'bruni', 'carlynne', false, 1),
-       (now(), '아쉽게도 택배비 포함안되서 16만원이에요.', 'carlynne', 'bruni', false, 1),
-       (now(), '알았어요. 16만원 보낼게요.', 'bruni', 'carlynne', false, 1),
-       (now(), '고마워요1', 'bruni', 'carlynne', false, 1),
-       (now(), '고마워요2', 'bruni', 'carlynne', false, 1),
-       (now(), '고마워요3', 'bruni', 'carlynne', false, 1),
-       (now(), '고마워요4', 'bruni', 'carlynne', false, 1),
-       (now(), '고마워요5', 'bruni', 'carlynne', false, 1),
-       (now(), '고마워요6', 'bruni', 'carlynne', false, 1),
-       (now(), '고마워요7', 'bruni', 'carlynne', false, 1),
-       (now(), '고마워요8', 'bruni', 'carlynne', false, 1),
-       (now(), '고마워요9', 'bruni', 'carlynne', false, 1),
-       (now(), '고마워요10', 'bruni', 'carlynne', false, 1);
+INSERT INTO chat_log(created_at, message, receiver, sender, read_count, chat_room_id)
+VALUES (now(), '안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.', 'bruni', 'carlynne', 0, 1),
+       (now(), '좋아요. 깍아서 15만원에 드릴게요.', 'carlynne', 'bruni', 0, 1),
+       (now(), '택배비 포함인가요?', 'bruni', 'carlynne', 0, 1),
+       (now(), '아쉽게도 택배비 포함안되서 16만원이에요.', 'carlynne', 'bruni', 0, 1),
+       (now(), '알았어요. 16만원 보낼게요.', 'bruni', 'carlynne', 0, 1),
+       (now(), '고마워요1', 'bruni', 'carlynne', 1, 1),
+       (now(), '고마워요2', 'bruni', 'carlynne', 1, 1),
+       (now(), '고마워요3', 'bruni', 'carlynne', 1, 1),
+       (now(), '고마워요4', 'bruni', 'carlynne', 1, 1),
+       (now(), '고마워요5', 'bruni', 'carlynne', 1, 1),
+       (now(), '고마워요6', 'bruni', 'carlynne', 1, 1),
+       (now(), '고마워요7', 'bruni', 'carlynne', 1, 1),
+       (now(), '고마워요8', 'bruni', 'carlynne', 1, 1),
+       (now(), '고마워요9', 'bruni', 'carlynne', 1, 1),
+       (now(), '고마워요10', 'bruni', 'carlynne', 1, 1);
 
 
 
