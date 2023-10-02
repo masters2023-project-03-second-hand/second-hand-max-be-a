@@ -181,13 +181,12 @@ class ChatLogServiceTest {
 			ChatLog.createBySender("깍아주세요.", chatRoom, Principal.from(buyer))
 		));
 
-		int messageIndex = 0;
 		Long cursor = null;
 		int size = 10;
 
 		// when
-		ChatLogListResponse response = chatLogService.readMessages(chatRoom.getId(), messageIndex,
-			Principal.from(seller), cursor, size);
+		ChatLogListResponse response = chatLogService.readMessages(chatRoom.getId(), Principal.from(seller), cursor,
+			size);
 
 		// then
 		assertAll(

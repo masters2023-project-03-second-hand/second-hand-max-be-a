@@ -2,7 +2,6 @@ package codesquard.app.api.chat;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -48,8 +47,7 @@ public class ChatLogService {
 
 	@SuppressWarnings("checkstyle:SeparatorWrap")
 	@Transactional
-	public ChatLogListResponse readMessages(Long chatRoomId, int messageIndex, Principal principal, Long cursor,
-		int size) {
+	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor, int size) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
 		Item item = findItemBy(chatRoom);
 
@@ -58,20 +56,12 @@ public class ChatLogService {
 
 		List<ChatLog> contents = slice.getContent().stream()
 			.collect(Collectors.toUnmodifiableList());
-
-		if (messageIndex < 0 || messageIndex >= contents.size()) {
-			return ChatLogListResponse.emptyResponse(chatPartnerName, item);
-		}
-
-		List<ChatLog> chatLogs = contents.subList(messageIndex, contents.size());
 		// 메시지 읽는다.
-		chatLogs.forEach(c -> c.readMessage(principal.getLoginId()));
+		contents.forEach(c -> c.readMessage(principal.getLoginId()));
 
-		List<ChatLogMessageResponse> messageResponses = IntStream.range(0, chatLogs.size())
-			.mapToObj(idx -> {
-				ChatLog chatLog = chatLogs.get(idx);
-				return ChatLogMessageResponse.from(idx, chatLog, principal);
-			}).collect(Collectors.toUnmodifiableList());
+		List<ChatLogMessageResponse> messageResponses = contents.stream()
+			.map(c -> ChatLogMessageResponse.from(c, principal))
+			.collect(Collectors.toUnmodifiableList());
 
 		boolean hasNext = slice.hasNext();
 		Long nextCursor = getNextCursor(messageResponses, hasNext);

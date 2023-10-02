@@ -23,19 +23,19 @@ public class ChatLogPaginationRepository {
 	public Slice<ChatLog> searchBySlice(Long lastChatLogId, Pageable pageable) {
 		List<ChatLog> chatLogs = queryFactory.selectFrom(chatLog)
 			.where(
-				lessThanChatRoomId(lastChatLogId)
+				greaterThanChatLogId(lastChatLogId)
 			)
-			.orderBy(chatLog.id.desc())
+			.orderBy(chatLog.id.asc())
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
 		return checkLastPage(pageable, chatLogs);
 	}
 
-	private BooleanExpression lessThanChatRoomId(Long chatLogId) {
+	private BooleanExpression greaterThanChatLogId(Long chatLogId) {
 		if (chatLogId == null) {
 			return null;
 		}
-		return chatLog.id.lt(chatLogId);
+		return chatLog.id.gt(chatLogId);
 	}
 
 	private Slice<ChatLog> checkLastPage(Pageable pageable, List<ChatLog> chatLogs) {

@@ -130,14 +130,13 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 		ChatLogItemResponse itemResponse = ChatLogItemResponse.from(item);
 		ChatRoom chatRoom = new ChatRoom(buyer, item);
 		ChatLog chatLog = new ChatLog("안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.", "23Yong", "carlynne", chatRoom, 1);
-		ChatLogMessageResponse messageResponse = ChatLogMessageResponse.from(0, chatLog, Principal.from(buyer));
+		ChatLogMessageResponse messageResponse = ChatLogMessageResponse.from(chatLog, Principal.from(buyer));
 		ChatLogListResponse response = new ChatLogListResponse("carlynne", itemResponse, List.of(messageResponse),
 			false, null);
 		given(chatLogService.readMessages(
 			ArgumentMatchers.anyLong(),
-			ArgumentMatchers.anyInt(),
 			ArgumentMatchers.any(Principal.class),
-			ArgumentMatchers.isNull(),
+			ArgumentMatchers.anyLong(),
 			ArgumentMatchers.anyInt()
 		)).willReturn(response);
 		int chatRoomId = 1;
@@ -156,25 +155,8 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("data.item.title").value(equalTo("빈티지 롤러 블레이드")))
 			.andExpect(jsonPath("data.item.thumbnailUrl").value(equalTo("thumbnailUrl")))
 			.andExpect(jsonPath("data.item.price").value(equalTo(200000)))
-			.andExpect(jsonPath("data.chat[*].messageIndex").value(containsInAnyOrder(0)))
 			.andExpect(jsonPath("data.chat[*].message").value(containsInAnyOrder("안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.")))
 			.andExpect(jsonPath("data.chat[*].isMe").value(containsInAnyOrder(true)));
-	}
-
-	@DisplayName("회원은 채팅 메시지 목록 요청시 messageIndex를 음수로 보낼수 없다")
-	@Test
-	public void readMessagesWithNegativeMessageIndex() throws Exception {
-		// given
-		int chatRoomId = 1;
-		String messageIndex = String.valueOf(-1);
-		// when & then
-		mockMvc.perform(get("/api/chats/" + chatRoomId)
-				.param("messageIndex", messageIndex))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("statusCode").value(equalTo(400)))
-			.andExpect(jsonPath("message").value(equalTo("유효하지 않은 입력형식입니다.")))
-			.andExpect(jsonPath("data[*].field").value(containsInAnyOrder("readMessages.messageIndex")))
-			.andExpect(jsonPath("data[*].defaultMessage").value(containsInAnyOrder("messageIndex는 0 이상이어야 합니다.")));
 	}
 
 	@DisplayName("회원이 새로운 채팅 메시지를 요청했지만 새로운 메시지가 없다는 응답을 받는다")
@@ -185,9 +167,8 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 		ChatLogListResponse response = new ChatLogListResponse("carlynne", itemResponse, List.of(), false, null);
 		given(chatLogService.readMessages(
 			ArgumentMatchers.anyLong(),
-			ArgumentMatchers.anyInt(),
 			ArgumentMatchers.any(Principal.class),
-			ArgumentMatchers.isNull(),
+			ArgumentMatchers.anyLong(),
 			ArgumentMatchers.anyInt()
 		)).willReturn(response);
 		int chatRoomId = 1;
