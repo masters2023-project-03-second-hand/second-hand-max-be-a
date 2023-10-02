@@ -26,10 +26,13 @@ public class SalesPaginationRepository {
 				item.id.as("itemId"),
 				item.thumbnailUrl,
 				item.title,
-				item.region,
+				item.region.as("tradingRegion"),
 				item.createdAt,
 				item.price,
-				item.status))
+				item.status,
+				item.wishCount,
+				item.chatCount,
+				item.member.loginId.as("sellerId")))
 			.from(item)
 			.where(itemRepository.lessThanItemId(cursor),
 				itemRepository.equalsStatus(status))
