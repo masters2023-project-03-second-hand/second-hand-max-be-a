@@ -2,6 +2,7 @@ package codesquard.app.api.category;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ public class CategoryQueryService {
 
 	private final CategoryRepository categoryRepository;
 
+	@Cacheable("categories")
 	public CategoryListResponse findAll() {
 		List<Category> categories = categoryRepository.findAll();
 		return new CategoryListResponse(categories);

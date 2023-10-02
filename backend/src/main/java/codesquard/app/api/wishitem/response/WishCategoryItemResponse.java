@@ -1,11 +1,13 @@
 package codesquard.app.api.wishitem.response;
 
+import java.io.Serializable;
+
 import codesquard.app.domain.category.Category;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class WishCategoryItemResponse {
+public class WishCategoryItemResponse implements Serializable {
 	private Long categoryId;
 	private String categoryName;
 

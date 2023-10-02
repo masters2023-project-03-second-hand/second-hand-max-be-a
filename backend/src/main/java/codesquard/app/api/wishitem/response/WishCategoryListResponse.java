@@ -1,5 +1,6 @@
 package codesquard.app.api.wishitem.response;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,7 +9,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class WishCategoryListResponse {
+public class WishCategoryListResponse implements Serializable {
 	private List<WishCategoryItemResponse> categories;
 
 	public static WishCategoryListResponse of(List<Category> categories) {
