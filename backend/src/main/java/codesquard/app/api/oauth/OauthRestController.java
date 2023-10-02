@@ -45,7 +45,7 @@ public class OauthRestController {
 	public ApiResponse<OauthSignUpResponse> signUp(
 		@PathVariable String provider,
 		@RequestParam String code,
-		@RequestParam String redirectUrl,
+		@RequestParam(value = "redirectUrl", required = false) String redirectUrl,
 		@RequestPart(value = "profile", required = false) MultipartFile profile,
 		@Valid @RequestPart(value = "signupData") OauthSignUpRequest request) {
 		log.info("provider : {}, code : {}, requestUrl : {}, profile : {}, request : {}", provider, code, redirectUrl,

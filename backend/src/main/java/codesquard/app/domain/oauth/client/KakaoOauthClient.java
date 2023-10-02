@@ -73,6 +73,9 @@ public class KakaoOauthClient extends OauthClient {
 	@Override
 	public MultiValueMap<String, String> createFormData(String authorizationCode, String redirectUrl) {
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+		if (redirectUrl == null) {
+			redirectUrl = getRedirectUri();
+		}
 		formData.add("code", authorizationCode);
 		formData.add("client_id", getClientId());
 		formData.add("client_secret", getClientSecret());
