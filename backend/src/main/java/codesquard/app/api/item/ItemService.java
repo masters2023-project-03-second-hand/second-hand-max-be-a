@@ -195,6 +195,7 @@ public class ItemService {
 
 	@Transactional
 	public void deleteItem(Long itemId, Principal writer) {
+		log.info("상품 게시글 삭제 서비스 요청 : itemId={}, writer={}", itemId, writer);
 		Item item = findItemByItemIdAndMemberId(itemId, writer.getMemberId());
 		List<Image> images = imageRepository.findAllByItemId(item.getId());
 		images.stream()

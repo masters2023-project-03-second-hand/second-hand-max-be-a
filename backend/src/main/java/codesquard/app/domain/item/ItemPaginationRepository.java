@@ -30,7 +30,8 @@ public class ItemPaginationRepository {
 				item.price,
 				item.status,
 				item.wishCount,
-				item.chatCount))
+				item.chatCount,
+				item.member.loginId.as("sellerId")))
 			.from(item)
 			.where(itemRepository.lessThanItemId(itemId),
 				itemRepository.equalCategoryId(categoryId),
