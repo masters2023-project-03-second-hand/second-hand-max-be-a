@@ -50,6 +50,10 @@ public class ChatRoom {
 		return item.getMember().getLoginId();
 	}
 
+	public Member getSeller() {
+		return item.getMember();
+	}
+
 	@Override
 	public String toString() {
 		return String.format("%s, %s(id=%d, buyerLoginId=%s, itemTitle=%s)", "회원", this.getClass().getSimpleName(), id,

@@ -1,11 +1,12 @@
 package codesquard.app.api.chat;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,10 +35,9 @@ public class ChatRoomRestController {
 
 	@GetMapping("/chats")
 	public ApiResponse<ChatRoomListResponse> readAllChatRoom(
-		@RequestParam(value = "size", defaultValue = "10", required = false) int size,
-		@RequestParam(value = "cursor", required = false) Long cursor,
+		@PageableDefault Pageable pageable,
 		@AuthPrincipal Principal principal) {
-		ChatRoomListResponse response = chatRoomService.readAllChatRoom(size, cursor, principal);
+		ChatRoomListResponse response = chatRoomService.readAllChatRoom(principal, pageable);
 		return ApiResponse.ok("채팅방 목록 조회를 완료하였습니다.", response);
 	}
 }

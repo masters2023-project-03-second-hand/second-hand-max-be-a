@@ -31,7 +31,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 		if (categoryId == null) {
 			return null;
 		}
-
 		return item.category.id.eq(categoryId);
 	}
 
@@ -73,4 +72,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 	Long findViewCountById(@Param("itemId") Long itemId);
 
 	Optional<Item> findItemByIdAndMemberId(Long itemId, Long memberId);
+
+	List<Item> findAllByMemberId(Long memberId);
 }
