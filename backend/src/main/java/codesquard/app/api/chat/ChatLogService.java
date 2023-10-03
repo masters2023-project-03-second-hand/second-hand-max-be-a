@@ -57,7 +57,7 @@ public class ChatLogService {
 		List<ChatLog> contents = slice.getContent().stream()
 			.collect(Collectors.toUnmodifiableList());
 		// 메시지 읽는다.
-		contents.forEach(c -> c.readMessage(principal.getLoginId()));
+		contents.forEach(c -> c.decreaseMessageReadCount(principal.getLoginId()));
 
 		List<ChatLogMessageResponse> messageResponses = contents.stream()
 			.map(c -> ChatLogMessageResponse.from(c, principal))

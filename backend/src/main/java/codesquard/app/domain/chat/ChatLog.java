@@ -55,11 +55,8 @@ public class ChatLog {
 		return sender.equals(loginId);
 	}
 
-	public void readMessage(String readerLoginId) {
-		if (this.readCount == 0) {
-			return;
-		}
-		if (this.sender.equals(readerLoginId)) {
+	public void decreaseMessageReadCount(String readerLoginId) {
+		if (this.readCount == 0 || this.sender.equals(readerLoginId)) {
 			return;
 		}
 		this.readCount--;
