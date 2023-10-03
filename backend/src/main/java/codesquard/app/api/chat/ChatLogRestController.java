@@ -47,10 +47,17 @@ public class ChatLogRestController {
 		@AuthPrincipal Principal sender) {
 		ChatLogSendResponse response = chatLogService.sendMessage(request, chatRoomId, sender);
 
-		this.chatRequests.forEach((key, cursor) ->
-			key.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.",
-				chatLogService.readMessages(chatRoomId, sender, cursor, DEFAULT_READ_MESSAGE_SIZE))));
+		onMessage(chatRoomId, sender);
 		return ApiResponse.created("메시지 전송이 완료되었습니다.", response);
+	}
+
+	private void onMessage(Long chatRoomId, Principal sender) {
+		for (Map.Entry<DeferredResult<ApiResponse<ChatLogListResponse>>, Long> entry : this.chatRequests.entrySet()) {
+			DeferredResult<ApiResponse<ChatLogListResponse>> key = entry.getKey();
+			Long cursor = entry.getValue();
+			key.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.",
+				chatLogService.readMessages(chatRoomId, sender, cursor, DEFAULT_READ_MESSAGE_SIZE)));
+		}
 	}
 
 	@GetMapping("/chats/{chatRoomId}")
