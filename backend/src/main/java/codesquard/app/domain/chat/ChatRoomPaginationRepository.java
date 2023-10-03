@@ -9,33 +9,28 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Repository
 public class ChatRoomPaginationRepository {
 
 	private final JPAQueryFactory queryFactory;
 
-	public Slice<ChatRoom> searchBySlice(Long lastChatRoomId, Pageable pageable) {
+	public Slice<ChatRoom> searchBySlice(BooleanBuilder whereBuilder, Pageable pageable) {
 		List<ChatRoom> chatRooms = queryFactory.selectFrom(chatRoom)
-			.where(
-				lessThanChatRoomId(lastChatRoomId)
-			)
+			.where(whereBuilder)
 			.orderBy(chatRoom.id.desc())
+			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
+		log.info("채팅방 목록 조회 결과 : {}", chatRooms);
 		return checkLastPage(pageable, chatRooms);
-	}
-
-	private BooleanExpression lessThanChatRoomId(Long chatRoomId) {
-		if (chatRoomId == null) {
-			return null;
-		}
-		return chatRoom.id.lt(chatRoomId);
 	}
 
 	private Slice<ChatRoom> checkLastPage(Pageable pageable, List<ChatRoom> chatRooms) {

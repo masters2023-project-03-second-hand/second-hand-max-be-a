@@ -1,10 +1,10 @@
 package codesquard.app.api.chat;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +17,7 @@ import codesquard.app.api.errors.errorcode.ChatRoomErrorCode;
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
 import codesquard.app.domain.chat.ChatLog;
+import codesquard.app.domain.chat.ChatLogPaginationRepository;
 import codesquard.app.domain.chat.ChatLogRepository;
 import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.chat.ChatRoomRepository;
@@ -35,6 +36,7 @@ public class ChatLogService {
 	private final ChatLogRepository chatLogRepository;
 	private final ChatRoomRepository chatRoomRepository;
 	private final ItemRepository itemRepository;
+	private final ChatLogPaginationRepository chatLogPaginationRepository;
 
 	@Transactional
 	public ChatLogSendResponse sendMessage(ChatLogSendRequest request, Long chatRoomId, Principal sender) {
@@ -43,28 +45,36 @@ public class ChatLogService {
 		return ChatLogSendResponse.from(chatLogRepository.save(chatLog));
 	}
 
-	public ChatLogListResponse readMessages(Long chatRoomId, int messageIndex, Principal principal) {
+	@Transactional
+	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor, Pageable pageable) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
 		Item item = findItemBy(chatRoom);
 
-		String chatPartnerName = getChatPartnerName(principal, item, chatRoom);
-		List<ChatLog> chatLogs = chatLogRepository.findAllByChatRoomIdOrderByCreatedAtAsc(chatRoomId);
-		log.debug("메시지 읽기에서 채팅 로그 결과 : chatLogs.size={}", chatLogs.size());
-		if (messageIndex > chatLogs.size()) {
-			return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), Collections.emptyList());
+		String chatPartnerName = principal.getChatPartnerName(item, chatRoom);
+		Slice<ChatLog> slice = chatLogPaginationRepository.searchBySlice(cursor, pageable);
+
+		List<ChatLog> contents = slice.getContent().stream()
+			.collect(Collectors.toUnmodifiableList());
+		// 메시지 읽는다.
+		contents.forEach(c -> c.decreaseMessageReadCount(principal.getLoginId()));
+
+		List<ChatLogMessageResponse> messageResponses = contents.stream()
+			.map(c -> ChatLogMessageResponse.from(c, principal))
+			.collect(Collectors.toUnmodifiableList());
+
+		boolean hasNext = slice.hasNext();
+		Long nextCursor = getNextCursor(messageResponses, hasNext);
+
+		return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), messageResponses, hasNext,
+			nextCursor);
+	}
+
+	private Long getNextCursor(List<ChatLogMessageResponse> contents, boolean hasNext) {
+		Long nextCursor = null;
+		if (hasNext) {
+			nextCursor = contents.get(contents.size() - 1).getChatLogId();
 		}
-
-		List<ChatLog> chatLogsAfterIndex = chatLogs.subList(messageIndex, chatLogs.size());
-		List<ChatLogMessageResponse> chats = IntStream.range(0, chatLogsAfterIndex.size())
-			.mapToObj(idx -> {
-				ChatLog chatLog = chatLogsAfterIndex.get(idx);
-				return ChatLogMessageResponse.from(idx, chatLog, principal);
-			}).collect(Collectors.toUnmodifiableList());
-
-		return new ChatLogListResponse(
-			chatPartnerName,
-			ChatLogItemResponse.from(item),
-			chats);
+		return nextCursor;
 	}
 
 	private ChatRoom findChatRoomBy(Long chatRoomId) {
@@ -75,12 +85,5 @@ public class ChatLogService {
 	private Item findItemBy(ChatRoom chatRoom) {
 		return itemRepository.findById(chatRoom.getItem().getId())
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
-	}
-
-	private String getChatPartnerName(Principal principal, Item item, ChatRoom chatRoom) {
-		if (principal.isSeller(item.getMember())) {
-			return chatRoom.getBuyer().getLoginId();
-		}
-		return item.getMember().getLoginId();
 	}
 }

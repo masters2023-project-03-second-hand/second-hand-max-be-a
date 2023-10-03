@@ -54,13 +54,6 @@ public class KakaoOauthClient extends OauthClient {
 				}
 				return clientResponse.bodyToMono(OauthAccessTokenResponse.class);
 			}).block();
-		// .retrieve() // ResponseEntity를 받아 디코딩
-		// .bodyToMono(OauthAccessTokenResponse.class) // 주어진 타입으로 디코딩
-		// .block();
-		// 1. statusCode 로그 찍기
-		// 2. 400 or 500 에러나면 리스폰스 바디를 스트링으로 뽑아서 로그 찍고 익셉션 발생
-		// 3. 200번대일경우에는 원래대로 모노로 변경해서 응답하기
-
 		log.info("response : {}", response);
 
 		if (Objects.requireNonNull(response).getAccessToken() == null) {

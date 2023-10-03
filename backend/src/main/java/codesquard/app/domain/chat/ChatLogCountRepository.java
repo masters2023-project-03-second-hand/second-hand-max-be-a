@@ -44,7 +44,7 @@ public class ChatLogCountRepository {
 	}
 
 	private BooleanExpression isUnread() {
-		return chatLog.isRead.eq(false);
+		return chatLog.readCount.goe(1);
 	}
 
 	private BooleanExpression notEqualsLoginId(String loginId) {
