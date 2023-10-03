@@ -6,7 +6,6 @@ import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.anyLong;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -27,6 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockAsyncContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -59,11 +60,14 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 	@MockBean
 	private ChatLogService chatLogService;
 
+	@Autowired
+	private PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver;
+
 	@BeforeEach
 	public void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(chatLogRestController)
 			.setControllerAdvice(globalExceptionHandler)
-			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
+			.setCustomArgumentResolvers(pageableHandlerMethodArgumentResolver, authPrincipalArgumentResolver)
 			.alwaysDo(print())
 			.build();
 
@@ -124,7 +128,7 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 		ChatLogMessageResponse messageResponse = ChatLogMessageResponse.from(chatLog, Principal.from(buyer));
 		ChatLogListResponse response = new ChatLogListResponse("carlynne", itemResponse, List.of(messageResponse),
 			false, null);
-		given(chatLogService.readMessages(anyLong(), any(Principal.class), anyLong(), anyInt()))
+		given(chatLogService.readMessages(anyLong(), any(Principal.class), anyLong(), any(Pageable.class)))
 			.willReturn(response);
 		int chatRoomId = 1;
 
@@ -156,7 +160,7 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 			anyLong(),
 			any(Principal.class),
 			anyLong(),
-			anyInt()
+			any(Pageable.class)
 		)).willReturn(response);
 		int chatRoomId = 1;
 

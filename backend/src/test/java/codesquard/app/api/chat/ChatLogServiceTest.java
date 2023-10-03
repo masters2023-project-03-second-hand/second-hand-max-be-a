@@ -17,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -161,11 +162,11 @@ class ChatLogServiceTest {
 		));
 
 		Long cursor = null;
-		int size = 10;
+		Pageable pageable = Pageable.ofSize(10);
 
 		// when
 		ChatLogListResponse response = chatLogService.readMessages(chatRoom.getId(), Principal.from(seller), cursor,
-			size);
+			pageable);
 
 		// then
 		assertAll(
