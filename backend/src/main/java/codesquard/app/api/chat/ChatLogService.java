@@ -46,12 +46,12 @@ public class ChatLogService {
 	}
 
 	@Transactional
-	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor, int size) {
+	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor, Pageable pageable) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
 		Item item = findItemBy(chatRoom);
 
-		String chatPartnerName = getChatPartnerName(principal, item, chatRoom);
-		Slice<ChatLog> slice = chatLogPaginationRepository.searchBySlice(cursor, Pageable.ofSize(size));
+		String chatPartnerName = principal.getChatPartnerName(item, chatRoom);
+		Slice<ChatLog> slice = chatLogPaginationRepository.searchBySlice(cursor, pageable);
 
 		List<ChatLog> contents = slice.getContent().stream()
 			.collect(Collectors.toUnmodifiableList());
@@ -85,12 +85,5 @@ public class ChatLogService {
 	private Item findItemBy(ChatRoom chatRoom) {
 		return itemRepository.findById(chatRoom.getItem().getId())
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
-	}
-
-	private String getChatPartnerName(Principal principal, Item item, ChatRoom chatRoom) {
-		if (principal.isSeller(item.getMember())) {
-			return chatRoom.getBuyer().getLoginId();
-		}
-		return item.getMember().getLoginId();
 	}
 }

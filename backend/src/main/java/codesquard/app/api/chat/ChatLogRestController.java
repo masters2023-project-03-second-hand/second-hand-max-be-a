@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +58,7 @@ public class ChatLogRestController {
 			DeferredResult<ApiResponse<ChatLogListResponse>> key = entry.getKey();
 			Long cursor = entry.getValue();
 			key.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.",
-				chatLogService.readMessages(chatRoomId, sender, cursor, DEFAULT_READ_MESSAGE_SIZE)));
+				chatLogService.readMessages(chatRoomId, sender, cursor, Pageable.ofSize(DEFAULT_READ_MESSAGE_SIZE))));
 		}
 	}
 
@@ -64,9 +66,9 @@ public class ChatLogRestController {
 	public DeferredResult<ApiResponse<ChatLogListResponse>> readMessages(
 		@PathVariable Long chatRoomId,
 		@RequestParam(required = false, defaultValue = "0") Long cursor,
-		@RequestParam(required = false, defaultValue = "10") int size,
+		@PageableDefault Pageable pageable,
 		@AuthPrincipal Principal principal) {
-		log.info("메시지 읽기 요청 : chatRoomId={}, cursor={}, size={}, 요청한 아이디={}", chatRoomId, cursor, size,
+		log.info("메시지 읽기 요청 : chatRoomId={}, cursor={}, pageable={}, 요청한 아이디={}", chatRoomId, cursor, pageable,
 			principal.getLoginId());
 
 		DeferredResult<ApiResponse<ChatLogListResponse>> deferredResult = new DeferredResult<>(10000L);
@@ -76,7 +78,7 @@ public class ChatLogRestController {
 		deferredResult.onTimeout(() -> deferredResult.setErrorResult(
 			ApiResponse.of(HttpStatus.REQUEST_TIMEOUT, "새로운 채팅 메시지가 존재하지 않습니다.", Collections.emptyList())));
 
-		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, principal, cursor, size);
+		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, principal, cursor, pageable);
 
 		if (!response.isEmptyChat()) {
 			deferredResult.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.", response));

@@ -2,6 +2,8 @@ package codesquard.app.domain.oauth.support;
 
 import java.util.Optional;
 
+import codesquard.app.domain.chat.ChatRoom;
+import codesquard.app.domain.item.Item;
 import codesquard.app.domain.member.Member;
 import io.jsonwebtoken.Claims;
 import lombok.Builder;
@@ -65,5 +67,12 @@ public class Principal {
 
 	public String createItemViewKey(String key) {
 		return loginId + "-" + key;
+	}
+
+	public String getChatPartnerName(Item item, ChatRoom chatRoom) {
+		if (isSeller(item.getMember())) {
+			return chatRoom.getBuyer().getLoginId();
+		}
+		return item.getMember().getLoginId();
 	}
 }
