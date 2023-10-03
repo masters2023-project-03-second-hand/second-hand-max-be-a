@@ -1,9 +1,9 @@
 package codesquard.app.api.chat;
 
+import static codesquard.app.ItemTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.MemberTownTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
-import static java.time.LocalDateTime.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -101,21 +101,10 @@ class ChatRoomServiceTest {
 			createMemberTown(seller, region, true),
 			createMemberTown(buyer, region, true)));
 
-		Category category = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
+		Category sport = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.member(seller)
-			.category(category)
-			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
 			new Image("imageUrlValue1", saveItem, true),
@@ -147,22 +136,9 @@ class ChatRoomServiceTest {
 			createMemberTown(seller, region, true),
 			createMemberTown(buyer, region, true)));
 
-		Category category = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
-
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.thumbnailUrl("imageUrlValue1")
-			.member(seller)
-			.category(category)
-			.build();
+		Category sport = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
 			new Image("imageUrlValue1", saveItem, true),
@@ -185,8 +161,8 @@ class ChatRoomServiceTest {
 				.extracting("thumbnailUrl", "chatPartnerName", "chatPartnerProfile", "lastSendMessage",
 					"newMessageCount")
 				.containsExactlyInAnyOrder(
-					Tuple.tuple("imageUrlValue1", "carlynne", "avatarUrlValue3", "롤러 블레이드 사고 싶습니다.2", 1L),
-					Tuple.tuple("imageUrlValue1", "bruni", "avatarUrlValue2", "롤러 블레이드 사고 싶습니다.", 1L)),
+					Tuple.tuple("thumbnailUrl", "carlynne", "avatarUrlValue3", "롤러 블레이드 사고 싶습니다.2", 1L),
+					Tuple.tuple("thumbnailUrl", "bruni", "avatarUrlValue2", "롤러 블레이드 사고 싶습니다.", 1L)),
 			() -> assertThat(response.getPaging())
 				.extracting("nextCursor", "hasNext")
 				.containsExactlyInAnyOrder(null, false)
@@ -207,22 +183,10 @@ class ChatRoomServiceTest {
 			createMemberTown(seller, region, true),
 			createMemberTown(buyer, region, true)));
 
-		Category category = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
+		Category sport = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.thumbnailUrl("imageUrlValue1")
-			.member(seller)
-			.category(category)
-			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
 			new Image("imageUrlValue1", saveItem, true),
@@ -245,7 +209,7 @@ class ChatRoomServiceTest {
 				.extracting("thumbnailUrl", "chatPartnerName", "chatPartnerProfile", "lastSendMessage",
 					"newMessageCount")
 				.containsExactlyInAnyOrder(
-					Tuple.tuple("imageUrlValue1", "23Yong", "avatarUrlValue1", "롤러 블레이드 사고 싶습니다.", 0L)),
+					Tuple.tuple("thumbnailUrl", "23Yong", "avatarUrlValue1", "롤러 블레이드 사고 싶습니다.", 0L)),
 			() -> assertThat(response.getPaging())
 				.extracting("nextCursor", "hasNext")
 				.containsExactlyInAnyOrder(null, false)

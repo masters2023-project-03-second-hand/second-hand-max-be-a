@@ -2,11 +2,11 @@ package codesquard.app.api.item;
 
 import static codesquard.app.CategoryTestSupport.*;
 import static codesquard.app.ImageTestSupport.*;
+import static codesquard.app.ItemTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.MemberTownTestSupport.*;
 import static codesquard.app.RegionTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
-import static java.time.LocalDateTime.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -175,29 +175,17 @@ class ItemServiceTest {
 	@Test
 	public void modifyItem() throws IOException {
 		// given
-		Category category = categoryRepository.save(findByName("스포츠/레저"));
-		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
-
+		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
-		memberTownRepository.save(MemberTownTestSupport.createMemberTown(member, region, true));
+		memberTownRepository.save(MemberTownTestSupport.createMemberTown(seller, region, true));
 
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.thumbnailUrl("imageUrlValue1")
-			.member(member)
-			.category(category)
-			.build();
+		Category sport = categoryRepository.save(findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 		Item saveItem = itemRepository.save(item);
+
 		List<Image> images = List.of(
-			new Image("imageUrlValue1", saveItem, true),
+			new Image("thumbnailUrl", saveItem, true),
 			new Image("imageUrlValue2", saveItem, false));
 		List<Image> saveImages = imageRepository.saveAll(images);
 
@@ -215,10 +203,10 @@ class ItemServiceTest {
 		requestBody.put("content", "내용");
 		requestBody.put("region", "가락동");
 		requestBody.put("status", "판매중");
-		requestBody.put("categoryId", category.getId());
-		requestBody.put("categoryName", category.getName());
+		requestBody.put("categoryId", sport.getId());
+		requestBody.put("categoryName", sport.getName());
 		requestBody.put("deleteImageUrls", deleteImageUrls);
-		requestBody.put("thumnailImage", "imageUrlValue1");
+		requestBody.put("thumnailImage", "thumbnailUrl");
 		ItemModifyRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			ItemModifyRequest.class);
 
@@ -226,7 +214,7 @@ class ItemServiceTest {
 			.willReturn("imageUrlValue3", "imageUrlValue4");
 
 		// when
-		itemService.modifyItem(saveItem.getId(), request, addImages, thumnailFile, Principal.from(member));
+		itemService.modifyItem(saveItem.getId(), request, addImages, thumnailFile, Principal.from(seller));
 
 		// then
 		assertAll(() -> {
@@ -240,7 +228,7 @@ class ItemServiceTest {
 			assertThat(modifiedImages).hasSize(3);
 
 			Image thumnail = modifiedImages.stream()
-				.filter(image -> image.getImageUrl().equals("imageUrlValue1"))
+				.filter(image -> image.getImageUrl().equals("thumbnailUrl"))
 				.findAny()
 				.orElseThrow();
 			assertThat(thumnail)
@@ -253,26 +241,15 @@ class ItemServiceTest {
 	@Test
 	public void modifyItemWithNewThumbnail() throws IOException {
 		// given
-		Category category = categoryRepository.save(findByName("스포츠/레저"));
-		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
 		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
-		memberTownRepository.save(MemberTown.selectedMemberTown(region, member));
+		memberTownRepository.save(MemberTown.selectedMemberTown(region, seller));
 
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.thumbnailUrl("imageUrlValue1")
-			.member(member)
-			.category(category)
-			.build();
+		Category sport = categoryRepository.save(findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
+
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
 			new Image("imageUrlValue1", saveItem, false),
@@ -292,8 +269,8 @@ class ItemServiceTest {
 		requestBody.put("content", "내용");
 		requestBody.put("region", "가락동");
 		requestBody.put("status", "판매중");
-		requestBody.put("categoryId", category.getId());
-		requestBody.put("categoryName", category.getName());
+		requestBody.put("categoryId", sport.getId());
+		requestBody.put("categoryName", sport.getName());
 		requestBody.put("deleteImageUrls", deleteImageUrls);
 		ItemModifyRequest request = objectMapper.readValue(objectMapper.writeValueAsString(requestBody),
 			ItemModifyRequest.class);
@@ -302,7 +279,7 @@ class ItemServiceTest {
 			.willReturn("imageUrlValue3", "imageUrlValue4");
 
 		// when
-		itemService.modifyItem(saveItem.getId(), request, addImages, thumnailFile, Principal.from(member));
+		itemService.modifyItem(saveItem.getId(), request, addImages, thumnailFile, Principal.from(seller));
 
 		// then
 		assertAll(() -> {
@@ -330,25 +307,14 @@ class ItemServiceTest {
 	public void modifyItemWithNonChange() throws IOException {
 		// given
 		Category category = categoryRepository.save(findByName("스포츠/레저"));
-		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
 		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
-		memberTownRepository.save(MemberTown.selectedMemberTown(region, member));
+		memberTownRepository.save(MemberTown.selectedMemberTown(region, seller));
 
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.thumbnailUrl("imageUrlValue1")
-			.member(member)
-			.category(category)
-			.build();
+		Category sport = categoryRepository.save(findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
 			new Image("imageUrlValue1", saveItem, true),
@@ -378,7 +344,7 @@ class ItemServiceTest {
 			.willReturn("imageUrlValue3");
 
 		// when
-		itemService.modifyItem(saveItem.getId(), request, addImages, thumnailFile, Principal.from(member));
+		itemService.modifyItem(saveItem.getId(), request, addImages, thumnailFile, Principal.from(seller));
 
 		// then
 		assertAll(() -> {
@@ -386,7 +352,7 @@ class ItemServiceTest {
 			assertThat(modifiedItem)
 				.extracting("title", "content", "price", "status", "region", "thumbnailUrl")
 				.contains(request.getTitle(), request.getContent(), request.getPrice(), request.getStatus(),
-					request.getRegion(), "imageUrlValue1");
+					request.getRegion(), "thumbnailUrl");
 
 			List<Image> modifiedImages = imageRepository.findAllByItemId(saveItem.getId());
 			assertThat(modifiedImages).hasSize(2);
@@ -423,21 +389,10 @@ class ItemServiceTest {
 	@Test
 	public void findDetailItemBySeller() {
 		// given
-		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
-		Category category = categoryRepository.save(findByName("스포츠/레저"));
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.member(member)
-			.category(category)
-			.build();
+		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		Category sport = categoryRepository.save(findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 		Item saveItem = itemRepository.save(item);
 
 		List<Image> images = List.of(
@@ -445,11 +400,11 @@ class ItemServiceTest {
 			new Image("imageUrlValue2", saveItem, false));
 		imageRepository.saveAll(images);
 
-		Wish wish = new Wish(member, item);
+		Wish wish = new Wish(seller, item);
 		wishRepository.save(wish);
 
 		// when
-		ItemDetailResponse response = itemService.findDetailItemBy(item.getId(), member.getId());
+		ItemDetailResponse response = itemService.findDetailItemBy(item.getId(), seller.getId());
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
@@ -484,33 +439,22 @@ class ItemServiceTest {
 	@Test
 	public void deleteItem() {
 		// given
-		Category category = categoryRepository.save(findByName("스포츠/레저"));
-		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 		List<Region> regions = regionRepository.saveAll(
 			List.of(createRegion("서울 송파구 가락동"), createRegion("서울 종로구 청운동")));
 		memberTownRepository.saveAll(List.of(
-			createMemberTown(member, regions.get(0), true),
-			createMemberTown(member, regions.get(1), false)));
+			createMemberTown(seller, regions.get(0), true),
+			createMemberTown(seller, regions.get(1), false)));
 
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.member(member)
-			.category(category)
-			.build();
+		Category sport = categoryRepository.save(findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
 			new Image("imageUrlValue1", saveItem, true),
 			new Image("imageUrlValue2", saveItem, false));
 		imageRepository.saveAll(images);
-		Principal principal = Principal.from(member);
+		Principal principal = Principal.from(seller);
 
 		// when
 		itemService.deleteItem(saveItem.getId(), principal);
@@ -529,33 +473,23 @@ class ItemServiceTest {
 	@Test
 	public void deleteItemWithNotExistItem() {
 		// given
-		Category category = categoryRepository.save(findByName("스포츠/레저"));
-		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 		List<Region> regions = regionRepository.saveAll(
 			List.of(createRegion("서울 송파구 가락동"), createRegion("서울 종로구 청운동")));
 		memberTownRepository.saveAll(List.of(
-			createMemberTown(member, regions.get(0), true),
-			createMemberTown(member, regions.get(1), false)));
+			createMemberTown(seller, regions.get(0), true),
+			createMemberTown(seller, regions.get(1), false)));
 
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.member(member)
-			.category(category)
-			.build();
+		Category sport = categoryRepository.save(findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 		Item saveItem = itemRepository.save(item);
+
 		List<Image> images = List.of(
 			new Image("imageUrlValue1", saveItem, true),
 			new Image("imageUrlValue2", saveItem, false));
 		imageRepository.saveAll(images);
-		Principal principal = Principal.from(member);
+		Principal principal = Principal.from(seller);
 		Long itemId = 9999L;
 
 		// when
@@ -573,7 +507,6 @@ class ItemServiceTest {
 	@Test
 	public void deleteItemWithNotSeller() {
 		// given
-		Category category = categoryRepository.save(findByName("스포츠/레저"));
 		List<Member> members = memberRepository.saveAll(
 			List.of(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"),
 				createMember("avatarUrlValue", "bruni@gmail.com", "bruni")));
@@ -584,19 +517,9 @@ class ItemServiceTest {
 			createMemberTown(seller, regions.get(0), true),
 			createMemberTown(seller, regions.get(1), false)));
 
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.member(seller)
-			.category(category)
-			.build();
+		Category sport = categoryRepository.save(findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
 			new Image("imageUrlValue1", saveItem, true),

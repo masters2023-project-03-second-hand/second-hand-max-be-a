@@ -1,8 +1,9 @@
 package codesquard.app.api.chat;
 
+import static codesquard.app.CategoryTestSupport.*;
+import static codesquard.app.ItemTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
-import static java.time.LocalDateTime.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
@@ -22,15 +23,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import codesquard.app.CategoryTestSupport;
 import codesquard.app.ControllerTestSupport;
 import codesquard.app.api.chat.response.ChatRoomCreateResponse;
 import codesquard.app.api.chat.response.ChatRoomItemResponse;
 import codesquard.app.api.chat.response.ChatRoomListResponse;
+import codesquard.app.domain.category.Category;
 import codesquard.app.domain.chat.ChatLog;
 import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.item.Item;
@@ -49,11 +51,14 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 	@MockBean
 	private ChatRoomService chatRoomService;
 
+	@Autowired
+	private PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver;
+
 	@BeforeEach
 	public void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(chatRoomRestController)
 			.setControllerAdvice(globalExceptionHandler)
-			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
+			.setCustomArgumentResolvers(pageableHandlerMethodArgumentResolver, authPrincipalArgumentResolver)
 			.alwaysDo(print())
 			.build();
 
@@ -92,20 +97,11 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 		// given
 		Member seller = createMember("avatarUrl", "carlynne@naver.com", "carlynne");
 		Member buyer = createMember("avatarUrlValue", "carlynne@naver.com", "carlynne");
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.thumbnailUrl("thumbnailUrl")
-			.member(seller)
-			.category(CategoryTestSupport.findByName("스포츠/레저"))
-			.build();
+
+		Category sport = findByName("스포츠/레저");
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
+
 		ChatRoom chatRoom = new ChatRoom(buyer, item);
 		ChatLog chatLog = new ChatLog("안녕하세요. 롤러블레이브를 사고 싶습니다. 만원만 깍아주세요.", "carlynne", "23Yong", chatRoom, 1);
 		Long newMessageCount = 1L;

@@ -1,9 +1,10 @@
 package codesquard.app.api.chat;
 
+import static codesquard.app.CategoryTestSupport.*;
+import static codesquard.app.ItemTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.MemberTownTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
-import static java.time.LocalDateTime.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -102,21 +103,10 @@ class ChatLogServiceTest {
 			createMemberTown(seller, region, true),
 			createMemberTown(buyer, region, true)));
 
-		Category category = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
+		Category sport = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.member(seller)
-			.category(category)
-			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
 			new Image("imageUrlValue1", saveItem, true),
@@ -153,21 +143,10 @@ class ChatLogServiceTest {
 			createMemberTown(seller, region, true),
 			createMemberTown(buyer, region, true)));
 
-		Category category = categoryRepository.save(CategoryTestSupport.findByName("스포츠/레저"));
+		Category sport = categoryRepository.save(findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.member(seller)
-			.category(category)
-			.build();
 		Item saveItem = itemRepository.save(item);
 		List<Image> images = List.of(
 			new Image("imageUrlValue1", saveItem, true),

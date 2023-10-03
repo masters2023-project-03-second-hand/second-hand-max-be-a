@@ -10,13 +10,14 @@ import codesquard.app.domain.member.Member;
 public class ItemTestSupport {
 
 	public static Item createItem(String title, String content, Long price, ItemStatus status, String region,
-		Member member, Category category) {
+		String thumbnailUrl, Member member, Category category) {
 		return Item.builder()
 			.title(title)
 			.content(content)
 			.price(price)
 			.status(status)
 			.region(region)
+			.thumbnailUrl(thumbnailUrl)
 			.createdAt(now())
 			.wishCount(0L)
 			.viewCount(0L)

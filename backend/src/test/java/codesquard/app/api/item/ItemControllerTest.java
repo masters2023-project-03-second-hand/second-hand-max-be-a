@@ -1,8 +1,9 @@
 package codesquard.app.api.item;
 
+import static codesquard.app.CategoryTestSupport.*;
+import static codesquard.app.ItemTestSupport.*;
 import static codesquard.app.MemberTestSupport.*;
 import static codesquard.app.domain.item.ItemStatus.*;
-import static java.time.LocalDateTime.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.any;
@@ -23,7 +24,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import codesquard.app.CategoryTestSupport;
 import codesquard.app.ControllerTestSupport;
 import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.RestApiException;
@@ -64,20 +64,9 @@ class ItemControllerTest extends ControllerTestSupport {
 	public void findDetailItemBySeller() throws Exception {
 		// given
 		Member seller = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
-		Category category = CategoryTestSupport.findByName("스포츠/레저");
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.member(seller)
-			.category(category)
-			.build();
+		Category sport = findByName("스포츠/레저");
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 
 		ItemDetailResponse response = ItemDetailResponse.of(item, seller.getId(), imageUrls, false);
@@ -107,20 +96,9 @@ class ItemControllerTest extends ControllerTestSupport {
 	public void findDetailItemByBuyer() throws Exception {
 		// given
 		Member seller = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
-		Category category = CategoryTestSupport.findByName("스포츠/레저");
-		Item item = Item.builder()
-			.title("빈티지 롤러 블레이드")
-			.content("어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.")
-			.price(200000L)
-			.status(ON_SALE)
-			.region("가락동")
-			.createdAt(now())
-			.wishCount(0L)
-			.viewCount(0L)
-			.chatCount(0L)
-			.member(seller)
-			.category(category)
-			.build();
+		Category sport = findByName("스포츠/레저");
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
 		Long loginMemberId = 9999L;
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 

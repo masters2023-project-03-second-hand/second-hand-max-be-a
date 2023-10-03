@@ -205,9 +205,9 @@ class WishItemServiceTest {
 			createMemberTown(buyer, regions.get(0), true),
 			createMemberTown(buyer, regions.get(0), true)));
 		Item item1 = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
-			"가락동", seller, sport);
+			"가락동", "thumbnailUrl", seller, sport);
 		Item item2 = createItem("빈티지 의자", "의자 팝니다.", 80000L, ON_SALE,
-			"가락동", seller, furniture);
+			"가락동", "thumnailUrl", seller, furniture);
 		itemRepository.saveAll(List.of(item1, item2));
 		wishRepository.saveAll(List.of(new Wish(buyer, item1), new Wish(buyer, item2)));
 		Principal principal = Principal.from(buyer);
