@@ -40,4 +40,13 @@ public class ChatRoomRestController {
 		ChatRoomListResponse response = chatRoomService.readAllChatRoom(principal, pageable);
 		return ApiResponse.ok("채팅방 목록 조회를 완료하였습니다.", response);
 	}
+
+	@GetMapping("/items/{itemId}/chats")
+	public ApiResponse<ChatRoomListResponse> readAllChatRoomByItem(
+		@PathVariable Long itemId,
+		@PageableDefault Pageable pageable,
+		@AuthPrincipal Principal principal) {
+		ChatRoomListResponse response = chatRoomService.readAllChatRoomByItem(itemId, principal, pageable);
+		return ApiResponse.ok("상품에 따른 채팅방 목록 조회를 완료하였습니다.", response);
+	}
 }

@@ -65,20 +65,20 @@ public class ChatLogRestController {
 	@GetMapping("/chats/{chatRoomId}")
 	public DeferredResult<ApiResponse<ChatLogListResponse>> readMessages(
 		@PathVariable Long chatRoomId,
-		@RequestParam(required = false, defaultValue = "0") Long cursor,
+		@RequestParam(required = false, defaultValue = "0") Long messageIndex,
 		@PageableDefault Pageable pageable,
 		@AuthPrincipal Principal principal) {
-		log.info("메시지 읽기 요청 : chatRoomId={}, cursor={}, pageable={}, 요청한 아이디={}", chatRoomId, cursor, pageable,
+		log.info("메시지 읽기 요청 : chatRoomId={}, cursor={}, pageable={}, 요청한 아이디={}", chatRoomId, messageIndex, pageable,
 			principal.getLoginId());
 
 		DeferredResult<ApiResponse<ChatLogListResponse>> deferredResult = new DeferredResult<>(10000L);
-		this.chatRequests.put(deferredResult, cursor);
+		this.chatRequests.put(deferredResult, messageIndex);
 
 		deferredResult.onCompletion(() -> chatRequests.remove(deferredResult));
 		deferredResult.onTimeout(() -> deferredResult.setErrorResult(
 			ApiResponse.of(HttpStatus.REQUEST_TIMEOUT, "새로운 채팅 메시지가 존재하지 않습니다.", Collections.emptyList())));
 
-		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, principal, cursor, pageable);
+		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, principal, messageIndex, pageable);
 
 		if (!response.isEmptyChat()) {
 			deferredResult.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.", response));

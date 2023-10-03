@@ -124,4 +124,24 @@ public class ChatRoomService {
 		}
 		return nextCursor;
 	}
+
+	public ChatRoomListResponse readAllChatRoomByItem(Long itemId, Principal principal, Pageable pageable) {
+		// key: 채팅방 등록번호, value: 새로운 메시지 개수
+		Map<Long, Long> newMessageMap = chatLogCountRepository.countNewMessage(principal.getLoginId());
+		log.debug("채팅방 목록 조회 : newMessageMap={}", newMessageMap);
+
+		Item item = findItemBy(itemId);
+		BooleanBuilder whereBuilder = new BooleanBuilder();
+		whereBuilder.andAnyOf(QChatRoom.chatRoom.item.eq(item));
+
+		Slice<ChatRoom> slice = chatRoomPaginationRepository.searchBySlice(whereBuilder, pageable);
+
+		List<ChatRoomItemResponse> contents = slice.getContent().stream()
+			.map(getChatRoomItemResponseMapper(newMessageMap, principal))
+			.collect(Collectors.toUnmodifiableList());
+		boolean hasNext = slice.hasNext();
+		Long nextCursor = getNextCursor(contents, hasNext);
+
+		return new ChatRoomListResponse(contents, hasNext, nextCursor);
+	}
 }
