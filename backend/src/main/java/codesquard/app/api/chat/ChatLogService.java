@@ -45,7 +45,6 @@ public class ChatLogService {
 		return ChatLogSendResponse.from(chatLogRepository.save(chatLog));
 	}
 
-	@SuppressWarnings("checkstyle:SeparatorWrap")
 	@Transactional
 	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor, int size) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
