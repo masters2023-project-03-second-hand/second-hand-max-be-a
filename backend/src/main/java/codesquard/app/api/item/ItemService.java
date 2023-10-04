@@ -18,6 +18,7 @@ import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.api.item.response.ItemResponse;
 import codesquard.app.api.item.response.ItemResponses;
+import codesquard.app.api.redis.ItemViewRedisService;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.category.CategoryRepository;
 import codesquard.app.domain.chat.ChatRoomRepository;
@@ -47,6 +48,7 @@ public class ItemService {
 	private final ItemPaginationRepository itemPaginationRepository;
 	private final WishRepository wishRepository;
 	private final ChatRoomRepository chatRoomRepository;
+	private final ItemViewRedisService itemViewRedisService;
 
 	@Transactional
 	public void register(ItemRegisterRequest request, List<MultipartFile> itemImages,
@@ -88,9 +90,9 @@ public class ItemService {
 		log.info("상품 상태 변경 결과 : item={}", item);
 	}
 
-	public ItemDetailResponse findDetailItemBy(Long itemId, Long loginMemberId) {
-		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
-
+	public ItemDetailResponse findDetailItemBy(Long itemId, Principal principal) {
+		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, principal.getMemberId());
+		itemViewRedisService.addViewCount(itemId, principal);
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
 
@@ -99,9 +101,9 @@ public class ItemService {
 			.map(Image::getImageUrl)
 			.collect(Collectors.toUnmodifiableList());
 
-		boolean isInWishList = wishRepository.existsByMemberIdAndItemId(loginMemberId, itemId);
+		boolean isInWishList = wishRepository.existsByMemberIdAndItemId(principal.getMemberId(), itemId);
 
-		return ItemDetailResponse.of(item, loginMemberId, imageUrls, isInWishList);
+		return ItemDetailResponse.of(item, principal.getMemberId(), imageUrls, isInWishList);
 	}
 
 	@Transactional

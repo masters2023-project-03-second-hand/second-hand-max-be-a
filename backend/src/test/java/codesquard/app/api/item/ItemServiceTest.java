@@ -390,6 +390,7 @@ class ItemServiceTest {
 	public void findDetailItemBySeller() {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
+		Principal principal = Principal.from(seller);
 		Category sport = categoryRepository.save(findByName("스포츠/레저"));
 		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
 			"가락동", "thumbnailUrl", seller, sport);
@@ -404,7 +405,7 @@ class ItemServiceTest {
 		wishRepository.save(wish);
 
 		// when
-		ItemDetailResponse response = itemService.findDetailItemBy(item.getId(), seller.getId());
+		ItemDetailResponse response = itemService.findDetailItemBy(item.getId(), principal);
 
 		// then
 		SoftAssertions.assertSoftly(softAssertions -> {
@@ -424,10 +425,11 @@ class ItemServiceTest {
 	public void findDetailItemWithNotExistItem() {
 		// given
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
+		Principal principal = Principal.from(member);
 		Long itemId = 9999L;
 		// when
 		Throwable throwable = Assertions.catchThrowable(
-			() -> itemService.findDetailItemBy(itemId, member.getId()));
+			() -> itemService.findDetailItemBy(itemId, principal));
 		// then
 		Assertions.assertThat(throwable)
 			.isInstanceOf(NotFoundResourceException.class)
