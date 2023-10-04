@@ -77,7 +77,7 @@ public class ChatLogService {
 	private Long getNextCursor(List<ChatLogMessageResponse> contents, boolean hasNext) {
 		Long nextCursor = null;
 		if (hasNext) {
-			nextCursor = contents.get(contents.size() - 1).getChatLogId();
+			nextCursor = contents.get(contents.size() - 1).getMessageIndex();
 		}
 		return nextCursor;
 	}
