@@ -19,8 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.api.errors.errorcode.ErrorCode;
-import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.exception.SecondHandException;
+import codesquard.app.api.errors.exception.UnAuthorizationException;
 import codesquard.app.api.redis.OauthRedisService;
 import codesquard.app.api.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -51,9 +51,9 @@ public class LogoutFilter extends OncePerRequestFilter {
 			return;
 		}
 		try {
-			String token = extractJwt(request).orElseThrow(() -> new RestApiException(JwtTokenErrorCode.EMPTY_TOKEN));
+			String token = extractJwt(request).orElseThrow(() -> new UnAuthorizationException(ErrorCode.EMPTY_TOKEN));
 			redisService.validateAlreadyLogout(token);
-		} catch (RestApiException e) {
+		} catch (SecondHandException e) {
 			setErrorResponse(response, e.getErrorCode());
 			return;
 		}

@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.UnAuthorizationException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -20,7 +20,7 @@ public class LogoutInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws
 		Exception {
 		log.debug("로그인 인터셉터 접속 : {}", request.getRequestURI());
-		String accessToken = extractJwt(request).orElseThrow(() -> new RestApiException(JwtTokenErrorCode.EMPTY_TOKEN));
+		String accessToken = extractJwt(request).orElseThrow(() -> new UnAuthorizationException(ErrorCode.EMPTY_TOKEN));
 		request.setAttribute("accessToken", accessToken);
 		return true;
 	}

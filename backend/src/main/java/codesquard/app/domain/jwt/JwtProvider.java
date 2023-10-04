@@ -7,8 +7,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import codesquard.app.api.errors.errorcode.JwtTokenErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.BadRequestException;
+import codesquard.app.api.errors.exception.ForBiddenException;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.oauth.support.Principal;
 import io.jsonwebtoken.Claims;
@@ -65,9 +66,9 @@ public class JwtProvider {
 				.parseClaimsJws(token)
 				.getBody();
 		} catch (ExpiredJwtException e) {
-			throw new RestApiException(JwtTokenErrorCode.EXPIRE_TOKEN);
+			throw new ForBiddenException(ErrorCode.EXPIRE_TOKEN);
 		} catch (JwtException e) {
-			throw new RestApiException(JwtTokenErrorCode.INVALID_TOKEN);
+			throw new BadRequestException(ErrorCode.INVALID_TOKEN);
 		}
 	}
 
@@ -79,10 +80,10 @@ public class JwtProvider {
 				.parseClaimsJws(token);
 		} catch (ExpiredJwtException e) {
 			log.error("토큰 만료 에러 : {}", e.getMessage());
-			throw new RestApiException(JwtTokenErrorCode.EXPIRE_TOKEN);
+			throw new ForBiddenException(ErrorCode.EXPIRE_TOKEN);
 		} catch (JwtException e) {
 			log.error("Jwt 에러 : {}", e.getMessage());
-			throw new RestApiException(JwtTokenErrorCode.INVALID_TOKEN);
+			throw new BadRequestException(ErrorCode.INVALID_TOKEN);
 		}
 	}
 

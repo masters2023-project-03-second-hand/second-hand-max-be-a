@@ -13,9 +13,8 @@ import codesquard.app.api.chat.response.ChatLogItemResponse;
 import codesquard.app.api.chat.response.ChatLogListResponse;
 import codesquard.app.api.chat.response.ChatLogMessageResponse;
 import codesquard.app.api.chat.response.ChatLogSendResponse;
-import codesquard.app.api.errors.errorcode.ChatRoomErrorCode;
-import codesquard.app.api.errors.errorcode.ItemErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.domain.chat.ChatLog;
 import codesquard.app.domain.chat.ChatLogPaginationRepository;
 import codesquard.app.domain.chat.ChatLogRepository;
@@ -79,11 +78,11 @@ public class ChatLogService {
 
 	private ChatRoom findChatRoomBy(Long chatRoomId) {
 		return chatRoomRepository.findById(chatRoomId)
-			.orElseThrow(() -> new RestApiException(ChatRoomErrorCode.NOT_FOUND_CHATROOM));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_CHATROOM));
 	}
 
 	private Item findItemBy(ChatRoom chatRoom) {
 		return itemRepository.findById(chatRoom.getItem().getId())
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
 	}
 }

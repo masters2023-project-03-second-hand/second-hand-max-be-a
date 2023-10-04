@@ -13,8 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import codesquard.app.api.errors.errorcode.ImageErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.BadRequestException;
+import codesquard.app.api.errors.exception.ServerInternalException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -76,7 +77,7 @@ public class ImageFile {
 		try {
 			return multipartFile.getInputStream();
 		} catch (IOException e) {
-			throw new RestApiException(ImageErrorCode.FILE_IO_EXCEPTION);
+			throw new ServerInternalException(ErrorCode.FILE_IO_EXCEPTION);
 		}
 	}
 
@@ -99,7 +100,7 @@ public class ImageFile {
 					return imageContentType.getContentType();
 				}
 			}
-			throw new RestApiException(ImageErrorCode.INVALID_FILE_EXTENSION);
+			throw new BadRequestException(ErrorCode.INVALID_FILE_EXTENSION);
 		}
 	}
 }

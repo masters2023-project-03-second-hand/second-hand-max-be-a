@@ -6,10 +6,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import codesquard.app.api.errors.errorcode.MemberErrorCode;
-import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
-import codesquard.app.api.errors.errorcode.RegionErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.BadRequestException;
+import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
@@ -72,18 +71,18 @@ public class MemberTownService {
 	private void changeIsSelectedWithRemainMemberTown(Principal principal) {
 		MemberTown remainMemberTown = memberTownRepository.findAllByMemberId(principal.getMemberId()).stream()
 			.findAny()
-			.orElseThrow(() -> new RestApiException(MemberTownErrorCode.NOT_FOUND_MEMBER_TOWN));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER_TOWN));
 		remainMemberTown.changeIsSelected(true);
 	}
 
 	private Region getAddressIdBy(Long addressId) {
 		return regionRepository.findById(addressId)
-			.orElseThrow(() -> new RestApiException(RegionErrorCode.NOT_FOUND_REGION));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_REGION));
 	}
 
 	private Member findMemberBy(Principal principal) {
 		return memberRepository.findById(principal.getMemberId())
-			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
 	}
 
 	@Transactional
@@ -102,13 +101,13 @@ public class MemberTownService {
 
 	private void validateRegisteredMemberTown(Long regionId, Long memberId) {
 		if (memberTownRepository.findMemberTownByMemberIdAndRegionId(memberId, regionId).isEmpty()) {
-			throw new RestApiException(MemberTownErrorCode.NOT_SELECT_UNREGISTERED_MEMBER_TOWN);
+			throw new BadRequestException(ErrorCode.NOT_SELECT_UNREGISTERED_MEMBER_TOWN);
 		}
 	}
 
 	private void validateExistRegion(Long regionId) {
 		if (regionRepository.findById(regionId).isEmpty()) {
-			throw new RestApiException(RegionErrorCode.NOT_FOUND_REGION);
+			throw new NotFoundResourceException(ErrorCode.NOT_FOUND_REGION);
 		}
 	}
 
