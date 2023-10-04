@@ -9,10 +9,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import codesquard.app.api.errors.errorcode.ItemErrorCode;
-import codesquard.app.api.errors.errorcode.MemberErrorCode;
-import codesquard.app.api.errors.errorcode.WishErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.BadRequestException;
+import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.api.item.response.ItemResponse;
 import codesquard.app.api.item.response.ItemResponses;
 import codesquard.app.api.wishitem.response.WishCategoryListResponse;
@@ -50,19 +49,19 @@ public class WishItemService {
 
 	private void register(Long itemId, Long memberId) {
 		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
 		if (wishRepository.existsByMemberIdAndItemId(memberId, itemId)) {
-			throw new RestApiException(WishErrorCode.DUPLICATED_REQUEST);
+			throw new BadRequestException(ErrorCode.DUPLICATED_REQUEST);
 		}
 		item.wishRegister();
 		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
 		wishRepository.save(new Wish(member, item));
 	}
 
 	private void cancel(Long itemId) {
 		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
 		item.wishCancel();
 		wishRepository.deleteByItemId(itemId);
 	}

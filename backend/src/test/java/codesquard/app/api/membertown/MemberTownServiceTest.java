@@ -20,7 +20,9 @@ import org.springframework.test.context.ActiveProfiles;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.exception.BadRequestException;
+import codesquard.app.api.errors.exception.ConflictException;
+import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.membertown.response.MemberAddRegionResponse;
@@ -103,7 +105,7 @@ class MemberTownServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(NotFoundResourceException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("주소를 찾지 못하였습니다.");
 	}
@@ -132,7 +134,7 @@ class MemberTownServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(BadRequestException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("회원이 가질 수 있는 개수(최대2개)를 초과하였습니다.");
 	}
@@ -156,7 +158,7 @@ class MemberTownServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(ConflictException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("이미 존재하는 동네입니다.");
 	}
@@ -220,7 +222,7 @@ class MemberTownServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(BadRequestException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("등록되지 않은 동네를 삭제할 수 없습니다.");
 	}
@@ -247,7 +249,7 @@ class MemberTownServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(BadRequestException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("동네는 최소 1개 이상 선택해야 해요. 새로운 동네를 등록한 후 삭제해주세요.");
 	}
@@ -304,7 +306,7 @@ class MemberTownServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(NotFoundResourceException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("주소를 찾지 못하였습니다.");
 	}
@@ -329,7 +331,7 @@ class MemberTownServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(BadRequestException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("회원이 등록한 동네만 선택할 수 있습니다.");
 	}

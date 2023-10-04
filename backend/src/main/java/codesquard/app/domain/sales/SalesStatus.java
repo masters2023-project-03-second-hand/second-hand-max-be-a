@@ -2,8 +2,8 @@ package codesquard.app.domain.sales;
 
 import java.util.Arrays;
 
-import codesquard.app.api.errors.errorcode.SalesErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.BadRequestException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +20,6 @@ public enum SalesStatus {
 		return Arrays.stream(SalesStatus.values())
 			.filter(salesStatus -> salesStatus.getStatus().equals(stringStatus.toLowerCase()))
 			.findFirst()
-			.orElseThrow(() -> new RestApiException(SalesErrorCode.INVALID_PARAMETER));
+			.orElseThrow(() -> new BadRequestException(ErrorCode.INVALID_PARAMETER));
 	}
 }

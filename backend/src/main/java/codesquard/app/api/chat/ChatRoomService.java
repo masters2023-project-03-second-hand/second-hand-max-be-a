@@ -16,10 +16,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import codesquard.app.api.chat.response.ChatRoomCreateResponse;
 import codesquard.app.api.chat.response.ChatRoomItemResponse;
 import codesquard.app.api.chat.response.ChatRoomListResponse;
-import codesquard.app.api.errors.errorcode.ChatLogErrorCode;
-import codesquard.app.api.errors.errorcode.ItemErrorCode;
-import codesquard.app.api.errors.errorcode.MemberErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.domain.chat.ChatLogCountRepository;
 import codesquard.app.domain.chat.ChatLogRepository;
 import codesquard.app.domain.chat.ChatRoom;
@@ -64,12 +62,12 @@ public class ChatRoomService {
 
 	private Item findItemBy(Long itemId) {
 		return itemRepository.findById(itemId)
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
 	}
 
 	private Member findMemberBy(Long memberId) {
 		return memberRepository.findById(memberId)
-			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
 	}
 
 	public ChatRoomListResponse readAllChatRoom(Principal principal, Pageable pageable) {
@@ -106,7 +104,7 @@ public class ChatRoomService {
 			chatRoom.getItem(),
 			getChatRoomPartner(principal, chatRoom),
 			chatLogRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
-				.orElseThrow(() -> new RestApiException(ChatLogErrorCode.NOT_FOUND_CHAT_LOG)),
+				.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_CHAT_LOG)),
 			newMessageMap.getOrDefault(chatRoom.getId(), 0L));
 	}
 

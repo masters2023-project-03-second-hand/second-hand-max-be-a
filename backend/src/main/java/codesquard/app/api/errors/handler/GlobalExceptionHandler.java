@@ -11,7 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.exception.SecondHandException;
 import codesquard.app.api.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,9 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	@ExceptionHandler(RestApiException.class)
-	public ResponseEntity<ApiResponse<Object>> handleRestApiException(RestApiException exception) {
-		log.error("RestApiException 발생 : {}", exception.toString());
+	@ExceptionHandler(SecondHandException.class)
+	public ResponseEntity<ApiResponse<Object>> handleSecondHandException(SecondHandException exception) {
+		log.error("SecondHandException 발생 : {}", exception.toString());
 		ApiResponse<Object> body = ApiResponse.error(exception.getErrorCode());
 		return ResponseEntity.status(exception.getErrorCode().getHttpStatus()).body(body);
 	}

@@ -2,8 +2,8 @@ package codesquard.app.domain.wish;
 
 import java.util.Arrays;
 
-import codesquard.app.api.errors.errorcode.WishErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.BadRequestException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +20,6 @@ public enum WishStatus {
 		return Arrays.stream(WishStatus.values())
 			.filter(wishStatus -> wishStatus.getStatus().equals(stringStatus.toLowerCase()))
 			.findFirst()
-			.orElseThrow(() -> new RestApiException(WishErrorCode.INVALID_PARAMETER));
+			.orElseThrow(() -> new BadRequestException(ErrorCode.INVALID_PARAMETER));
 	}
 }

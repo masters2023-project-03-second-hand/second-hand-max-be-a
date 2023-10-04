@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.BadRequestException;
+import codesquard.app.api.errors.exception.ConflictException;
 import codesquard.app.domain.membertown.MemberTown;
 import codesquard.app.domain.region.Region;
-import codesquard.app.domain.region.RegionRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -17,8 +17,6 @@ public class MemberTownValidator {
 
 	private static final int MAXIMUM_MEMBER_TOWN_SIZE = 2;
 	private static final int MINIMUM_MEMBER_TOWN_SIZE = 1;
-
-	private final RegionRepository regionRepository;
 
 	public void validateAddMemberTown(List<MemberTown> memberTowns, Region region) {
 		validateDuplicateAddress(memberTowns, region);
@@ -36,7 +34,7 @@ public class MemberTownValidator {
 			.anyMatch(r -> r.equals(region));
 
 		if (match) {
-			throw new RestApiException(MemberTownErrorCode.ALREADY_ADDRESS_NAME);
+			throw new ConflictException(ErrorCode.ALREADY_ADDRESS_NAME);
 		}
 	}
 
@@ -46,19 +44,19 @@ public class MemberTownValidator {
 			.noneMatch(r -> r.equals(region));
 
 		if (noneMatch) {
-			throw new RestApiException(MemberTownErrorCode.UNREGISTERED_ADDRESS_TO_REMOVE);
+			throw new BadRequestException(ErrorCode.UNREGISTERED_ADDRESS_TO_REMOVE);
 		}
 	}
 
 	private void validateMaximumMemberTownSize(List<MemberTown> memberTowns) {
 		if (memberTowns.size() > MAXIMUM_MEMBER_TOWN_SIZE) {
-			throw new RestApiException(MemberTownErrorCode.MAXIMUM_MEMBER_TOWN_SIZE);
+			throw new BadRequestException(ErrorCode.MAXIMUM_MEMBER_TOWN_SIZE);
 		}
 	}
 
 	private void validateMinimumMemberTownSize(List<MemberTown> memberTowns) {
 		if (memberTowns.size() <= MINIMUM_MEMBER_TOWN_SIZE) {
-			throw new RestApiException(MemberTownErrorCode.MINIMUM_MEMBER_TOWN_SIZE);
+			throw new BadRequestException(ErrorCode.MINIMUM_MEMBER_TOWN_SIZE);
 		}
 	}
 }

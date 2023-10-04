@@ -6,9 +6,6 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import codesquard.app.api.converter.ItemRequestConverter;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemStatus;
 import lombok.AccessLevel;
@@ -24,7 +21,6 @@ public class ItemModifyRequest {
 	private String content;
 	@NotBlank(message = "동네는 필수 정보입니다.")
 	private String region;
-	@JsonDeserialize(converter = ItemRequestConverter.class)
 	private ItemStatus status;
 	@Positive(message = "카테고리 등록번호는 양수여야 합니다.")
 	private Long categoryId;

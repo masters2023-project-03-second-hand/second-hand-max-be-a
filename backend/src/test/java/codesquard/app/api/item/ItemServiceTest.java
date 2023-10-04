@@ -35,7 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.MemberTownTestSupport;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.api.image.ImageUploader;
 import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.api.item.request.ItemRegisterRequest;
@@ -430,7 +430,7 @@ class ItemServiceTest {
 			() -> itemService.findDetailItemBy(itemId, member.getId()));
 		// then
 		Assertions.assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(NotFoundResourceException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("상품을 찾을 수 없습니다.");
 	}
@@ -497,7 +497,7 @@ class ItemServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(NotFoundResourceException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("상품을 찾을 수 없습니다.");
 
@@ -532,7 +532,7 @@ class ItemServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(NotFoundResourceException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("상품을 찾을 수 없습니다.");
 

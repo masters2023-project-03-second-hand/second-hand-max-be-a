@@ -28,9 +28,11 @@ import org.springframework.test.context.ActiveProfiles;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import codesquard.app.api.errors.errorcode.MemberErrorCode;
-import codesquard.app.api.errors.errorcode.OauthErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.BadRequestException;
+import codesquard.app.api.errors.exception.ConflictException;
+import codesquard.app.api.errors.exception.NotFoundResourceException;
+import codesquard.app.api.errors.exception.UnAuthorizationException;
 import codesquard.app.api.image.ImageService;
 import codesquard.app.api.oauth.request.OauthLoginRequest;
 import codesquard.app.api.oauth.request.OauthLogoutRequest;
@@ -133,7 +135,7 @@ class OauthServiceTest {
 
 		// then
 		Member findMember = memberRepository.findMemberByLoginId("23Yong")
-			.orElseThrow(() -> new RestApiException(MemberErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
 		List<MemberTown> memberTowns = memberTownRepository.findAllByMemberId(findMember.getId());
 
 		assertAll(() -> {
@@ -168,7 +170,7 @@ class OauthServiceTest {
 		// then
 
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(ConflictException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("중복된 아이디입니다.");
 	}
@@ -216,7 +218,7 @@ class OauthServiceTest {
 		// then
 
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(UnAuthorizationException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("이미 회원가입된 상태입니다.");
 	}
@@ -234,7 +236,7 @@ class OauthServiceTest {
 			OauthSignUpRequest.class);
 
 		given(oauthClientRepository.findOneBy(anyString()))
-			.willThrow(new RestApiException(OauthErrorCode.NOT_FOUND_PROVIDER));
+			.willThrow(new NotFoundResourceException(ErrorCode.NOT_FOUND_PROVIDER));
 
 		String provider = "github";
 		String code = "1234";
@@ -244,7 +246,7 @@ class OauthServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(NotFoundResourceException.class)
 			.extracting("errorCode")
 			.extracting("name", "httpStatus", "message")
 			.containsExactlyInAnyOrder("NOT_FOUND_PROVIDER", HttpStatus.NOT_FOUND, "provider를 찾을 수 없습니다.");
@@ -272,7 +274,7 @@ class OauthServiceTest {
 		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString(), anyString()))
 			.willReturn(mockAccessTokenResponse);
 		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
-			.willThrow(new RestApiException(OauthErrorCode.WRONG_AUTHORIZATION_CODE));
+			.willThrow(new BadRequestException(ErrorCode.WRONG_AUTHORIZATION_CODE));
 
 		String provider = "naver";
 		String code = "1234";
@@ -283,7 +285,7 @@ class OauthServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(BadRequestException.class)
 			.extracting("errorCode")
 			.extracting("name", "httpStatus", "message")
 			.containsExactlyInAnyOrder("WRONG_AUTHORIZATION_CODE", HttpStatus.BAD_REQUEST, "잘못된 인가 코드입니다.");
@@ -337,7 +339,7 @@ class OauthServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(ConflictException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("중복된 아이디입니다.");
 	}
@@ -502,7 +504,7 @@ class OauthServiceTest {
 
 		// then
 		assertThat(throwable)
-			.isInstanceOf(RestApiException.class)
+			.isInstanceOf(BadRequestException.class)
 			.extracting("errorCode.message")
 			.isEqualTo("유효하지 않은 토큰입니다.");
 	}

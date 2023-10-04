@@ -9,10 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import codesquard.app.api.errors.errorcode.CategoryErrorCode;
-import codesquard.app.api.errors.errorcode.ImageErrorCode;
-import codesquard.app.api.errors.errorcode.ItemErrorCode;
-import codesquard.app.api.errors.exception.RestApiException;
+import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.BadRequestException;
+import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.api.image.ImageService;
 import codesquard.app.api.item.request.ItemModifyRequest;
 import codesquard.app.api.item.request.ItemRegisterRequest;
@@ -84,7 +83,7 @@ public class ItemService {
 	public void changeItemStatus(Long itemId, ItemStatus status) {
 		log.info("상품 상태 변경 서비스 요청 : itemId={}, status={}", itemId, status);
 		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
 		item.changeStatus(status);
 		log.info("상품 상태 변경 결과 : item={}", item);
 	}
@@ -93,7 +92,7 @@ public class ItemService {
 		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, loginMemberId);
 
 		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
 
 		List<Image> images = imageRepository.findAllByItemId(itemId);
 		List<String> imageUrls = images.stream()
@@ -137,7 +136,7 @@ public class ItemService {
 
 	private Category findCategoryBy(Long categoryId) {
 		return categoryRepository.findById(categoryId)
-			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_CATEGORY));
 	}
 
 	private String updateThumnail(Item item, MultipartFile thumbnailFile, String thumbnailUrl) {
@@ -179,7 +178,7 @@ public class ItemService {
 	private int deleteImages(Long itemId, List<String> deleteImageUrls) {
 		int currentImageSize = imageRepository.countImageByItemId(itemId);
 		if (currentImageSize <= deleteImageUrls.size()) {
-			throw new RestApiException(ImageErrorCode.NOT_REMOVE_IMAGES);
+			throw new BadRequestException(ErrorCode.NOT_REMOVE_IMAGES);
 		}
 		return imageRepository.deleteImagesByItemIdAndImageUrlIn(itemId, deleteImageUrls);
 	}
@@ -190,7 +189,7 @@ public class ItemService {
 
 	private Item findItemByItemIdAndMemberId(Long itemId, Long memberId) {
 		return itemRepository.findItemByIdAndMemberId(itemId, memberId)
-			.orElseThrow(() -> new RestApiException(ItemErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
 	}
 
 	@Transactional
