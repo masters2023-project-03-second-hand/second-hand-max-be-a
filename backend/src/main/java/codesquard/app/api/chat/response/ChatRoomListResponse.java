@@ -17,4 +17,8 @@ public class ChatRoomListResponse {
 		this.contents = contents;
 		this.paging = ItemResponses.Paging.create(nextCursor, hasNext);
 	}
+
+	public boolean isEmptyChatRooms() {
+		return contents.isEmpty();
+	}
 }

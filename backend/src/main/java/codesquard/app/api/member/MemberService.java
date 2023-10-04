@@ -28,4 +28,9 @@ public class MemberService {
 		member.changeAvatarUrl(avatarUrl);
 		return new MemberProfileResponse(avatarUrl);
 	}
+
+	public Member findMemberByLoginId(String loginId) {
+		return memberRepository.findMemberByLoginId(loginId)
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
+	}
 }
