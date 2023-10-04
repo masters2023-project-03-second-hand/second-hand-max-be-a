@@ -22,7 +22,6 @@ public class ItemRegisterRequest {
 	private Long price;
 	private String content;
 	private String region;
-	// @JsonDeserialize(converter = ItemRequestConverter.class)
 	private ItemStatus status;
 	private Long categoryId;
 	private String categoryName;
