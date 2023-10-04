@@ -8,6 +8,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.querydsl.core.BooleanBuilder;
+
 import codesquard.app.api.chat.request.ChatLogSendRequest;
 import codesquard.app.api.chat.response.ChatLogItemResponse;
 import codesquard.app.api.chat.response.ChatLogListResponse;
@@ -50,7 +52,11 @@ public class ChatLogService {
 		Item item = findItemBy(chatRoom);
 
 		String chatPartnerName = principal.getChatPartnerName(item, chatRoom);
-		Slice<ChatLog> slice = chatLogPaginationRepository.searchBySlice(cursor, pageable);
+		BooleanBuilder whereBuilder = new BooleanBuilder();
+		whereBuilder.orAllOf(
+			chatLogRepository.greaterThanChatLogId(cursor),
+			chatLogRepository.equalChatRoomId(chatRoomId));
+		Slice<ChatLog> slice = chatLogPaginationRepository.searchBySlice(whereBuilder, pageable);
 
 		List<ChatLog> contents = slice.getContent().stream()
 			.collect(Collectors.toUnmodifiableList());

@@ -9,7 +9,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -20,22 +20,13 @@ public class ChatLogPaginationRepository {
 
 	private final JPAQueryFactory queryFactory;
 
-	public Slice<ChatLog> searchBySlice(Long lastChatLogId, Pageable pageable) {
+	public Slice<ChatLog> searchBySlice(BooleanBuilder whereBuilder, Pageable pageable) {
 		List<ChatLog> chatLogs = queryFactory.selectFrom(chatLog)
-			.where(
-				greaterThanChatLogId(lastChatLogId)
-			)
+			.where(whereBuilder)
 			.orderBy(chatLog.id.asc())
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
 		return checkLastPage(pageable, chatLogs);
-	}
-
-	private BooleanExpression greaterThanChatLogId(Long chatLogId) {
-		if (chatLogId == null) {
-			return null;
-		}
-		return chatLog.id.gt(chatLogId);
 	}
 
 	private Slice<ChatLog> checkLastPage(Pageable pageable, List<ChatLog> chatLogs) {
