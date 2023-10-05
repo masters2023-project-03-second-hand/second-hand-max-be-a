@@ -25,7 +25,6 @@ import codesquard.app.api.item.request.ItemRegisterRequest;
 import codesquard.app.api.item.request.ItemStatusModifyRequest;
 import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.api.item.response.ItemResponses;
-import codesquard.app.api.redis.ItemViewRedisService;
 import codesquard.app.api.response.ApiResponse;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
@@ -39,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ItemController {
 
 	private final ItemService itemService;
-	private final ItemViewRedisService itemViewRedisService;
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
@@ -62,8 +60,7 @@ public class ItemController {
 	@GetMapping("/{itemId}")
 	public ApiResponse<ItemDetailResponse> findDetailItem(@PathVariable Long itemId,
 		@AuthPrincipal Principal principal) {
-		itemViewRedisService.addViewCount(itemId, principal);
-		ItemDetailResponse response = itemService.findDetailItemBy(itemId, principal.getMemberId());
+		ItemDetailResponse response = itemService.findDetailItemBy(itemId, principal);
 		log.debug("상품 상세 조회 결과 : {}", response);
 		return ApiResponse.ok("상품 상세 조회에 성공하였습니다.", response);
 	}

@@ -119,7 +119,11 @@ public class Item {
 	public void wishCancel() {
 		this.wishCount--;
 	}
-	
+
+	public boolean isSeller(Long memberId) {
+		return member.getId() == memberId;
+	}
+
 	@Override
 	public String toString() {
 		return String.format("%s, %s(id=%d, title=%s, price=%d, status=%s, region=%s, viewCount=%d)",
