@@ -60,7 +60,7 @@ public class ChatLogRestController {
 
 		deferredResult.onCompletion(() -> chatService.removeMessageIndex(deferredResult));
 		deferredResult.onTimeout(() -> deferredResult.setErrorResult(
-			ApiResponse.of(HttpStatus.REQUEST_TIMEOUT, "새로운 채팅 메시지가 존재하지 않습니다.", Collections.emptyList())));
+			ApiResponse.ok("새로운 채팅 메시지가 존재하지 않습니다.", Collections.emptyList())));
 
 		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, principal, messageId, pageable);
 
