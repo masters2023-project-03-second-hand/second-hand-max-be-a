@@ -70,14 +70,13 @@ public class ChatLogService {
 		boolean hasNext = slice.hasNext();
 		Long nextCursor = getNextCursor(messageResponses, hasNext);
 
-		return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), messageResponses, hasNext,
-			nextCursor);
+		return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), messageResponses, nextCursor);
 	}
 
 	private Long getNextCursor(List<ChatLogMessageResponse> contents, boolean hasNext) {
 		Long nextCursor = null;
 		if (hasNext) {
-			nextCursor = contents.get(contents.size() - 1).getMessageIndex();
+			nextCursor = contents.get(contents.size() - 1).getMessageId();
 		}
 		return nextCursor;
 	}

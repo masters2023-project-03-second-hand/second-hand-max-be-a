@@ -1,7 +1,5 @@
 package codesquard.app.api.chat.response;
 
-import static codesquard.app.api.item.response.ItemResponses.*;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -15,22 +13,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public class ChatLogListResponse {
+
 	private String chatPartnerName;
 	private ChatLogItemResponse item;
 	private List<ChatLogMessageResponse> chat;
-	private Paging paging;
-
-	public ChatLogListResponse(String chatPartnerName, ChatLogItemResponse item, List<ChatLogMessageResponse> chat,
-		boolean hasNext, Long nextCursor) {
-		this.chatPartnerName = chatPartnerName;
-		this.item = item;
-		this.chat = chat;
-		this.paging = Paging.create(nextCursor, hasNext);
-	}
+	private Long nextMessageId;
 
 	public static ChatLogListResponse emptyResponse(String chatPartnerName, Item item) {
-		return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), Collections.emptyList(), false,
-			null);
+		return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), Collections.emptyList(), null);
 	}
 
 	public boolean isEmptyChat() {

@@ -117,7 +117,7 @@ class ChatRoomServiceTest {
 		// then
 		assertAll(() -> {
 			assertThat(response)
-				.extracting("id")
+				.extracting("chatRoomId")
 				.isNotNull();
 		});
 	}
