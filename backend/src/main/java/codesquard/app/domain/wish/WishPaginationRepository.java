@@ -21,8 +21,9 @@ public class WishPaginationRepository {
 
 	private final JPAQueryFactory queryFactory;
 	private final ItemRepository itemRepository;
+	private final WishRepository wishRepository;
 
-	public Slice<ItemResponse> findAll(Long categoryId, int size, Long cursor) {
+	public Slice<ItemResponse> findAll(Long categoryId, int size, Long cursor, Long memberId) {
 		List<ItemResponse> itemResponses = queryFactory.select(Projections.fields(ItemResponse.class,
 				item.id.as("itemId"),
 				item.thumbnailUrl,
@@ -38,7 +39,8 @@ public class WishPaginationRepository {
 			.join(wish.item, item)
 			.on(wish.item.id.eq(item.id))
 			.where(itemRepository.lessThanItemId(cursor),
-				itemRepository.equalCategoryId(categoryId))
+				itemRepository.equalCategoryId(categoryId),
+				wishRepository.equalMemberId(memberId))
 			.orderBy(wish.createdAt.desc())
 			.limit(size + 1)
 			.fetch();
