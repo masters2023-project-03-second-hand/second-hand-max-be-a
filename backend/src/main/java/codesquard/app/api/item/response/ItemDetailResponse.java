@@ -51,27 +51,6 @@ public class ItemDetailResponse implements Serializable {
 	}
 
 	public static ItemDetailResponse toBuyer(Item item, Long loginMemberId, List<String> imageUrls,
-		boolean isInWishList) {
-		Member seller = item.getMember();
-		boolean isSeller = seller.equalId(loginMemberId);
-		return ItemDetailResponse.builder()
-			.isSeller(isSeller)
-			.imageUrls(imageUrls)
-			.seller(seller.getLoginId())
-			.status(item.getStatus().getStatus())
-			.title(item.getTitle())
-			.categoryName(item.getCategory().getName())
-			.createdAt(item.getCreatedAt())
-			.content(item.getContent())
-			.chatCount(item.getChatCount())
-			.wishCount(item.getWishCount())
-			.viewCount(item.getViewCount())
-			.price(item.getPrice())
-			.isInWishList(isInWishList)
-			.build();
-	}
-
-	public static ItemDetailResponse toSeller(Item item, Long loginMemberId, List<String> imageUrls,
 		boolean isInWishList, Long chatRoomId) {
 		Member seller = item.getMember();
 		boolean isSeller = seller.equalId(loginMemberId);
@@ -90,6 +69,27 @@ public class ItemDetailResponse implements Serializable {
 			.price(item.getPrice())
 			.isInWishList(isInWishList)
 			.chatRoomId(chatRoomId)
+			.build();
+	}
+
+	public static ItemDetailResponse toSeller(Item item, Long loginMemberId, List<String> imageUrls,
+		boolean isInWishList) {
+		Member seller = item.getMember();
+		boolean isSeller = seller.equalId(loginMemberId);
+		return ItemDetailResponse.builder()
+			.isSeller(isSeller)
+			.imageUrls(imageUrls)
+			.seller(seller.getLoginId())
+			.status(item.getStatus().getStatus())
+			.title(item.getTitle())
+			.categoryName(item.getCategory().getName())
+			.createdAt(item.getCreatedAt())
+			.content(item.getContent())
+			.chatCount(item.getChatCount())
+			.wishCount(item.getWishCount())
+			.viewCount(item.getViewCount())
+			.price(item.getPrice())
+			.isInWishList(isInWishList)
 			.build();
 	}
 

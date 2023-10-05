@@ -69,8 +69,9 @@ class ItemControllerTest extends ControllerTestSupport {
 			"가락동", "thumbnailUrl", seller, sport);
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 
-		ItemDetailResponse response = ItemDetailResponse.toBuyer(item, seller.getId(), imageUrls, false);
+		ItemDetailResponse response = ItemDetailResponse.toBuyer(item, seller.getId(), imageUrls, false, null);
 		given(itemService.findDetailItemBy(any(), any())).willReturn(response);
+		
 		// when & then
 		mockMvc.perform(get("/api/items/1"))
 			.andExpect(status().isOk())
@@ -102,7 +103,7 @@ class ItemControllerTest extends ControllerTestSupport {
 		Long loginMemberId = 9999L;
 		List<String> imageUrls = List.of("imageUrlValue1", "imageUrlValue2");
 
-		ItemDetailResponse response = ItemDetailResponse.toSeller(item, loginMemberId, imageUrls, false, 1L);
+		ItemDetailResponse response = ItemDetailResponse.toSeller(item, loginMemberId, imageUrls, false);
 		given(itemService.findDetailItemBy(any(), any())).willReturn(response);
 		// when & then
 		mockMvc.perform(get("/api/items/1"))

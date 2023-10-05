@@ -108,11 +108,11 @@ public class ItemService {
 		boolean isInWishList = wishRepository.existsByMemberIdAndItemId(principal.getMemberId(), itemId);
 
 		if (item.isSeller(principal.getMemberId())) {
-			Long chatRoomId = chatRoomRepository.findByItemIdAndMemberId(itemId, principal.getMemberId())
-				.orElse(null);
-			return ItemDetailResponse.toSeller(item, principal.getMemberId(), imageUrls, isInWishList, chatRoomId);
+			return ItemDetailResponse.toSeller(item, principal.getMemberId(), imageUrls, isInWishList);
 		}
-		return ItemDetailResponse.toBuyer(item, principal.getMemberId(), imageUrls, isInWishList);
+		Long chatRoomId = chatRoomRepository.findByItemIdAndMemberId(itemId, principal.getMemberId())
+			.orElse(null);
+		return ItemDetailResponse.toBuyer(item, principal.getMemberId(), imageUrls, isInWishList, chatRoomId);
 	}
 
 	@Transactional
