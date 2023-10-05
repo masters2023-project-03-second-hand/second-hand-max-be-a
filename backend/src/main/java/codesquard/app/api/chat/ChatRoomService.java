@@ -144,7 +144,7 @@ public class ChatRoomService {
 
 		Item item = findItemBy(itemId);
 		BooleanBuilder whereBuilder = new BooleanBuilder();
-		whereBuilder.andAnyOf(QChatRoom.chatRoom.item.eq(item));
+		whereBuilder.andAnyOf(chatRoomRepository.equalItemId(item.getId()));
 
 		Slice<ChatRoom> slice = chatRoomPaginationRepository.searchBySlice(whereBuilder, pageable);
 
