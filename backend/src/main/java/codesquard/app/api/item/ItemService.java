@@ -82,12 +82,16 @@ public class ItemService {
 	}
 
 	@Transactional
-	public void changeItemStatus(Long itemId, ItemStatus status) {
+	public void changeItemStatus(Long itemId, ItemStatus status, Principal principal) {
 		log.info("상품 상태 변경 서비스 요청 : itemId={}, status={}", itemId, status);
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
-		item.changeStatus(status);
-		log.info("상품 상태 변경 결과 : item={}", item);
+		if (item.isSeller(principal.getMemberId())) {
+			item.changeStatus(status);
+			log.info("상품 상태 변경 결과 : item={}", item);
+		} else {
+			new BadRequestException(ErrorCode.ITEM_FORBIDDEN);
+		}
 	}
 
 	public ItemDetailResponse findDetailItemBy(Long itemId, Principal principal) {

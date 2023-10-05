@@ -12,6 +12,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import codesquard.app.api.item.response.ItemResponse;
 import codesquard.app.domain.item.ItemRepository;
+import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class SalesPaginationRepository {
 	private final JPAQueryFactory queryFactory;
 	private final ItemRepository itemRepository;
 
-	public Slice<ItemResponse> findAll(SalesStatus status, int size, Long cursor) {
+	public Slice<ItemResponse> findAll(SalesStatus status, int size, Long cursor, Principal principal) {
 		List<ItemResponse> itemResponses = queryFactory.select(Projections.fields(ItemResponse.class,
 				item.id.as("itemId"),
 				item.thumbnailUrl,
@@ -34,7 +35,9 @@ public class SalesPaginationRepository {
 				item.chatCount,
 				item.member.loginId.as("sellerId")))
 			.from(item)
-			.where(itemRepository.lessThanItemId(cursor),
+			.where(
+				itemRepository.equalMemberId(principal.getMemberId()),
+				itemRepository.lessThanItemId(cursor),
 				itemRepository.equalsStatus(status))
 			.orderBy(item.createdAt.desc())
 			.limit(size + 1)
