@@ -115,7 +115,7 @@ jobs:
           script: |
             cd ./backend
             sudo chmod 666 /var/run/docker.sock
-            docker-compose -f docker-compose-dev.yml down -v
+            docker-compose -f docker-compose-dev.yml down
             docker-compose -f docker-compose-dev.yml pull
             docker-compose -f docker-compose-dev.yml up -d
             docker image prune -f
