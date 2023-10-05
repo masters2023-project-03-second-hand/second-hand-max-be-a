@@ -61,6 +61,7 @@ public enum ErrorCode {
 
 	// ChatLog
 	NOT_FOUND_CHAT_LOG(HttpStatus.NOT_FOUND, "채팅이 존재하지 않습니다."),
+	FORBIDDEN_CHAT_LOG(HttpStatus.FORBIDDEN, "채팅에 대한 권한이 없습니다."),
 
 	// ChatRoom
 	NOT_FOUND_CHATROOM(HttpStatus.NOT_FOUND, "채팅방을 찾을 수 없습니다.");

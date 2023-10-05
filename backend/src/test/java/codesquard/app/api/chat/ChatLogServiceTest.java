@@ -28,6 +28,7 @@ import codesquard.app.RegionTestSupport;
 import codesquard.app.api.chat.request.ChatLogSendRequest;
 import codesquard.app.api.chat.response.ChatLogListResponse;
 import codesquard.app.api.chat.response.ChatLogSendResponse;
+import codesquard.app.api.errors.exception.ForBiddenException;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.category.CategoryRepository;
 import codesquard.app.domain.chat.ChatLog;
@@ -174,6 +175,52 @@ class ChatLogServiceTest {
 			() -> assertThat(chatLogRepository.findAll().stream().map(ChatLog::getReadCount)).allMatch(
 				count -> count == 0)
 		);
+	}
+
+	@DisplayName("구매자와 판매자가 아닌 제 3자가 채팅방의 채팅 메시지를 읽을 수 없다.")
+	@Test
+	public void readMessageWithOtherMember() {
+		// given
+		Member seller = memberRepository.save(createMember("avatarUrlValue1", "23Yong@gmail.com", "23Yong"));
+		Member buyer = memberRepository.save(createMember("avatarUrlValue2", "bruni@gmail.com", "bruni"));
+		Member anonymous = memberRepository.save(createMember("avatarUrlValue3", "lee1234@gmail.com", "lee1234"));
+
+		Region region = regionRepository.save(RegionTestSupport.createRegion("서울 종로구 청운동"));
+
+		memberTownRepository.saveAll(List.of(
+			createMemberTown(seller, region, true),
+			createMemberTown(buyer, region, true)));
+
+		Category sport = categoryRepository.save(findByName("스포츠/레저"));
+		Item item = createItem("빈티지 롤러 블레이드", "어린시절 추억의향수를 불러 일으키는 롤러 스케이트입니다.", 200000L, ON_SALE,
+			"가락동", "thumbnailUrl", seller, sport);
+
+		Item saveItem = itemRepository.save(item);
+		List<Image> images = List.of(
+			new Image("imageUrlValue1", saveItem, true),
+			new Image("imageUrlValue2", saveItem, false));
+		imageRepository.saveAll(images);
+
+		ChatRoom chatRoom = chatRoomRepository.save(new ChatRoom(buyer, item));
+
+		chatLogRepository.saveAll(List.of(
+			ChatLog.createBySender("롤러 블레이드 사고 싶음", chatRoom, Principal.from(buyer)),
+			ChatLog.createBySender("깍아주세요.", chatRoom, Principal.from(buyer))
+		));
+
+		Long cursor = null;
+		Pageable pageable = Pageable.ofSize(10);
+
+		// when
+		Throwable throwable = catchThrowable(
+			() -> chatLogService.readMessages(chatRoom.getId(), Principal.from(anonymous), cursor,
+				pageable));
+
+		// then
+		assertThat(throwable)
+			.isInstanceOf(ForBiddenException.class)
+			.extracting("errorCode.message")
+			.isEqualTo("채팅에 대한 권한이 없습니다.");
 	}
 
 }

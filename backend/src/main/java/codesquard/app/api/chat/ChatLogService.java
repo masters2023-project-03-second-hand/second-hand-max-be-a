@@ -16,6 +16,7 @@ import codesquard.app.api.chat.response.ChatLogListResponse;
 import codesquard.app.api.chat.response.ChatLogMessageResponse;
 import codesquard.app.api.chat.response.ChatLogSendResponse;
 import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.exception.ForBiddenException;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.domain.chat.ChatLog;
 import codesquard.app.domain.chat.ChatLogPaginationRepository;
@@ -50,6 +51,10 @@ public class ChatLogService {
 	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor, Pageable pageable) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
 		Item item = findItemBy(chatRoom);
+
+		if (!principal.isSeller(chatRoom.getSeller()) && !principal.isBuyer(chatRoom.getBuyer())) {
+			throw new ForBiddenException(ErrorCode.FORBIDDEN_CHAT_LOG);
+		}
 
 		String chatPartnerName = principal.getChatPartnerName(item, chatRoom);
 		BooleanBuilder whereBuilder = new BooleanBuilder();
