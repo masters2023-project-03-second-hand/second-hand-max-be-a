@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
@@ -50,6 +52,9 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 
 	@MockBean
 	private ChatRoomService chatRoomService;
+
+	@MockBean
+	private ChatService chatService;
 
 	@Autowired
 	private PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver;
@@ -115,7 +120,11 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 			.willReturn(response);
 
 		// when & then
-		mockMvc.perform(get("/api/chats"))
+		MvcResult asyncListener = mockMvc.perform(get("/api/chats"))
+			.andExpect(request().asyncStarted())
+			.andReturn();
+
+		mockMvc.perform(asyncDispatch(asyncListener))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("statusCode").value(equalTo(200)))
 			.andExpect(jsonPath("message").value(equalTo("채팅방 목록 조회를 완료하였습니다.")))

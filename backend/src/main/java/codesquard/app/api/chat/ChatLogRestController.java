@@ -1,8 +1,6 @@
 package codesquard.app.api.chat;
 
 import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -34,12 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class ChatLogRestController {
 
-	private static final int DEFAULT_READ_MESSAGE_SIZE = 10;
-
-	private final Map<DeferredResult<ApiResponse<ChatLogListResponse>>, Long> chatRequests =
-		new ConcurrentHashMap<>();
-
 	private final ChatLogService chatLogService;
+	private final ChatService chatService;
 
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/chats/{chatRoomId}")
@@ -48,18 +42,8 @@ public class ChatLogRestController {
 		@RequestBody ChatLogSendRequest request,
 		@AuthPrincipal Principal sender) {
 		ChatLogSendResponse response = chatLogService.sendMessage(request, chatRoomId, sender);
-
-		onMessage(chatRoomId, sender);
+		chatService.onMessage(chatRoomId, sender);
 		return ApiResponse.created("메시지 전송이 완료되었습니다.", response);
-	}
-
-	private void onMessage(Long chatRoomId, Principal sender) {
-		for (Map.Entry<DeferredResult<ApiResponse<ChatLogListResponse>>, Long> entry : this.chatRequests.entrySet()) {
-			DeferredResult<ApiResponse<ChatLogListResponse>> key = entry.getKey();
-			Long cursor = entry.getValue();
-			key.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.",
-				chatLogService.readMessages(chatRoomId, sender, cursor, Pageable.ofSize(DEFAULT_READ_MESSAGE_SIZE))));
-		}
 	}
 
 	@GetMapping("/chats/{chatRoomId}")
@@ -72,9 +56,9 @@ public class ChatLogRestController {
 			principal.getLoginId());
 
 		DeferredResult<ApiResponse<ChatLogListResponse>> deferredResult = new DeferredResult<>(10000L);
-		this.chatRequests.put(deferredResult, messageIndex);
+		chatService.putMessageIndex(deferredResult, messageIndex);
 
-		deferredResult.onCompletion(() -> chatRequests.remove(deferredResult));
+		deferredResult.onCompletion(() -> chatService.removeMessageIndex(deferredResult));
 		deferredResult.onTimeout(() -> deferredResult.setErrorResult(
 			ApiResponse.of(HttpStatus.REQUEST_TIMEOUT, "새로운 채팅 메시지가 존재하지 않습니다.", Collections.emptyList())));
 

@@ -1,5 +1,6 @@
 package codesquard.app.api.chat;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -89,6 +90,7 @@ public class ChatRoomService {
 
 		List<ChatRoomItemResponse> contents = slice.getContent().stream()
 			.map(getChatRoomItemResponseMapper(newMessageMap, principal))
+			.sorted(Comparator.comparing(ChatRoomItemResponse::getLastSendTime).reversed())
 			.collect(Collectors.toUnmodifiableList());
 		boolean hasNext = slice.hasNext();
 		Long nextCursor = getNextCursor(contents, hasNext);
@@ -136,6 +138,7 @@ public class ChatRoomService {
 
 		List<ChatRoomItemResponse> contents = slice.getContent().stream()
 			.map(getChatRoomItemResponseMapper(newMessageMap, principal))
+			.sorted(Comparator.comparing(ChatRoomItemResponse::getLastSendTime).reversed())
 			.collect(Collectors.toUnmodifiableList());
 		boolean hasNext = slice.hasNext();
 		Long nextCursor = getNextCursor(contents, hasNext);

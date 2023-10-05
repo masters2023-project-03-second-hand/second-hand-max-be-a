@@ -7,6 +7,7 @@ import static codesquard.app.domain.item.ItemStatus.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.anyLong;
+import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -41,6 +42,7 @@ import codesquard.app.api.chat.response.ChatLogItemResponse;
 import codesquard.app.api.chat.response.ChatLogListResponse;
 import codesquard.app.api.chat.response.ChatLogMessageResponse;
 import codesquard.app.api.chat.response.ChatLogSendResponse;
+import codesquard.app.api.member.MemberService;
 import codesquard.app.domain.category.Category;
 import codesquard.app.domain.chat.ChatLog;
 import codesquard.app.domain.chat.ChatRoom;
@@ -59,6 +61,12 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 
 	@MockBean
 	private ChatLogService chatLogService;
+
+	@MockBean
+	private ChatService chatService;
+
+	@MockBean
+	private MemberService memberService;
 
 	@Autowired
 	private PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver;
@@ -98,6 +106,11 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 			anyLong(),
 			any(Principal.class)))
 			.willReturn(response);
+
+		Member receiver = createMember("avatarUrl", "bruni@gmail.com", "bruni");
+		given(memberService.findMemberByLoginId(
+			anyString()
+		)).willReturn(receiver);
 
 		// when & then
 		mockMvc.perform(post("/api/chats/1")
