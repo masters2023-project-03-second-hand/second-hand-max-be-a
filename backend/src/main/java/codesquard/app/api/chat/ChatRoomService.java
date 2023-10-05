@@ -3,6 +3,7 @@ package codesquard.app.api.chat;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import codesquard.app.api.chat.response.ChatRoomItemResponse;
 import codesquard.app.api.chat.response.ChatRoomListResponse;
 import codesquard.app.api.errors.errorcode.ErrorCode;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
+import codesquard.app.domain.chat.ChatLog;
 import codesquard.app.domain.chat.ChatLogCountRepository;
 import codesquard.app.domain.chat.ChatLogRepository;
 import codesquard.app.domain.chat.ChatRoom;
@@ -79,6 +81,8 @@ public class ChatRoomService {
 		List<Long> itemIds = itemRepository.findAllByMemberId(principal.getMemberId()).stream()
 			.map(Item::getId)
 			.collect(Collectors.toUnmodifiableList());
+		log.info("회원이 판매하는 상품 아이디 : {}", itemIds);
+
 		// 1. 내가 팔고 있는 상품들의 등록번호 조회 조건
 		BooleanExpression chatRoomOfSellingItemsCondition = QChatRoom.chatRoom.item.id.in(itemIds);
 		// 2. 내가 사려고 하는 상품에 대한 채팅방 목록 조회 조건
@@ -87,9 +91,11 @@ public class ChatRoomService {
 		whereBuilder.andAnyOf(chatRoomOfSellingItemsCondition, chatRoomOfBuyingItemsCondition);
 
 		Slice<ChatRoom> slice = chatRoomPaginationRepository.searchBySlice(whereBuilder, pageable);
+		log.info("채팅방 페이징 조회 결과 개수 : {}", slice.getSize());
 
 		List<ChatRoomItemResponse> contents = slice.getContent().stream()
 			.map(getChatRoomItemResponseMapper(newMessageMap, principal))
+			.filter(Objects::nonNull)
 			.sorted(Comparator.comparing(ChatRoomItemResponse::getLastSendTime).reversed())
 			.collect(Collectors.toUnmodifiableList());
 		boolean hasNext = slice.hasNext();
@@ -101,13 +107,19 @@ public class ChatRoomService {
 	private Function<ChatRoom, ChatRoomItemResponse> getChatRoomItemResponseMapper(Map<Long, Long> newMessageMap,
 		Principal principal) {
 
-		return chatRoom -> ChatRoomItemResponse.of(
-			chatRoom,
-			chatRoom.getItem(),
-			getChatRoomPartner(principal, chatRoom),
-			chatLogRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
-				.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_CHAT_LOG)),
-			newMessageMap.getOrDefault(chatRoom.getId(), 0L));
+		return chatRoom -> {
+			ChatLog chatLog = chatLogRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
+				.orElse(null);
+			if (chatLog == null) {
+				return null;
+			}
+			return ChatRoomItemResponse.of(
+				chatRoom,
+				chatRoom.getItem(),
+				getChatRoomPartner(principal, chatRoom),
+				chatLog,
+				newMessageMap.getOrDefault(chatRoom.getId(), 0L));
+		};
 	}
 
 	private Member getChatRoomPartner(Principal principal, ChatRoom chatRoom) {

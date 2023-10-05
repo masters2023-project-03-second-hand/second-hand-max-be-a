@@ -12,8 +12,9 @@ plugins {
     id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
 
+project.base.archivesBaseName('second_hand')
+version = '0.1.0-SNAPSHOT'
 group = 'codesquard'
-version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '11'
