@@ -17,6 +17,7 @@ import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.member.MemberRepository;
+import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.domain.sales.SalesStatus;
 import codesquard.support.SupportRepository;
 
@@ -47,10 +48,11 @@ class SalesItemServiceTest {
 	void salesListFindAllTest() {
 
 		// given
-		fixtureItemAndMember();
+		Member member = fixtureItemAndMember();
+		Principal principal = Principal.from(member);
 
 		// when
-		ItemResponses all = salesItemService.findAll(SalesStatus.All, 10, null);
+		ItemResponses all = salesItemService.findAll(SalesStatus.All, 10, null, principal);
 
 		// then
 		assertAll(
@@ -66,10 +68,11 @@ class SalesItemServiceTest {
 	void salesListFindOnSalesTest() {
 
 		// given
-		fixtureItemAndMember();
+		Member member = fixtureItemAndMember();
+		Principal principal = Principal.from(member);
 
 		// when
-		ItemResponses all = salesItemService.findAll(SalesStatus.ON_SALE, 10, null);
+		ItemResponses all = salesItemService.findAll(SalesStatus.ON_SALE, 10, null, principal);
 
 		// then
 		assertAll(
@@ -84,10 +87,11 @@ class SalesItemServiceTest {
 	void salesListFindSoldOutTest() {
 
 		// given
-		fixtureItemAndMember();
+		Member member = fixtureItemAndMember();
+		Principal principal = Principal.from(member);
 
 		// when
-		ItemResponses all = salesItemService.findAll(SalesStatus.SOLD_OUT, 10, null);
+		ItemResponses all = salesItemService.findAll(SalesStatus.SOLD_OUT, 10, null, principal);
 
 		// then
 		assertAll(
@@ -96,7 +100,23 @@ class SalesItemServiceTest {
 		);
 	}
 
-	private void fixtureItemAndMember() {
+	@Test
+	@DisplayName("본인이 게시한 게시물이 아닌 경우 판매목록에 노출되지 않는다.")
+	void salesListIsSellerTest() {
+		// given
+		fixtureItemAndMember();
+		Member consumer = new Member("pieImage", "pi2pi2@gmail.com", "pieee");
+		Principal principal = Principal.from(consumer);
+
+		// when
+		ItemResponses all = salesItemService.findAll(SalesStatus.SOLD_OUT, 10, null, principal);
+
+		// then
+		assertThat(all.getContents().size()).isEqualTo(0);
+
+	}
+
+	private Member fixtureItemAndMember() {
 		Category category1 = supportRepository.save(new Category("가전", "~~~~"));
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "구래동", ItemStatus.SOLD_OUT, category1.getId(), null);
@@ -108,5 +128,6 @@ class SalesItemServiceTest {
 		supportRepository.save(request1.toEntity(member, "thumbnail"));
 		supportRepository.save(request2.toEntity(member, "thumb"));
 		supportRepository.save(request3.toEntity(member, "nail"));
+		return member;
 	}
 }
