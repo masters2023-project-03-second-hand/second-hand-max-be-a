@@ -3,7 +3,6 @@ package codesquard.app.api.chat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -16,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ChatService {
 
-	private static final int DEFAULT_READ_MESSAGE_SIZE = 10;
-
 	private final Map<DeferredResult<ApiResponse<ChatLogListResponse>>, Long> chatRequests =
 		new ConcurrentHashMap<>();
 
@@ -28,7 +25,7 @@ public class ChatService {
 			DeferredResult<ApiResponse<ChatLogListResponse>> key = entry.getKey();
 			Long cursor = entry.getValue();
 			key.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.",
-				chatLogService.readMessages(chatRoomId, sender, cursor, Pageable.ofSize(DEFAULT_READ_MESSAGE_SIZE))));
+				chatLogService.readMessages(chatRoomId, sender, cursor)));
 		}
 	}
 

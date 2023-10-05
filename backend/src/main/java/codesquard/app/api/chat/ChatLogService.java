@@ -3,8 +3,6 @@ package codesquard.app.api.chat;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +46,7 @@ public class ChatLogService {
 	}
 
 	@Transactional
-	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor, Pageable pageable) {
+	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
 		Item item = findItemBy(chatRoom);
 
@@ -61,29 +59,21 @@ public class ChatLogService {
 		whereBuilder.orAllOf(
 			chatLogRepository.greaterThanChatLogId(cursor),
 			chatLogRepository.equalChatRoomId(chatRoomId));
-		Slice<ChatLog> slice = chatLogPaginationRepository.searchBySlice(whereBuilder, pageable);
+		List<ChatLog> chatLogs = chatLogPaginationRepository.searchBy(whereBuilder);
 
-		List<ChatLog> contents = slice.getContent().stream()
-			.collect(Collectors.toUnmodifiableList());
 		// 메시지 읽는다.
-		contents.forEach(c -> c.decreaseMessageReadCount(principal.getLoginId()));
+		chatLogs.forEach(c -> c.decreaseMessageReadCount(principal.getLoginId()));
 
-		List<ChatLogMessageResponse> messageResponses = contents.stream()
+		List<ChatLogMessageResponse> messageResponses = chatLogs.stream()
 			.map(c -> ChatLogMessageResponse.from(c, principal))
 			.collect(Collectors.toUnmodifiableList());
 
-		boolean hasNext = slice.hasNext();
-		Long nextCursor = getNextCursor(messageResponses, hasNext);
-
-		return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), messageResponses, nextCursor);
-	}
-
-	private Long getNextCursor(List<ChatLogMessageResponse> contents, boolean hasNext) {
-		Long nextCursor = null;
-		if (hasNext) {
-			nextCursor = contents.get(contents.size() - 1).getMessageId();
+		Long nextMessageId = null;
+		if (!chatLogs.isEmpty()) {
+			nextMessageId = chatLogs.get(chatLogs.size() - 1).getId();
 		}
-		return nextCursor;
+		return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), messageResponses,
+			nextMessageId);
 	}
 
 	private ChatRoom findChatRoomBy(Long chatRoomId) {

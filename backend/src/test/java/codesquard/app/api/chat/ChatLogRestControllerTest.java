@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockAsyncContext;
@@ -142,7 +141,7 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 		ChatLogMessageResponse messageResponse = ChatLogMessageResponse.from(chatLog, Principal.from(buyer));
 		ChatLogListResponse response = new ChatLogListResponse("carlynne", itemResponse, List.of(messageResponse),
 			null);
-		given(chatLogService.readMessages(anyLong(), any(Principal.class), anyLong(), any(Pageable.class)))
+		given(chatLogService.readMessages(anyLong(), any(Principal.class), anyLong()))
 			.willReturn(response);
 		int chatRoomId = 1;
 
@@ -173,8 +172,7 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 		given(chatLogService.readMessages(
 			anyLong(),
 			any(Principal.class),
-			anyLong(),
-			any(Pageable.class)
+			anyLong()
 		)).willReturn(response);
 		int chatRoomId = 1;
 
