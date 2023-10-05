@@ -31,6 +31,8 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
+    volumes:
+      - second_hand-data:/var/lib/mysql
     command:
       - --local-infile=1
     networks:
@@ -56,3 +58,5 @@ services:
       - backend_net
 networks:
   backend_net:
+volumes:
+  second_hand-data:
