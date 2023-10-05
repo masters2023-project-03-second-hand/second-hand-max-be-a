@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -190,7 +191,8 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 		// then
 		mockMvc.perform(asyncDispatch(asyncListener))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("statusCode").value(equalTo(408)))
-			.andExpect(jsonPath("message").value(equalTo("새로운 채팅 메시지가 존재하지 않습니다.")));
+			.andExpect(jsonPath("statusCode").value(equalTo(200)))
+			.andExpect(jsonPath("message").value(equalTo("새로운 채팅 메시지가 존재하지 않습니다.")))
+			.andExpect(jsonPath("data").value(equalTo(Collections.emptyList())));
 	}
 }

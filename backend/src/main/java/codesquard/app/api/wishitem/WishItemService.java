@@ -66,8 +66,9 @@ public class WishItemService {
 		wishRepository.deleteByItemId(itemId);
 	}
 
-	public ItemResponses findAll(Long categoryId, int size, Long cursor) {
-		Slice<ItemResponse> itemResponses = wishPaginationRepository.findAll(categoryId, size, cursor);
+	public ItemResponses findAll(Long categoryId, int size, Long cursor, Principal principal) {
+		Long memberId = principal.getMemberId();
+		Slice<ItemResponse> itemResponses = wishPaginationRepository.findAll(categoryId, size, cursor, memberId);
 		return PaginationUtils.getItemResponses(itemResponses);
 	}
 

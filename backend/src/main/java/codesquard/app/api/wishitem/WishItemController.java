@@ -33,8 +33,9 @@ public class WishItemController {
 
 	@GetMapping
 	public ApiResponse<ItemResponses> findAll(@RequestParam(required = false) Long categoryId,
-		@RequestParam(required = false, defaultValue = "10") int size, @RequestParam(required = false) Long cursor) {
-		return ApiResponse.ok("관심상품 조회에 성공하였습니다.", wishItemService.findAll(categoryId, size, cursor));
+		@RequestParam(required = false, defaultValue = "10") int size, @RequestParam(required = false) Long cursor,
+		@AuthPrincipal Principal principal) {
+		return ApiResponse.ok("관심상품 조회에 성공하였습니다.", wishItemService.findAll(categoryId, size, cursor, principal));
 	}
 
 	@GetMapping("/categories")

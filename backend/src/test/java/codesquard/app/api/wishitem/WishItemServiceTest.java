@@ -143,7 +143,7 @@ class WishItemServiceTest {
 		// when
 		Long categoryId = null;
 		Long cursor = null;
-		ItemResponses responses = wishItemService.findAll(categoryId, 2, cursor);
+		ItemResponses responses = wishItemService.findAll(categoryId, 2, cursor, Principal.from(member));
 
 		// then
 		List<ItemResponse> contents = responses.getContents();
@@ -178,7 +178,7 @@ class WishItemServiceTest {
 		wishItemService.changeWishStatus(item3.getId(), member.getId(), WishStatus.YES);
 
 		// when
-		ItemResponses responses = wishItemService.findAll(category1.getId(), 10, null);
+		ItemResponses responses = wishItemService.findAll(category1.getId(), 10, null, Principal.from(member));
 
 		// then
 		assertThat(responses.getContents()).hasSize(2);
