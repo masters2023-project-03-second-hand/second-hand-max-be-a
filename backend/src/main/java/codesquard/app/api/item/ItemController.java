@@ -76,8 +76,9 @@ public class ItemController {
 	}
 
 	@PutMapping("/{itemId}/status")
-	public ApiResponse<Void> modifyItemStatus(@PathVariable Long itemId, @RequestBody ItemStatusModifyRequest request) {
-		itemService.changeItemStatus(itemId, request.getStatus());
+	public ApiResponse<Void> modifyItemStatus(@PathVariable Long itemId, @RequestBody ItemStatusModifyRequest request,
+		@PathVariable Principal principal) {
+		itemService.changeItemStatus(itemId, request.getStatus(), principal);
 		return ApiResponse.ok("상품 상태 변경에 성공하였습니다.", null);
 	}
 
