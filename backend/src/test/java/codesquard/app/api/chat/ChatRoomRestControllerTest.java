@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import codesquard.app.ControllerTestSupport;
@@ -78,7 +76,7 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 	public void createChatRoom() throws Exception {
 		// given
 		Map<String, Object> responseBody = new HashMap<>();
-		responseBody.put("id", 1L);
+		responseBody.put("chatRoomId", 1L);
 
 		ChatRoomCreateResponse response = objectMapper.readValue(objectMapper.writeValueAsString(responseBody),
 			ChatRoomCreateResponse.class);
@@ -93,7 +91,7 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("statusCode").value(equalTo(201)))
 			.andExpect(jsonPath("message").value(equalTo("채팅방 생성을 완료하였습니다.")))
-			.andExpect(jsonPath("data.id").value(equalTo(1)));
+			.andExpect(jsonPath("data.chatRoomId").value(equalTo(1)));
 	}
 
 	@DisplayName("회원은 채팅방 목록을 요청한다")
@@ -120,11 +118,7 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 			.willReturn(response);
 
 		// when & then
-		MvcResult asyncListener = mockMvc.perform(get("/api/chats"))
-			.andExpect(request().asyncStarted())
-			.andReturn();
-
-		mockMvc.perform(asyncDispatch(asyncListener))
+		mockMvc.perform(get("/api/chats"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("statusCode").value(equalTo(200)))
 			.andExpect(jsonPath("message").value(equalTo("채팅방 목록 조회를 완료하였습니다.")))

@@ -23,7 +23,7 @@ public class ChatLogPaginationRepository {
 	public Slice<ChatLog> searchBySlice(BooleanBuilder whereBuilder, Pageable pageable) {
 		List<ChatLog> chatLogs = queryFactory.selectFrom(chatLog)
 			.where(whereBuilder)
-			.orderBy(chatLog.id.asc())
+			.orderBy(chatLog.id.asc(), chatLog.createdAt.asc())
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
 		return checkLastPage(pageable, chatLogs);

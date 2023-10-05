@@ -150,6 +150,7 @@ public class ChatRoomService {
 
 		List<ChatRoomItemResponse> contents = slice.getContent().stream()
 			.map(getChatRoomItemResponseMapper(newMessageMap, principal))
+			.filter(Objects::nonNull)
 			.sorted(Comparator.comparing(ChatRoomItemResponse::getLastSendTime).reversed())
 			.collect(Collectors.toUnmodifiableList());
 		boolean hasNext = slice.hasNext();
