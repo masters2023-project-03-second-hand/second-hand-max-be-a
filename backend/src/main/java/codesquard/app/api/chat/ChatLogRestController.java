@@ -2,8 +2,6 @@ package codesquard.app.api.chat;
 
 import java.util.Collections;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,10 +48,8 @@ public class ChatLogRestController {
 	public DeferredResult<ApiResponse<ChatLogListResponse>> readMessages(
 		@PathVariable Long chatRoomId,
 		@RequestParam(required = false, defaultValue = "0") Long messageId,
-		@PageableDefault Pageable pageable,
 		@AuthPrincipal Principal principal) {
-		log.info("메시지 읽기 요청 : chatRoomId={}, cursor={}, pageable={}, 요청한 아이디={}", chatRoomId, messageId, pageable,
-			principal.getLoginId());
+		log.info("메시지 읽기 요청 : chatRoomId={}, cursor={}, 요청한 아이디={}", chatRoomId, messageId, principal.getLoginId());
 
 		DeferredResult<ApiResponse<ChatLogListResponse>> deferredResult = new DeferredResult<>(10000L);
 		chatService.putMessageIndex(deferredResult, messageId);
@@ -62,7 +58,7 @@ public class ChatLogRestController {
 		deferredResult.onTimeout(() -> deferredResult.setErrorResult(
 			ApiResponse.ok("새로운 채팅 메시지가 존재하지 않습니다.", Collections.emptyList())));
 
-		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, principal, messageId, pageable);
+		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, principal, messageId);
 
 		if (!response.isEmptyChat()) {
 			deferredResult.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.", response));

@@ -3,7 +3,6 @@ package codesquard.app.api.chat;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +46,7 @@ public class ChatLogService {
 	}
 
 	@Transactional
-	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor, Pageable pageable) {
+	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
 		Item item = findItemBy(chatRoom);
 
@@ -69,7 +68,10 @@ public class ChatLogService {
 			.map(c -> ChatLogMessageResponse.from(c, principal))
 			.collect(Collectors.toUnmodifiableList());
 
-		Long nextMessageId = chatLogs.get(chatLogs.size() - 1).getId();
+		Long nextMessageId = null;
+		if (!chatLogs.isEmpty()) {
+			nextMessageId = chatLogs.get(chatLogs.size() - 1).getId();
+		}
 		return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), messageResponses,
 			nextMessageId);
 	}
