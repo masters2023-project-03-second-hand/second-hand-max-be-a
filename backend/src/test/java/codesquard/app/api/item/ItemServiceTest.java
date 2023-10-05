@@ -375,11 +375,12 @@ class ItemServiceTest {
 		ItemRegisterRequest request1 = new ItemRegisterRequest(
 			"선풍기", 12000L, null, "가양 1동", ItemStatus.ON_SALE, category.getId(), null);
 		Member member = supportRepository.save(new Member("avatar", "pie@pie", "pieeeeeee"));
+		Principal principal = Principal.from(member);
 		Item item = supportRepository.save(request1.toEntity(member, "thumbnail"));
 
 		// when
+		itemService.changeItemStatus(item.getId(), ItemStatus.RESERVED, principal);
 		Item updateItem = supportRepository.findById(item.getId(), Item.class);
-		updateItem.changeStatus(ItemStatus.RESERVED);
 
 		// then
 		assertThat(updateItem.getStatus()).isEqualTo(ItemStatus.RESERVED);

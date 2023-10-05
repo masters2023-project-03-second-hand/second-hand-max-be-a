@@ -34,6 +34,13 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 		return item.category.id.eq(categoryId);
 	}
 
+	default BooleanExpression equalMemberId(Long memberId) {
+		if (memberId == null) {
+			return item.member.id.eq(-1L);
+		}
+		return item.member.id.eq(memberId);
+	}
+
 	default BooleanExpression equalTradingRegion(String region) {
 		if (region == null) {
 			return null;
