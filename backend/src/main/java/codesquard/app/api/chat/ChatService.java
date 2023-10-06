@@ -16,8 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ChatService {
 
-	private final Map<DeferredResult<ApiResponse<ChatLogListResponse>>, Map<String, Object>> chatRequests =
-		new ConcurrentHashMap<>();
+	private final Map<DeferredResult<ApiResponse<ChatLogListResponse>>, Map<String, Object>> chatRequests = new ConcurrentHashMap<>();
 
 	private final ChatLogService chatLogService;
 
