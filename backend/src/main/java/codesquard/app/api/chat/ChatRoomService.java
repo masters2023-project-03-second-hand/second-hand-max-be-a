@@ -53,6 +53,7 @@ public class ChatRoomService {
 		log.info("채팅방 생성 서비스 요청 : itemId={}, sender={}", itemId, sender);
 
 		Item item = findItemBy(itemId);
+		item.increaseChatCount();
 		Member senderMember = findMemberBy(sender.getMemberId());
 
 		ChatRoom chatRoom = new ChatRoom(senderMember, item);
