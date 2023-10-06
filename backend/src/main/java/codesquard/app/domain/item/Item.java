@@ -124,9 +124,14 @@ public class Item {
 		return member.getId() == memberId;
 	}
 
+	public void increaseChatCount() {
+		this.chatCount++;
+	}
+
 	@Override
 	public String toString() {
 		return String.format("%s, %s(id=%d, title=%s, price=%d, status=%s, region=%s, viewCount=%d)",
 			"상품", this.getClass().getSimpleName(), id, title, price, status, region, viewCount);
 	}
+
 }
