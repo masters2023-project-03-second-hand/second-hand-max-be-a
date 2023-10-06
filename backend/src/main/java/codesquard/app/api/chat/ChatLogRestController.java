@@ -40,7 +40,7 @@ public class ChatLogRestController {
 		@RequestBody ChatLogSendRequest request,
 		@AuthPrincipal Principal sender) {
 		ChatLogSendResponse response = chatLogService.sendMessage(request, chatRoomId, sender);
-		chatService.onMessage(chatRoomId, sender);
+		chatService.onMessage(chatRoomId);
 		return ApiResponse.created("메시지 전송이 완료되었습니다.", response);
 	}
 
@@ -52,7 +52,7 @@ public class ChatLogRestController {
 		log.info("메시지 읽기 요청 : chatRoomId={}, cursor={}, 요청한 아이디={}", chatRoomId, messageId, principal.getLoginId());
 
 		DeferredResult<ApiResponse<ChatLogListResponse>> deferredResult = new DeferredResult<>(10000L);
-		chatService.putMessageIndex(deferredResult, messageId);
+		chatService.putMessageIndex(deferredResult, messageId, principal);
 
 		deferredResult.onCompletion(() -> chatService.removeMessageIndex(deferredResult));
 		deferredResult.onTimeout(() -> deferredResult.setErrorResult(
