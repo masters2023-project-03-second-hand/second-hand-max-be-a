@@ -142,21 +142,37 @@
 
 ## ERD
 
-![img.png](docs/img.png)
+![image](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/b3615bdc-c569-490a-b188-86025ea89b19)
 
 ## 데모 영상
 
 ### 회원가입/로그인/프로필 사진 변경
 
+![member_resize](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/23ca29ce-a2d3-4598-a926-ff1c07d37337)
+
 ### 회원 동네 선택/추가/삭제
+
+![member_town](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/68804c45-368d-4d2e-8477-d9d657fcbe42)
+
 
 ### 상품 게시글 등록/삭제
 
+![register_remove-item_resize](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/91ecfad3-aeff-4b98-99a0-17a1afb54c21)
+
 ### 상품 게시글 상태 변경 및 게시글 조회
+
+![status-item_resize](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/68610ac5-1b92-4c8f-8749-8a939fec15f6)
 
 ### 상품 판매내역 조회
 
+![sales-item](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/4c109fd1-c937-44ee-a6e0-638604a8d872)
+
 ### 상품 관심내역 조회
 
+![wish-item_resize](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/be2992b8-61e2-4ccd-a627-93a0c91ebe05)
+
 ### 채팅
+
+![chat_resize](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/05a9e1e5-6287-4194-bff1-fa538d7dc09c)
+
 
