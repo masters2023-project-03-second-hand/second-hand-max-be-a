@@ -11,6 +11,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import codesquard.app.api.item.response.ItemResponse;
+import codesquard.app.domain.item.ItemPaginationRepository;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class SalesPaginationRepository {
 
 	private final JPAQueryFactory queryFactory;
 	private final ItemRepository itemRepository;
+	private final ItemPaginationRepository itemPaginationRepository;
 
 	public Slice<ItemResponse> findAll(SalesStatus status, int size, Long cursor, Principal principal) {
 		List<ItemResponse> itemResponses = queryFactory.select(Projections.fields(ItemResponse.class,
@@ -36,9 +38,9 @@ public class SalesPaginationRepository {
 				item.member.loginId.as("sellerId")))
 			.from(item)
 			.where(
-				itemRepository.equalMemberId(principal.getMemberId()),
-				itemRepository.lessThanItemId(cursor),
-				itemRepository.equalsStatus(status))
+				itemPaginationRepository.equalMemberId(principal.getMemberId()),
+				itemPaginationRepository.lessThanItemId(cursor),
+				itemPaginationRepository.equalsStatus(status))
 			.orderBy(item.createdAt.desc())
 			.limit(size + 1)
 			.fetch();

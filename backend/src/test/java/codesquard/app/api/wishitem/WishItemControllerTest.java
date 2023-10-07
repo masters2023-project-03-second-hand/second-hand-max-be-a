@@ -41,7 +41,7 @@ class WishItemControllerTest extends ControllerTestSupport {
 	private WishItemService wishItemService;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(wishItemController)
 			.setControllerAdvice(globalExceptionHandler)
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
@@ -57,7 +57,7 @@ class WishItemControllerTest extends ControllerTestSupport {
 
 	@DisplayName("관심 상품들의 카테고리 목록을 요청한다")
 	@Test
-	public void readWishCategories() throws Exception {
+	void readWishCategories() throws Exception {
 		// given
 		WishCategoryListResponse response = WishCategoryListResponse.of(
 			List.of(findByName("스포츠/레저"), findByName("가구/인테리어")));

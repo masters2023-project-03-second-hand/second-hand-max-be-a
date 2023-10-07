@@ -33,6 +33,7 @@ import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.domain.pagination.PaginationUtils;
+import codesquard.app.domain.wish.Wish;
 import codesquard.app.domain.wish.WishRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -153,18 +154,15 @@ public class ItemService {
 	}
 
 	private String updateThumnail(Item item, MultipartFile thumbnailFile, String thumbnailUrl) {
-		// 상품 게시글 수정시 수정하고자 하는 썸네일 파일이 없다면 기존 상품 게시글의 썸네일을 사용합니다.
 		if (thumbnailFile == null) {
 			return item.getThumbnailUrl();
 		}
 
-		// 상품 게시글 수정시 수정하고자 하는 썸네일 파일이 있다면 썸네일 사진을 교체합니다.
 		if (!thumbnailFile.isEmpty()) {
 			String thumbnail = updateNewThumnail(item.getId(), thumbnailFile);
 			return updateThumbnailStatus(thumbnail, item);
 		}
 
-		// 상품 게시글 수정시 수정하고자 하는 썸네일 파일이 기존 이미지 사진들중 하나인 경우 해당 사진으로 썸네일을 교체합니다.
 		return updateThumbnailStatus(thumbnailUrl, item);
 	}
 
@@ -219,7 +217,10 @@ public class ItemService {
 
 	private void deleteAllRelatedItem(Long itemId) {
 		imageRepository.deleteByItemId(itemId);
-		wishRepository.deleteByItemId(itemId);
+		List<Long> wishIds = wishRepository.findByItemId(itemId).stream()
+			.map(Wish::getId)
+			.collect(Collectors.toUnmodifiableList());
+		wishRepository.deleteAllByIdIn(wishIds);
 		chatRoomRepository.deleteByItemId(itemId);
 		itemRepository.deleteById(itemId);
 	}

@@ -58,8 +58,8 @@ public class ChatLogService {
 		String chatPartnerName = principal.getChatPartnerName(item, chatRoom);
 		BooleanBuilder whereBuilder = new BooleanBuilder();
 		whereBuilder.orAllOf(
-			chatLogRepository.greaterThanChatLogId(cursor),
-			chatLogRepository.equalChatRoomId(chatRoomId));
+			chatLogPaginationRepository.greaterThanChatLogId(cursor),
+			chatLogPaginationRepository.equalChatRoomId(chatRoomId));
 		List<ChatLog> chatLogs = chatLogPaginationRepository.searchBy(whereBuilder);
 
 		// 메시지 읽는다.

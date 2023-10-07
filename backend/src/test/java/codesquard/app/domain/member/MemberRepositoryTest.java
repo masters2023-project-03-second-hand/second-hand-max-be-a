@@ -28,7 +28,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("로그인 아이디를 가지고 회원을 조회할 수 있다")
 	@Test
-	public void findMemberByLoginId() {
+	void findMemberByLoginId() {
 		// given
 		Member member = new Member("avatarUrl", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
@@ -44,7 +44,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("로그인 아이디를 가지고 회원을 조회할때 해당하는 회원이 없는 경우 null을 반환한다")
 	@Test
-	public void findMemberByLoginIdWhenMemberIsNotExist() {
+	void findMemberByLoginIdWhenMemberIsNotExist() {
 		// given
 		String loginId = "23Yong";
 
@@ -58,7 +58,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("닉네임을 가지고 회원이 존재하는지 확인한다")
 	@Test
-	public void existsMemberByLoginId() {
+	void existsMemberByLoginId() {
 		// given
 		Member member = new Member("avatarUrl", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
@@ -73,7 +73,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("로그인 아이디와 이메일을 가지고 회원을 조회한다")
 	@Test
-	public void findMemberByLoginIdAndAndEmail() {
+	void findMemberByLoginIdAndAndEmail() {
 		// given
 		String loginId = "23Yong";
 		String email = "23Yong1234@gmail.com";
@@ -92,7 +92,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("로그인 아이디와 이메일을 가지고 회원을 조회할때 회원이 없는 경우 null을 반환한다")
 	@Test
-	public void findMemberByLoginIdAndAndEmailWhenMemberIsNotExist() {
+	void findMemberByLoginIdAndAndEmailWhenMemberIsNotExist() {
 		// given
 		String loginId = "23Yong";
 		String email = "23Yong1234@gmail.com";
@@ -107,7 +107,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("이메일을 가지고 회원을 조회한다")
 	@Test
-	public void findMemberByEmail() {
+	void findMemberByEmail() {
 		// given
 		String email = "23Yong@gmail.com";
 		String loginId = "23Yong";

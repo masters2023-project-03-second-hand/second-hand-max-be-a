@@ -90,7 +90,7 @@ class ChatRoomServiceTest {
 
 	@DisplayName("구매자가 한 상품에 대한 채팅방을 생성한다")
 	@Test
-	public void createChatRoom() {
+	void createChatRoom() {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue1", "23Yong@gmail.com", "23Yong"));
 		Member buyer = memberRepository.save(createMember("avatarUrlValue2", "bruni@gmail.com", "bruni"));
@@ -124,7 +124,7 @@ class ChatRoomServiceTest {
 
 	@DisplayName("판매자 회원이 채팅방 목록을 조회한다.")
 	@Test
-	public void readAllChatRoomWithSeller() {
+	void readAllChatRoomWithSeller() {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue1", "23Yong@gmail.com", "23Yong"));
 		Member buyer = memberRepository.save(createMember("avatarUrlValue2", "bruni@gmail.com", "bruni"));
@@ -171,7 +171,7 @@ class ChatRoomServiceTest {
 
 	@DisplayName("구매자 회원이 채팅방 목록을 조회한다.")
 	@Test
-	public void readAllChatRoomWithBuyer() {
+	void readAllChatRoomWithBuyer() {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue1", "23Yong@gmail.com", "23Yong"));
 		Member buyer = memberRepository.save(createMember("avatarUrlValue2", "bruni@gmail.com", "bruni"));

@@ -30,7 +30,6 @@ public class ChatRoomPaginationRepository {
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
-		log.info("채팅방 목록 조회 결과 : {}", chatRooms);
 		return checkLastPage(pageable, chatRooms);
 	}
 

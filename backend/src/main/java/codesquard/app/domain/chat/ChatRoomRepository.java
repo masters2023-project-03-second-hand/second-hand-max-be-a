@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
-	int deleteByItemId(Long itemId);
+	void deleteByItemId(Long itemId);
 
 	@Query("select chatRoom.id from ChatRoom chatRoom where chatRoom.item.id = :itemId and chatRoom.buyer.id = :memberId")
 	Optional<Long> findByItemIdAndMemberId(@Param("itemId") Long itemId, @Param("memberId") Long memberId);

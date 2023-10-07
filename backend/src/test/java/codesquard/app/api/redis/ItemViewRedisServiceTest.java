@@ -84,7 +84,7 @@ class ItemViewRedisServiceTest extends CacheTestSupport {
 
 	@DisplayName("회원이 두번째로 상품 상세 조회시 뷰 카운트는 증가하지 않는다")
 	@Test
-	public void addViewCount() {
+	void addViewCount() {
 		// given
 		Member member = MemberTestSupport.createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
 		Principal principal = Principal.from(member);

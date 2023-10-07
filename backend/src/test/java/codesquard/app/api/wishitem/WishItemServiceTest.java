@@ -186,7 +186,7 @@ class WishItemServiceTest {
 
 	@DisplayName("한 회원이 등록한 관심 상품들의 중복되지 않은 카테고리를 조회한다")
 	@Test
-	public void readWishCategories() {
+	void readWishCategories() {
 		// given
 		List<Category> categories = categoryRepository.saveAll(List.of(findByName("스포츠/레저"), findByName("가구/인테리어")));
 		Category sport = categories.get(0);

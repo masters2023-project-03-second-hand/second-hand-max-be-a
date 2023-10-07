@@ -58,7 +58,7 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 	private PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(chatRoomRestController)
 			.setControllerAdvice(globalExceptionHandler)
 			.setCustomArgumentResolvers(pageableHandlerMethodArgumentResolver, authPrincipalArgumentResolver)
@@ -73,7 +73,7 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("채팅방 생성을 요청한다")
 	@Test
-	public void createChatRoom() throws Exception {
+	void createChatRoom() throws Exception {
 		// given
 		Map<String, Object> responseBody = new HashMap<>();
 		responseBody.put("chatRoomId", 1L);
@@ -96,7 +96,7 @@ class ChatRoomRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("회원은 채팅방 목록을 요청한다")
 	@Test
-	public void readAllChatRoom() throws Exception {
+	void readAllChatRoom() throws Exception {
 		// given
 		Member seller = createMember("avatarUrl", "carlynne@naver.com", "carlynne");
 		Member buyer = createMember("avatarUrlValue", "carlynne@naver.com", "carlynne");

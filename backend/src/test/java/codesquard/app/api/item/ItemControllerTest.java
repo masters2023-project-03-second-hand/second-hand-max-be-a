@@ -46,7 +46,7 @@ class ItemControllerTest extends ControllerTestSupport {
 	private ItemService itemService;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(itemController)
 			.setControllerAdvice(globalExceptionHandler)
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
@@ -61,7 +61,7 @@ class ItemControllerTest extends ControllerTestSupport {
 
 	@DisplayName("판매자가 자신이 판매하는 상품의 상세한 내용을 조회합니다.")
 	@Test
-	public void findDetailItemBySeller() throws Exception {
+	void findDetailItemBySeller() throws Exception {
 		// given
 		Member seller = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
 		Category sport = findByName("스포츠/레저");
@@ -94,7 +94,7 @@ class ItemControllerTest extends ControllerTestSupport {
 
 	@DisplayName("구매자가 상품의 상세한 내용을 조회합니다.")
 	@Test
-	public void findDetailItemByBuyer() throws Exception {
+	void findDetailItemByBuyer() throws Exception {
 		// given
 		Member seller = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
 		Category sport = findByName("스포츠/레저");
@@ -127,7 +127,7 @@ class ItemControllerTest extends ControllerTestSupport {
 
 	@DisplayName("구매자가 상품의 상세한 내용을 조회합니다.")
 	@Test
-	public void findDetailItemWithNotExistItem() throws Exception {
+	void findDetailItemWithNotExistItem() throws Exception {
 		// given
 		given(itemService.findDetailItemBy(any(), any()))
 			.willThrow(new NotFoundResourceException(ItemErrorCode.ITEM_NOT_FOUND));
@@ -142,7 +142,7 @@ class ItemControllerTest extends ControllerTestSupport {
 
 	@DisplayName("상품을 삭제합니다.")
 	@Test
-	public void deleteItem() throws Exception {
+	void deleteItem() throws Exception {
 		// given
 		willDoNothing().given(itemService).deleteItem(
 			ArgumentMatchers.anyLong(),

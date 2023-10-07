@@ -36,7 +36,7 @@ class RegionRestControllerTest extends ControllerTestSupport {
 	private RegionService regionService;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(regionRestController)
 			.setControllerAdvice(globalExceptionHandler)
 			.alwaysDo(print())
@@ -45,7 +45,7 @@ class RegionRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("동네(지역) 목록을 조회한다")
 	@Test
-	public void findAll() throws Exception {
+	void findAll() throws Exception {
 		// given
 		RegionItemResponse region1 = createRegionItemResponse("경기 부천시 괴안동");
 		RegionItemResponse region2 = createRegionItemResponse("경기 부천시 범박동");

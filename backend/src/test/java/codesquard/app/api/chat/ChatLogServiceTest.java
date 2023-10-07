@@ -92,7 +92,7 @@ class ChatLogServiceTest {
 
 	@DisplayName("채팅 메시지를 전송한다")
 	@Test
-	public void sendMessage() throws JsonProcessingException {
+	void sendMessage() throws JsonProcessingException {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue1", "23Yong@gmail.com", "23Yong"));
 		Member buyer = memberRepository.save(createMember("avatarUrlValue2", "bruni@gmail.com", "bruni"));
@@ -132,7 +132,7 @@ class ChatLogServiceTest {
 
 	@DisplayName("판매자가 구매자의 채팅 로그들을 읽는다")
 	@Test
-	public void readMessage() {
+	void readMessage() {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue1", "23Yong@gmail.com", "23Yong"));
 		Member buyer = memberRepository.save(createMember("avatarUrlValue2", "bruni@gmail.com", "bruni"));

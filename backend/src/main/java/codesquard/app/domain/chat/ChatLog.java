@@ -22,6 +22,9 @@ import lombok.NoArgsConstructor;
 @Entity
 public class ChatLog {
 
+	private static final int INITIAL_READ_COUNt = 1;
+	private static final int ALL_READ = 0;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -46,9 +49,9 @@ public class ChatLog {
 
 	public static ChatLog createBySender(String message, ChatRoom chatRoom, Principal sender) {
 		if (sender.isBuyer(chatRoom.getBuyer())) {
-			return new ChatLog(message, sender.getLoginId(), chatRoom.getSellerLoginId(), chatRoom, 1);
+			return new ChatLog(message, sender.getLoginId(), chatRoom.getSellerLoginId(), chatRoom, INITIAL_READ_COUNt);
 		}
-		return new ChatLog(message, sender.getLoginId(), chatRoom.getBuyerLoginId(), chatRoom, 1);
+		return new ChatLog(message, sender.getLoginId(), chatRoom.getBuyerLoginId(), chatRoom, INITIAL_READ_COUNt);
 	}
 
 	public boolean isSender(String loginId) {
@@ -56,7 +59,7 @@ public class ChatLog {
 	}
 
 	public void decreaseMessageReadCount(String readerLoginId) {
-		if (this.readCount == 0 || this.sender.equals(readerLoginId)) {
+		if (this.readCount == ALL_READ || this.sender.equals(readerLoginId)) {
 			return;
 		}
 		this.readCount--;

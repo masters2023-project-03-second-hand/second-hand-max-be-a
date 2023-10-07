@@ -113,7 +113,6 @@ public class MemberTownService {
 		}
 	}
 
-	@Transactional(readOnly = true)
 	public MemberTownListResponse readAll(Principal principal) {
 		List<MemberTownItemResponse> itemResponses = memberTownRepository.findAllByMemberId(principal.getMemberId())
 			.stream()

@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.BadRequestException;
+import codesquard.app.api.errors.exception.OauthException;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
 import codesquard.app.domain.oauth.properties.OauthProperties;
@@ -47,9 +48,9 @@ public class KakaoOauthClient extends OauthClient {
 			.exchangeToMono(clientResponse -> {
 				log.info("statusCode : {}", clientResponse.statusCode());
 				if (clientResponse.statusCode().is4xxClientError() || clientResponse.statusCode().is5xxServerError()) {
-					return clientResponse.bodyToMono(String.class).handle((s, sink) -> {
-						log.info("s : {}", s);
-						sink.error(new IllegalStateException("error"));
+					return clientResponse.bodyToMono(String.class).handle((body, sink) -> {
+						log.info("responseBody : {}", body);
+						sink.error(new OauthException(OauthErrorCode.FAIL_ACCESS_TOKEN));
 					});
 				}
 				return clientResponse.bodyToMono(OauthAccessTokenResponse.class);

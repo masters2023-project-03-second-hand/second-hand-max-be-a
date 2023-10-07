@@ -5,6 +5,7 @@ import static codesquard.app.domain.chat.QChatRoom.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
@@ -38,8 +39,8 @@ public class ChatLogCountRepository {
 		int unreadMessageCountIdx = 1;
 		return results.stream()
 			.collect(Collectors.toMap(
-				tuple -> tuple.get(chatRoomIdIdx, Long.class),            // chatRoomId
-				tuple -> tuple.get(unreadMessageCountIdx, Long.class)    // newMessageCount
+				tuple -> tuple.get(chatRoomIdIdx, Long.class),
+				tuple -> Optional.ofNullable(tuple.get(unreadMessageCountIdx, Long.class)).orElse(0L)
 			));
 	}
 

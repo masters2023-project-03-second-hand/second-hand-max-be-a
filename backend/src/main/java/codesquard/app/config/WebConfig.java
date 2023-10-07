@@ -30,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+	private static final int CACHE_MAX_AGES_SECONDS = 3600;
+
 	private final AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
 	private final JwtProvider jwtProvider;
 	private final AuthenticationContext authenticationContext;
@@ -44,7 +46,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 		WebContentInterceptor webCacheContentInterceptor = new WebContentInterceptor();
 		webCacheContentInterceptor.addCacheMapping(
-			CacheControl.maxAge(3600, TimeUnit.SECONDS).noTransform().mustRevalidate(),
+			CacheControl.maxAge(CACHE_MAX_AGES_SECONDS, TimeUnit.SECONDS).noTransform().mustRevalidate(),
 			"/api/categories", "/api/wishes/categories");
 
 		registry.addInterceptor(webCacheContentInterceptor);

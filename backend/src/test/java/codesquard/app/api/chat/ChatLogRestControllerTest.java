@@ -72,7 +72,7 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 	private PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(chatLogRestController)
 			.setControllerAdvice(globalExceptionHandler)
 			.setCustomArgumentResolvers(pageableHandlerMethodArgumentResolver, authPrincipalArgumentResolver)
@@ -87,7 +87,7 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("구매자가 판매자에게 채팅 메시지를 전송합니다.")
 	@Test
-	public void sendMessage() throws Exception {
+	void sendMessage() throws Exception {
 		// given
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("message", "롤러 블레이드 삽니다.");
@@ -127,7 +127,7 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("회원은 채팅방 안에 채팅 메시지 목록들을 요청합니다.")
 	@Test
-	public void readMessages() throws Exception {
+	void readMessages() throws Exception {
 		// given
 		Member seller = createMember("avatarUrl", "carlynne@naver.com", "carlynne");
 		Member buyer = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
@@ -165,7 +165,7 @@ class ChatLogRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("회원이 새로운 채팅 메시지를 요청했지만 새로운 메시지가 없다는 응답을 받는다")
 	@Test
-	public void readMessagesWithTimeout() throws Exception {
+	void readMessagesWithTimeout() throws Exception {
 		// given
 		ChatLogItemResponse itemResponse = null;
 		ChatLogListResponse response = new ChatLogListResponse("carlynne", itemResponse, List.of(), null);

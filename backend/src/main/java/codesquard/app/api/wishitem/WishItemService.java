@@ -65,7 +65,10 @@ public class WishItemService {
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> new NotFoundResourceException(ItemErrorCode.ITEM_NOT_FOUND));
 		item.wishCancel();
-		wishRepository.deleteByItemId(itemId);
+		List<Long> wishIds = wishRepository.findByItemId(item.getId()).stream()
+			.map(Wish::getId)
+			.collect(Collectors.toUnmodifiableList());
+		wishRepository.deleteAllByIdIn(wishIds);
 	}
 
 	public ItemResponses findAll(Long categoryId, int size, Long cursor, Principal principal) {

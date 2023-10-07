@@ -21,7 +21,7 @@ class InMemoryOauthClientRepositoryTest {
 
 	@DisplayName("provider가 주어지고 provider에 따른 OauthProvider를 조회하고 oauth 설정들을 가진다")
 	@Test
-	public void findByProviderName() {
+	void findByProviderName() {
 		// given
 		String provider = "naver";
 

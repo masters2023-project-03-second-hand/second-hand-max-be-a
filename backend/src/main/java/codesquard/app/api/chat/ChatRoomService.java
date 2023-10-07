@@ -91,7 +91,7 @@ public class ChatRoomService {
 		whereBuilder.andAnyOf(inItemIdsOfChatRoom, equalBuyerIdOfChatRoom);
 
 		Slice<ChatRoom> slice = chatRoomPaginationRepository.searchBySlice(whereBuilder, pageable);
-		log.info("채팅방 페이징 조회 결과 개수 : {}", slice.getSize());
+		log.info("채팅방 페이징 조회 결과 : {}", slice.getContent());
 
 		List<ChatRoomItemResponse> contents = slice.getContent().stream()
 			.map(getChatRoomItemResponseMapper(newMessageMap, principal))
@@ -142,6 +142,7 @@ public class ChatRoomService {
 		whereBuilder.andAnyOf(chatRoomPaginationRepository.equalItemId(item.getId()));
 
 		Slice<ChatRoom> slice = chatRoomPaginationRepository.searchBySlice(whereBuilder, pageable);
+		log.info("채팅방 목록 조회 결과 : {}", slice.getContent());
 
 		List<ChatRoomItemResponse> contents = slice.getContent().stream()
 			.map(getChatRoomItemResponseMapper(newMessageMap, principal))
