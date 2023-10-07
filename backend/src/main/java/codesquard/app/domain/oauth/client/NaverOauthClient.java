@@ -10,7 +10,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.BadRequestException;
 import codesquard.app.api.oauth.response.OauthAccessTokenResponse;
 import codesquard.app.api.oauth.response.OauthUserProfileResponse;
@@ -48,7 +48,7 @@ public class NaverOauthClient extends OauthClient {
 			.block();
 
 		if (Objects.requireNonNull(response).getAccessToken() == null) {
-			throw new BadRequestException(ErrorCode.WRONG_AUTHORIZATION_CODE);
+			throw new BadRequestException(OauthErrorCode.WRONG_AUTHORIZATION_CODE);
 		}
 
 		return response;

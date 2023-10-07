@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.MemberErrorCode;
+import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.api.errors.exception.UnAuthorizationException;
 
@@ -35,7 +36,7 @@ class MemberRepositoryTest {
 
 		// when
 		Member findMember = memberRepository.findMemberByLoginId(loginId)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(MemberErrorCode.NOT_FOUND_MEMBER));
 
 		// then
 		assertThat(member.getLoginId()).isEqualTo(findMember.getLoginId());
@@ -81,7 +82,7 @@ class MemberRepositoryTest {
 
 		// when
 		Member findMember = memberRepository.findMemberByLoginIdAndEmail(loginId, email)
-			.orElseThrow(() -> new UnAuthorizationException(ErrorCode.FAIL_LOGIN));
+			.orElseThrow(() -> new UnAuthorizationException(OauthErrorCode.FAIL_LOGIN));
 
 		// then
 		assertThat(findMember)
@@ -115,7 +116,7 @@ class MemberRepositoryTest {
 
 		// when
 		Member findMember = memberRepository.findMemberByEmail(email)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(MemberErrorCode.NOT_FOUND_MEMBER));
 
 		// thenR
 		assertThat(findMember).isNotNull();

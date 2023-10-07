@@ -59,12 +59,6 @@ public class Principal {
 		return memberId.equals(member.getId());
 	}
 
-	@Override
-	public String toString() {
-		return String.format("%s, %s(id=%d, email=%s, loginId=%s)", "Principal", this.getClass().getSimpleName(),
-			memberId, email, loginId);
-	}
-
 	public String createItemViewKey(String key) {
 		return loginId + "-" + key;
 	}
@@ -75,4 +69,11 @@ public class Principal {
 		}
 		return item.getMember().getLoginId();
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s, %s(id=%d, email=%s, loginId=%s)", "Principal", this.getClass().getSimpleName(),
+			memberId, email, loginId);
+	}
+
 }

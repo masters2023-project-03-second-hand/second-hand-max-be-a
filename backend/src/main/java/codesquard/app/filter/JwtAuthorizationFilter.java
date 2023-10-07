@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.JwtErrorCode;
 import codesquard.app.api.errors.exception.SecondHandException;
 import codesquard.app.api.errors.exception.UnAuthorizationException;
 import codesquard.app.api.redis.OauthRedisService;
@@ -67,7 +68,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 			return;
 		}
 		try {
-			String token = extractJwt(request).orElseThrow(() -> new UnAuthorizationException(ErrorCode.EMPTY_TOKEN));
+			String token = extractJwt(request).orElseThrow(
+				() -> new UnAuthorizationException(JwtErrorCode.EMPTY_TOKEN));
 			jwtProvider.validateToken(token);
 			redisService.validateAlreadyLogout(token);
 			authenticationContext.setPrincipal(jwtProvider.extractPrincipal(token));

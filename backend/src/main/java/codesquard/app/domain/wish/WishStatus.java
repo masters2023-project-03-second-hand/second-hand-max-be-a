@@ -2,7 +2,7 @@ package codesquard.app.domain.wish;
 
 import java.util.Arrays;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.SalesErrorCode;
 import codesquard.app.api.errors.exception.BadRequestException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +20,6 @@ public enum WishStatus {
 		return Arrays.stream(WishStatus.values())
 			.filter(wishStatus -> wishStatus.getStatus().equals(stringStatus.toLowerCase()))
 			.findFirst()
-			.orElseThrow(() -> new BadRequestException(ErrorCode.INVALID_PARAMETER));
+			.orElseThrow(() -> new BadRequestException(SalesErrorCode.INVALID_SALES_PARAMETER));
 	}
 }

@@ -28,7 +28,8 @@ import org.springframework.test.context.ActiveProfiles;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.MemberErrorCode;
+import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.BadRequestException;
 import codesquard.app.api.errors.exception.ConflictException;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
@@ -135,7 +136,7 @@ class OauthServiceTest {
 
 		// then
 		Member findMember = memberRepository.findMemberByLoginId("23Yong")
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(MemberErrorCode.NOT_FOUND_MEMBER));
 		List<MemberTown> memberTowns = memberTownRepository.findAllByMemberId(findMember.getId());
 
 		assertAll(() -> {
@@ -236,7 +237,7 @@ class OauthServiceTest {
 			OauthSignUpRequest.class);
 
 		given(oauthClientRepository.findOneBy(anyString()))
-			.willThrow(new NotFoundResourceException(ErrorCode.NOT_FOUND_PROVIDER));
+			.willThrow(new NotFoundResourceException(OauthErrorCode.NOT_FOUND_PROVIDER));
 
 		String provider = "github";
 		String code = "1234";
@@ -274,7 +275,7 @@ class OauthServiceTest {
 		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString(), anyString()))
 			.willReturn(mockAccessTokenResponse);
 		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
-			.willThrow(new BadRequestException(ErrorCode.WRONG_AUTHORIZATION_CODE));
+			.willThrow(new BadRequestException(OauthErrorCode.WRONG_AUTHORIZATION_CODE));
 
 		String provider = "naver";
 		String code = "1234";

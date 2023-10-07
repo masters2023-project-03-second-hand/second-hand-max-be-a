@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.JwtErrorCode;
 import codesquard.app.api.errors.exception.BadRequestException;
 import codesquard.app.api.errors.exception.ForBiddenException;
 import codesquard.app.domain.member.Member;
@@ -66,9 +66,9 @@ public class JwtProvider {
 				.parseClaimsJws(token)
 				.getBody();
 		} catch (ExpiredJwtException e) {
-			throw new ForBiddenException(ErrorCode.EXPIRE_TOKEN);
+			throw new ForBiddenException(JwtErrorCode.EXPIRE_TOKEN);
 		} catch (JwtException e) {
-			throw new BadRequestException(ErrorCode.INVALID_TOKEN);
+			throw new BadRequestException(JwtErrorCode.INVALID_TOKEN);
 		}
 	}
 
@@ -80,10 +80,10 @@ public class JwtProvider {
 				.parseClaimsJws(token);
 		} catch (ExpiredJwtException e) {
 			log.error("토큰 만료 에러 : {}", e.getMessage());
-			throw new ForBiddenException(ErrorCode.EXPIRE_TOKEN);
+			throw new ForBiddenException(JwtErrorCode.EXPIRE_TOKEN);
 		} catch (JwtException e) {
 			log.error("Jwt 에러 : {}", e.getMessage());
-			throw new BadRequestException(ErrorCode.INVALID_TOKEN);
+			throw new BadRequestException(JwtErrorCode.INVALID_TOKEN);
 		}
 	}
 

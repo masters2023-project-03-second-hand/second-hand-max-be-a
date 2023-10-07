@@ -9,7 +9,8 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.JwtErrorCode;
+import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.BadRequestException;
 import codesquard.app.api.errors.exception.UnAuthorizationException;
 import codesquard.app.domain.jwt.Jwt;
@@ -32,13 +33,13 @@ public class OauthRedisService {
 	public String findEmailBy(String refreshToken) {
 		Set<String> keys = redisTemplate.keys(REFRESH_TOKEN_PATTERN.pattern());
 		if (keys == null) {
-			throw new UnAuthorizationException(ErrorCode.EMPTY_TOKEN);
+			throw new UnAuthorizationException(JwtErrorCode.EMPTY_TOKEN);
 		}
 		return keys.stream()
 			.filter(key -> Objects.equals(redisTemplate.opsForValue().get(key), refreshToken))
 			.findAny()
 			.map(email -> email.replace(REFRESH_TOKEN_PREFIX, Strings.EMPTY))
-			.orElseThrow(() -> new BadRequestException(ErrorCode.INVALID_TOKEN));
+			.orElseThrow(() -> new BadRequestException(JwtErrorCode.INVALID_TOKEN));
 	}
 
 	public void saveRefreshToken(String key, Jwt jwt) {
@@ -63,7 +64,7 @@ public class OauthRedisService {
 	public void validateAlreadyLogout(String token) {
 		String logout = redisTemplate.opsForValue().get(token);
 		if (LOGOUT.equals(logout)) {
-			throw new UnAuthorizationException(ErrorCode.NOT_LOGIN_STATE);
+			throw new UnAuthorizationException(OauthErrorCode.NOT_LOGIN_STATE);
 		}
 	}
 }

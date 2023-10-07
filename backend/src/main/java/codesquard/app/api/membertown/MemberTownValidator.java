@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.MemberTownErrorCode;
 import codesquard.app.api.errors.exception.BadRequestException;
 import codesquard.app.api.errors.exception.ConflictException;
 import codesquard.app.domain.membertown.MemberTown;
@@ -34,7 +34,7 @@ public class MemberTownValidator {
 			.anyMatch(r -> r.equals(region));
 
 		if (match) {
-			throw new ConflictException(ErrorCode.ALREADY_ADDRESS_NAME);
+			throw new ConflictException(MemberTownErrorCode.ALREADY_ADDRESS_NAME);
 		}
 	}
 
@@ -44,19 +44,19 @@ public class MemberTownValidator {
 			.noneMatch(r -> r.equals(region));
 
 		if (noneMatch) {
-			throw new BadRequestException(ErrorCode.UNREGISTERED_ADDRESS_TO_REMOVE);
+			throw new BadRequestException(MemberTownErrorCode.UNREGISTERED_ADDRESS_TO_REMOVE);
 		}
 	}
 
 	private void validateMaximumMemberTownSize(List<MemberTown> memberTowns) {
 		if (memberTowns.size() > MAXIMUM_MEMBER_TOWN_SIZE) {
-			throw new BadRequestException(ErrorCode.MAXIMUM_MEMBER_TOWN_SIZE);
+			throw new BadRequestException(MemberTownErrorCode.MAXIMUM_MEMBER_TOWN_SIZE);
 		}
 	}
 
 	private void validateMinimumMemberTownSize(List<MemberTown> memberTowns) {
 		if (memberTowns.size() <= MINIMUM_MEMBER_TOWN_SIZE) {
-			throw new BadRequestException(ErrorCode.MINIMUM_MEMBER_TOWN_SIZE);
+			throw new BadRequestException(MemberTownErrorCode.MINIMUM_MEMBER_TOWN_SIZE);
 		}
 	}
 }
