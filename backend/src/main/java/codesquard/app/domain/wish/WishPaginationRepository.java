@@ -9,9 +9,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import codesquard.app.api.item.response.ItemResponse;
+import codesquard.app.domain.item.ItemPaginationRepository;
 import codesquard.app.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +24,7 @@ public class WishPaginationRepository {
 	private final JPAQueryFactory queryFactory;
 	private final ItemRepository itemRepository;
 	private final WishRepository wishRepository;
+	private final ItemPaginationRepository itemPaginationRepository;
 
 	public Slice<ItemResponse> findAll(Long categoryId, int size, Long cursor, Long memberId) {
 		List<ItemResponse> itemResponses = queryFactory.select(Projections.fields(ItemResponse.class,
@@ -38,12 +41,19 @@ public class WishPaginationRepository {
 			.from(wish)
 			.join(wish.item, item)
 			.on(wish.item.id.eq(item.id))
-			.where(itemRepository.lessThanItemId(cursor),
-				itemRepository.equalCategoryId(categoryId),
-				wishRepository.equalMemberId(memberId))
+			.where(itemPaginationRepository.lessThanItemId(cursor),
+				itemPaginationRepository.equalCategoryId(categoryId),
+				equalMemberId(memberId))
 			.orderBy(wish.createdAt.desc())
 			.limit(size + 1)
 			.fetch();
 		return itemRepository.checkLastPage(size, itemResponses);
+	}
+
+	public BooleanExpression equalMemberId(Long memberId) {
+		if (memberId == null) {
+			return null;
+		}
+		return QWish.wish.member.id.eq(memberId);
 	}
 }

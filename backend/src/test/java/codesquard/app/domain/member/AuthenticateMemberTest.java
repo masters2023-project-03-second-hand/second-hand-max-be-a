@@ -11,7 +11,7 @@ class AuthenticateMemberTest {
 
 	@DisplayName("Member 엔티티를 가지고 AuthenticateUser 객체를 생성한다")
 	@Test
-	public void from() {
+	void from() {
 		// given
 		Member member = new Member("avatarUrlValue", "23Yong1234@gmail.com", "23Yong");
 

@@ -46,7 +46,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 	private MemberTownService memberTownService;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(memberTownRestController)
 			.setControllerAdvice(globalExceptionHandler)
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
@@ -56,7 +56,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("주소 등록번호를 가지고 회원 동네를 추가한다")
 	@Test
-	public void addMemberTown() throws Exception {
+	void addMemberTown() throws Exception {
 		// given
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("addressId", 1L);
@@ -83,7 +83,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("주소 등록번호를 가지고 회원의 동네를 삭제한다")
 	@Test
-	public void removeMemberTown() throws Exception {
+	void removeMemberTown() throws Exception {
 		// given
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("addressId", 1L);
@@ -105,7 +105,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("주소 등록번호가 null이면 회원의 동네를 제거할 수 없다")
 	@Test
-	public void removeMemberTownWithAddressIsNull() throws Exception {
+	void removeMemberTownWithAddressIsNull() throws Exception {
 		// given
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("addressId", null);
@@ -124,7 +124,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("회원이 지역 등록번호를 가지고 회원의 동네를 선택한다")
 	@Test
-	public void selectRegion() throws Exception {
+	void selectRegion() throws Exception {
 		// given
 		Map<String, Object> requestBody = Map.of("selectedAddressId", 1L);
 
@@ -142,7 +142,7 @@ class MemberTownRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("회원이 지역 등록번호를 null을 전달하여 회원의 동네를 선택할 수 없다")
 	@Test
-	public void selectRegionWithSelectedAddressIdIsNull() throws Exception {
+	void selectRegionWithSelectedAddressIdIsNull() throws Exception {
 		// given
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("selectedAddressId", null);

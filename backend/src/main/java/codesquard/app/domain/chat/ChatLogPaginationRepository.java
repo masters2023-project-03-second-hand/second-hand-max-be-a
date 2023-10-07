@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -22,5 +23,19 @@ public class ChatLogPaginationRepository {
 			.where(whereBuilder)
 			.orderBy(chatLog.id.asc(), chatLog.createdAt.asc())
 			.fetch();
+	}
+
+	public BooleanExpression greaterThanChatLogId(Long chatLogId) {
+		if (chatLogId == null) {
+			return null;
+		}
+		return chatLog.id.gt(chatLogId);
+	}
+
+	public BooleanExpression equalChatRoomId(Long chatRoomId) {
+		if (chatRoomId == null) {
+			return null;
+		}
+		return chatLog.chatRoom.id.eq(chatRoomId);
 	}
 }

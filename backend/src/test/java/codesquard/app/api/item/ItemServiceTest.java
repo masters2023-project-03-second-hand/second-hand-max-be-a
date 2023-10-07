@@ -173,7 +173,7 @@ class ItemServiceTest {
 
 	@DisplayName("회원은 상품 정보 수정시 기존 썸네일 이미지를 두고 수정한다")
 	@Test
-	public void modifyItem() throws IOException {
+	void modifyItem() throws IOException {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 		Region region = regionRepository.save(createRegion("서울 송파구 가락동"));
@@ -239,7 +239,7 @@ class ItemServiceTest {
 
 	@DisplayName("회원은 상품 정보 수정시 새로운 썸네일 이미지를 두고 수정한다")
 	@Test
-	public void modifyItemWithNewThumbnail() throws IOException {
+	void modifyItemWithNewThumbnail() throws IOException {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
@@ -304,7 +304,7 @@ class ItemServiceTest {
 
 	@DisplayName("회원은 상품 정보 수정시 썸네일 이미지를 그대로 두고 수정한다")
 	@Test
-	public void modifyItemWithNonChange() throws IOException {
+	void modifyItemWithNonChange() throws IOException {
 		// given
 		Category category = categoryRepository.save(findByName("스포츠/레저"));
 		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
@@ -388,7 +388,7 @@ class ItemServiceTest {
 
 	@DisplayName("판매자가 한 상품의 상세한 정보를 조회한다")
 	@Test
-	public void findDetailItemBySeller() {
+	void findDetailItemBySeller() {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 		Principal principal = Principal.from(seller);
@@ -423,7 +423,7 @@ class ItemServiceTest {
 
 	@DisplayName("존재하지 않는 상품 등록번호로 상품을 조회할 수 없다")
 	@Test
-	public void findDetailItemWithNotExistItem() {
+	void findDetailItemWithNotExistItem() {
 		// given
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		Principal principal = Principal.from(member);
@@ -440,7 +440,7 @@ class ItemServiceTest {
 
 	@DisplayName("상품을 삭제합니다.")
 	@Test
-	public void deleteItem() {
+	void deleteItem() {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 		List<Region> regions = regionRepository.saveAll(
@@ -474,7 +474,7 @@ class ItemServiceTest {
 
 	@DisplayName("존재하지 않는 상품을 삭제할 수 없다.")
 	@Test
-	public void deleteItemWithNotExistItem() {
+	void deleteItemWithNotExistItem() {
 		// given
 		Member seller = memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 		List<Region> regions = regionRepository.saveAll(
@@ -508,7 +508,7 @@ class ItemServiceTest {
 
 	@DisplayName("판매자가 아닌 사람이 판매자의 상품을 삭제할 수 없다")
 	@Test
-	public void deleteItemWithNotSeller() {
+	void deleteItemWithNotSeller() {
 		// given
 		List<Member> members = memberRepository.saveAll(
 			List.of(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"),

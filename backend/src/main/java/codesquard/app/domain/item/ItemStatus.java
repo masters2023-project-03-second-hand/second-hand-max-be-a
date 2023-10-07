@@ -5,7 +5,7 @@ import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.BadRequestException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,6 @@ public enum ItemStatus {
 	public static ItemStatus of(String status) {
 		return Arrays.stream(ItemStatus.values())
 			.filter(itemStatus -> itemStatus.getStatus().equals(status))
-			.findFirst().orElseThrow(() -> new BadRequestException(ErrorCode.INVALID_STATUS));
+			.findFirst().orElseThrow(() -> new BadRequestException(ItemErrorCode.INVALID_STATUS));
 	}
 }

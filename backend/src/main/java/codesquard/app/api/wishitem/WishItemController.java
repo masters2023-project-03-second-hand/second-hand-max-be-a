@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import codesquard.app.api.item.response.ItemResponses;
 import codesquard.app.api.response.ApiResponse;
+import codesquard.app.api.success.successcode.WishSuccessCode;
 import codesquard.app.api.wishitem.response.WishCategoryListResponse;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
@@ -28,19 +29,20 @@ public class WishItemController {
 	public ApiResponse<Void> wishStatus(@PathVariable Long itemId, @RequestParam WishStatus wish,
 		@AuthPrincipal Principal principal) {
 		wishItemService.changeWishStatus(itemId, principal.getMemberId(), wish);
-		return ApiResponse.ok("관심상품 변경이 완료되었습니다.", null);
+		return ApiResponse.success(WishSuccessCode.OK_MODIFIED_WISH_STATUS);
 	}
 
 	@GetMapping
 	public ApiResponse<ItemResponses> findAll(@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false, defaultValue = "10") int size, @RequestParam(required = false) Long cursor,
 		@AuthPrincipal Principal principal) {
-		return ApiResponse.ok("관심상품 조회에 성공하였습니다.", wishItemService.findAll(categoryId, size, cursor, principal));
+		return ApiResponse.success(WishSuccessCode.OK_WISHES,
+			wishItemService.findAll(categoryId, size, cursor, principal));
 	}
 
 	@GetMapping("/categories")
 	public ApiResponse<WishCategoryListResponse> readWishCategories(@AuthPrincipal Principal principal) {
 		log.info("관심 상품들의 카테고리 목록 요청 : {}", principal);
-		return ApiResponse.ok("관심상품의 카테고리 목록 조회를 완료하였습니다.", wishItemService.readWishCategories(principal));
+		return ApiResponse.success(WishSuccessCode.OK_WISH_CATEGORIES, wishItemService.readWishCategories(principal));
 	}
 }

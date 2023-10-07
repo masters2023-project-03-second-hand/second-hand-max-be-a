@@ -3,6 +3,7 @@ package codesquard.app.api.response;
 import org.springframework.http.HttpStatus;
 
 import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.success.successcode.SuccessCode;
 import lombok.Getter;
 
 @Getter
@@ -28,6 +29,14 @@ public class ApiResponse<T> {
 
 	public static <T> ApiResponse<T> created(String message, T data) {
 		return new ApiResponse<>(HttpStatus.CREATED, message, data);
+	}
+
+	public static <T> ApiResponse<T> success(SuccessCode code) {
+		return new ApiResponse<>(code.getHttpStatus(), code.getMessage(), null);
+	}
+
+	public static <T> ApiResponse<T> success(SuccessCode code, T data) {
+		return new ApiResponse<>(code.getHttpStatus(), code.getMessage(), data);
 	}
 
 	public static <T> ApiResponse<T> error(ErrorCode errorCode) {

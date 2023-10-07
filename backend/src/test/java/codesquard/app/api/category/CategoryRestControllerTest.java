@@ -33,7 +33,7 @@ class CategoryRestControllerTest extends ControllerTestSupport {
 	private CategoryRestController categoryRestController;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(categoryRestController)
 			.setControllerAdvice(globalExceptionHandler)
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
@@ -43,7 +43,7 @@ class CategoryRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("카테고리 목록을 조회한다")
 	@Test
-	public void findAll() throws Exception {
+	void findAll() throws Exception {
 		// given
 		CategoryListResponse response = new CategoryListResponse(getCategories());
 		given(categoryQueryService.findAll()).willReturn(response);

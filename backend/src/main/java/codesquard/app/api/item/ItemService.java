@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.CategoryErrorCode;
+import codesquard.app.api.errors.errorcode.ImageErrorCode;
+import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.BadRequestException;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.api.image.ImageService;
@@ -31,6 +33,7 @@ import codesquard.app.domain.item.ItemStatus;
 import codesquard.app.domain.member.Member;
 import codesquard.app.domain.oauth.support.Principal;
 import codesquard.app.domain.pagination.PaginationUtils;
+import codesquard.app.domain.wish.Wish;
 import codesquard.app.domain.wish.WishRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,12 +88,12 @@ public class ItemService {
 	public void changeItemStatus(Long itemId, ItemStatus status, Principal principal) {
 		log.info("상품 상태 변경 서비스 요청 : itemId={}, status={}", itemId, status);
 		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ItemErrorCode.ITEM_NOT_FOUND));
 		if (item.isSeller(principal.getMemberId())) {
 			item.changeStatus(status);
 			log.info("상품 상태 변경 결과 : item={}", item);
 		} else {
-			new BadRequestException(ErrorCode.ITEM_FORBIDDEN);
+			new BadRequestException(ItemErrorCode.ITEM_FORBIDDEN);
 		}
 	}
 
@@ -98,7 +101,7 @@ public class ItemService {
 		log.info("상품 상세 조회 서비스 요청, 상품 등록번호 : {}, 로그인 회원의 등록번호 : {}", itemId, principal.getMemberId());
 		itemViewRedisService.addViewCount(itemId, principal);
 		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ItemErrorCode.ITEM_NOT_FOUND));
 
 		List<Image> images = imageRepository.findAllByItemId(itemId);
 		List<String> imageUrls = images.stream()
@@ -147,22 +150,19 @@ public class ItemService {
 
 	private Category findCategoryBy(Long categoryId) {
 		return categoryRepository.findById(categoryId)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_CATEGORY));
+			.orElseThrow(() -> new NotFoundResourceException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 	}
 
 	private String updateThumnail(Item item, MultipartFile thumbnailFile, String thumbnailUrl) {
-		// 상품 게시글 수정시 수정하고자 하는 썸네일 파일이 없다면 기존 상품 게시글의 썸네일을 사용합니다.
 		if (thumbnailFile == null) {
 			return item.getThumbnailUrl();
 		}
 
-		// 상품 게시글 수정시 수정하고자 하는 썸네일 파일이 있다면 썸네일 사진을 교체합니다.
 		if (!thumbnailFile.isEmpty()) {
 			String thumbnail = updateNewThumnail(item.getId(), thumbnailFile);
 			return updateThumbnailStatus(thumbnail, item);
 		}
 
-		// 상품 게시글 수정시 수정하고자 하는 썸네일 파일이 기존 이미지 사진들중 하나인 경우 해당 사진으로 썸네일을 교체합니다.
 		return updateThumbnailStatus(thumbnailUrl, item);
 	}
 
@@ -189,7 +189,7 @@ public class ItemService {
 	private int deleteImages(Long itemId, List<String> deleteImageUrls) {
 		int currentImageSize = imageRepository.countImageByItemId(itemId);
 		if (currentImageSize <= deleteImageUrls.size()) {
-			throw new BadRequestException(ErrorCode.NOT_REMOVE_IMAGES);
+			throw new BadRequestException(ImageErrorCode.NOT_REMOVE_IMAGES);
 		}
 		return imageRepository.deleteImagesByItemIdAndImageUrlIn(itemId, deleteImageUrls);
 	}
@@ -200,7 +200,7 @@ public class ItemService {
 
 	private Item findItemByItemIdAndMemberId(Long itemId, Long memberId) {
 		return itemRepository.findItemByIdAndMemberId(itemId, memberId)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ItemErrorCode.ITEM_NOT_FOUND));
 	}
 
 	@Transactional
@@ -217,7 +217,10 @@ public class ItemService {
 
 	private void deleteAllRelatedItem(Long itemId) {
 		imageRepository.deleteByItemId(itemId);
-		wishRepository.deleteByItemId(itemId);
+		List<Long> wishIds = wishRepository.findByItemId(itemId).stream()
+			.map(Wish::getId)
+			.collect(Collectors.toUnmodifiableList());
+		wishRepository.deleteAllByIdIn(wishIds);
 		chatRoomRepository.deleteByItemId(itemId);
 		itemRepository.deleteById(itemId);
 	}

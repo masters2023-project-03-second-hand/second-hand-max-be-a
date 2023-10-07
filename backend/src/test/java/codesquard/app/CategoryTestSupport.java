@@ -3,7 +3,7 @@ package codesquard.app;
 import java.util.ArrayList;
 import java.util.List;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.CategoryErrorCode;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.domain.category.Category;
 
@@ -42,6 +42,6 @@ public class CategoryTestSupport {
 		return categories.stream()
 			.filter(category -> category.getName().equals(name))
 			.findAny()
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_CATEGORY));
+			.orElseThrow(() -> new NotFoundResourceException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 	}
 }

@@ -23,7 +23,7 @@ public class OauthPropertiesTest {
 
 	@DisplayName("provider가 주어지고 provider에 따른 oauth 설정값들을 OauthProvider가 가진다")
 	@Test
-	public void createOauthClientMap() {
+	void createOauthClientMap() {
 		// given
 		String provider = "naver";
 

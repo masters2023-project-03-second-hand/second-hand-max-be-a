@@ -26,7 +26,7 @@ class JwtProviderTest {
 
 	@DisplayName("해시맵을 기반으로 JWT 객체를 생성한다")
 	@Test
-	public void createJwtBasedOnAuthenticateMember() {
+	void createJwtBasedOnAuthenticateMember() {
 		// given
 		JwtProvider jwtProvider = new JwtProvider(jwtProperties);
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");

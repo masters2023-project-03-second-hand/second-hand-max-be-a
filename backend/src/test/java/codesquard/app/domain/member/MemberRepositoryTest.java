@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.MemberErrorCode;
+import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.api.errors.exception.UnAuthorizationException;
 
@@ -27,7 +28,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("로그인 아이디를 가지고 회원을 조회할 수 있다")
 	@Test
-	public void findMemberByLoginId() {
+	void findMemberByLoginId() {
 		// given
 		Member member = new Member("avatarUrl", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
@@ -35,7 +36,7 @@ class MemberRepositoryTest {
 
 		// when
 		Member findMember = memberRepository.findMemberByLoginId(loginId)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(MemberErrorCode.NOT_FOUND_MEMBER));
 
 		// then
 		assertThat(member.getLoginId()).isEqualTo(findMember.getLoginId());
@@ -43,7 +44,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("로그인 아이디를 가지고 회원을 조회할때 해당하는 회원이 없는 경우 null을 반환한다")
 	@Test
-	public void findMemberByLoginIdWhenMemberIsNotExist() {
+	void findMemberByLoginIdWhenMemberIsNotExist() {
 		// given
 		String loginId = "23Yong";
 
@@ -57,7 +58,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("닉네임을 가지고 회원이 존재하는지 확인한다")
 	@Test
-	public void existsMemberByLoginId() {
+	void existsMemberByLoginId() {
 		// given
 		Member member = new Member("avatarUrl", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
@@ -72,7 +73,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("로그인 아이디와 이메일을 가지고 회원을 조회한다")
 	@Test
-	public void findMemberByLoginIdAndAndEmail() {
+	void findMemberByLoginIdAndAndEmail() {
 		// given
 		String loginId = "23Yong";
 		String email = "23Yong1234@gmail.com";
@@ -81,7 +82,7 @@ class MemberRepositoryTest {
 
 		// when
 		Member findMember = memberRepository.findMemberByLoginIdAndEmail(loginId, email)
-			.orElseThrow(() -> new UnAuthorizationException(ErrorCode.FAIL_LOGIN));
+			.orElseThrow(() -> new UnAuthorizationException(OauthErrorCode.FAIL_LOGIN));
 
 		// then
 		assertThat(findMember)
@@ -91,7 +92,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("로그인 아이디와 이메일을 가지고 회원을 조회할때 회원이 없는 경우 null을 반환한다")
 	@Test
-	public void findMemberByLoginIdAndAndEmailWhenMemberIsNotExist() {
+	void findMemberByLoginIdAndAndEmailWhenMemberIsNotExist() {
 		// given
 		String loginId = "23Yong";
 		String email = "23Yong1234@gmail.com";
@@ -106,7 +107,7 @@ class MemberRepositoryTest {
 
 	@DisplayName("이메일을 가지고 회원을 조회한다")
 	@Test
-	public void findMemberByEmail() {
+	void findMemberByEmail() {
 		// given
 		String email = "23Yong@gmail.com";
 		String loginId = "23Yong";
@@ -115,7 +116,7 @@ class MemberRepositoryTest {
 
 		// when
 		Member findMember = memberRepository.findMemberByEmail(email)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(MemberErrorCode.NOT_FOUND_MEMBER));
 
 		// thenR
 		assertThat(findMember).isNotNull();

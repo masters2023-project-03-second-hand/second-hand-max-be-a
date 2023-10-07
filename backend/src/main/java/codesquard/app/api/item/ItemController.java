@@ -26,6 +26,7 @@ import codesquard.app.api.item.request.ItemStatusModifyRequest;
 import codesquard.app.api.item.response.ItemDetailResponse;
 import codesquard.app.api.item.response.ItemResponses;
 import codesquard.app.api.response.ApiResponse;
+import codesquard.app.api.success.successcode.ItemSuccessCode;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
@@ -46,15 +47,16 @@ public class ItemController {
 		@RequestPart("thumbnailImage") MultipartFile thumbnail,
 		@AuthPrincipal Principal principal) {
 		itemService.register(request, itemImage, thumbnail, principal.getMemberId());
-		return ApiResponse.created("상품 등록이 완료되었습니다.", null);
+		return ApiResponse.success(ItemSuccessCode.CREATED_ITEM);
 	}
 
 	@GetMapping
-	public ApiResponse<ItemResponses> findAll(@RequestParam String region,
-		@RequestParam(required = false, defaultValue = "10") int size, @RequestParam(required = false) Long cursor,
+	public ApiResponse<ItemResponses> findAll(
+		@RequestParam String region,
+		@RequestParam(required = false, defaultValue = "10") int size,
+		@RequestParam(required = false) Long cursor,
 		@RequestParam(required = false) Long categoryId) {
-		return ApiResponse.ok("상품 목록 조회에 성공하였습니다.",
-			itemService.findAll(region, size, cursor, categoryId));
+		return ApiResponse.success(ItemSuccessCode.OK_ITEMS, itemService.findAll(region, size, cursor, categoryId));
 	}
 
 	@GetMapping("/{itemId}")
@@ -62,7 +64,7 @@ public class ItemController {
 		@AuthPrincipal Principal principal) {
 		ItemDetailResponse response = itemService.findDetailItemBy(itemId, principal);
 		log.debug("상품 상세 조회 결과 : {}", response);
-		return ApiResponse.ok("상품 상세 조회에 성공하였습니다.", response);
+		return ApiResponse.success(ItemSuccessCode.OK_DETAILED_ITEM, response);
 	}
 
 	@PatchMapping("/{itemId}")
@@ -72,19 +74,19 @@ public class ItemController {
 		@RequestPart(value = "thumbnailImage", required = false) MultipartFile thumbnailImage,
 		@AuthPrincipal Principal principal) {
 		itemService.modifyItem(itemId, request, addImages, thumbnailImage, principal);
-		return ApiResponse.ok("상품 수정을 완료하였습니다.", null);
+		return ApiResponse.success(ItemSuccessCode.OK_MODIFIED_ITEM);
 	}
 
 	@PutMapping("/{itemId}/status")
 	public ApiResponse<Void> modifyItemStatus(@PathVariable Long itemId, @RequestBody ItemStatusModifyRequest request,
 		@AuthPrincipal Principal principal) {
 		itemService.changeItemStatus(itemId, request.getStatus(), principal);
-		return ApiResponse.ok("상품 상태 변경에 성공하였습니다.", null);
+		return ApiResponse.success(ItemSuccessCode.OK_MODIFIED_STATUS_ITEM);
 	}
 
 	@DeleteMapping("/{itemId}")
 	public ApiResponse<Void> deleteItem(@PathVariable Long itemId, @AuthPrincipal Principal principal) {
 		itemService.deleteItem(itemId, principal);
-		return ApiResponse.ok("상품 삭제가 완료되었습니다.", null);
+		return ApiResponse.success(ItemSuccessCode.OK_DELETED_ITEM);
 	}
 }

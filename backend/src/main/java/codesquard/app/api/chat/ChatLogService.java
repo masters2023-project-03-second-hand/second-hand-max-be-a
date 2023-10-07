@@ -13,7 +13,8 @@ import codesquard.app.api.chat.response.ChatLogItemResponse;
 import codesquard.app.api.chat.response.ChatLogListResponse;
 import codesquard.app.api.chat.response.ChatLogMessageResponse;
 import codesquard.app.api.chat.response.ChatLogSendResponse;
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.ChatRoomErrorCode;
+import codesquard.app.api.errors.errorcode.ItemErrorCode;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.domain.chat.ChatLog;
 import codesquard.app.domain.chat.ChatLogPaginationRepository;
@@ -44,6 +45,11 @@ public class ChatLogService {
 		return ChatLogSendResponse.from(chatLogRepository.save(chatLog));
 	}
 
+	private ChatRoom findChatRoomBy(Long chatRoomId) {
+		return chatRoomRepository.findById(chatRoomId)
+			.orElseThrow(() -> new NotFoundResourceException(ChatRoomErrorCode.NOT_FOUND_CHATROOM));
+	}
+
 	@Transactional
 	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
@@ -52,8 +58,8 @@ public class ChatLogService {
 		String chatPartnerName = principal.getChatPartnerName(item, chatRoom);
 		BooleanBuilder whereBuilder = new BooleanBuilder();
 		whereBuilder.orAllOf(
-			chatLogRepository.greaterThanChatLogId(cursor),
-			chatLogRepository.equalChatRoomId(chatRoomId));
+			chatLogPaginationRepository.greaterThanChatLogId(cursor),
+			chatLogPaginationRepository.equalChatRoomId(chatRoomId));
 		List<ChatLog> chatLogs = chatLogPaginationRepository.searchBy(whereBuilder);
 
 		// 메시지 읽는다.
@@ -71,13 +77,8 @@ public class ChatLogService {
 			nextMessageId);
 	}
 
-	private ChatRoom findChatRoomBy(Long chatRoomId) {
-		return chatRoomRepository.findById(chatRoomId)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_CHATROOM));
-	}
-
 	private Item findItemBy(ChatRoom chatRoom) {
 		return itemRepository.findById(chatRoom.getItem().getId())
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ItemErrorCode.ITEM_NOT_FOUND));
 	}
 }

@@ -46,7 +46,7 @@ class RegionServiceTest {
 
 	@DisplayName("주소 목록을 처음 조회할때 10개가 조회한다")
 	@Test
-	public void findAllByRegionName() {
+	void findAllByRegionName() {
 		// given
 		regionRepository.saveAll(createFixedRegions());
 		int size = 10;

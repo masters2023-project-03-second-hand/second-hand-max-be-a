@@ -28,7 +28,7 @@ class RegionSliceRepositoryTest {
 
 	@DisplayName("아무 조건없이 모든 동네중 10개를 조회한다")
 	@Test
-	public void searchBySlice() {
+	void searchBySlice() {
 		// given
 		List<Region> regions = RegionTestSupport.createFixedRegions();
 		regionRepository.saveAll(regions);
@@ -49,7 +49,7 @@ class RegionSliceRepositoryTest {
 
 	@DisplayName("첫 동네 조회 이후 5칸 스크롤하여 다음 페이지의 동네를 조회한다")
 	@Test
-	public void searchBySliceWithScrollToNextPage() {
+	void searchBySliceWithScrollToNextPage() {
 		// given
 		List<Region> regions = RegionTestSupport.createFixedRegions();
 		regionRepository.saveAll(regions);
@@ -74,7 +74,7 @@ class RegionSliceRepositoryTest {
 
 	@DisplayName("동네 이름에 '부천시'가 들어간 조회 이후 5칸 만큼 스크롤한다")
 	@Test
-	public void searchBySliceRegionNameWithScrollToNextPage() {
+	void searchBySliceRegionNameWithScrollToNextPage() {
 		// given
 		List<Region> regions = RegionTestSupport.createFixedRegions();
 		regionRepository.saveAll(regions);

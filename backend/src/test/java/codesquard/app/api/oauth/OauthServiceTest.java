@@ -28,7 +28,8 @@ import org.springframework.test.context.ActiveProfiles;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.MemberErrorCode;
+import codesquard.app.api.errors.errorcode.OauthErrorCode;
 import codesquard.app.api.errors.exception.BadRequestException;
 import codesquard.app.api.errors.exception.ConflictException;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
@@ -97,7 +98,7 @@ class OauthServiceTest {
 
 	@DisplayName("로그인 아이디와 소셜 로그인을 하여 회원가입을 한다")
 	@Test
-	public void signUp() throws IOException {
+	void signUp() throws IOException {
 		// given
 		regionRepository.save(createRegion("서울 송파구 가락동"));
 		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
@@ -135,7 +136,7 @@ class OauthServiceTest {
 
 		// then
 		Member findMember = memberRepository.findMemberByLoginId("23Yong")
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(MemberErrorCode.NOT_FOUND_MEMBER));
 		List<MemberTown> memberTowns = memberTownRepository.findAllByMemberId(findMember.getId());
 
 		assertAll(() -> {
@@ -151,7 +152,7 @@ class OauthServiceTest {
 
 	@DisplayName("중복된 로그인 아이디로 회원가입을 할 수 없다")
 	@Test
-	public void signupWithDuplicateLoginId() throws IOException {
+	void signupWithDuplicateLoginId() throws IOException {
 		// given
 		memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
 
@@ -177,7 +178,7 @@ class OauthServiceTest {
 
 	@DisplayName("한 명의 소셜 사용자가 서로 다른 로그인 아이디로 이중 회원가입을 할 수 없다")
 	@Test
-	public void signupWithMultipleLoginId() throws IOException {
+	void signupWithMultipleLoginId() throws IOException {
 		// given
 		memberRepository.deleteAllInBatch();
 		memberRepository.save(createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong"));
@@ -225,7 +226,7 @@ class OauthServiceTest {
 
 	@DisplayName("제공되지 않은 provider로 소셜 로그인하여 회원가입을 할 수 없다")
 	@Test
-	public void signUpWithInvalidProvider() throws IOException {
+	void signUpWithInvalidProvider() throws IOException {
 		// given
 
 		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
@@ -236,7 +237,7 @@ class OauthServiceTest {
 			OauthSignUpRequest.class);
 
 		given(oauthClientRepository.findOneBy(anyString()))
-			.willThrow(new NotFoundResourceException(ErrorCode.NOT_FOUND_PROVIDER));
+			.willThrow(new NotFoundResourceException(OauthErrorCode.NOT_FOUND_PROVIDER));
 
 		String provider = "github";
 		String code = "1234";
@@ -254,7 +255,7 @@ class OauthServiceTest {
 
 	@DisplayName("잘못된 인가 코드로 소셜 로그인하여 회원가입을 할 수 없다")
 	@Test
-	public void signUpWithInvalidCode() throws IOException {
+	void signUpWithInvalidCode() throws IOException {
 		// given
 		List<Long> addressIds = getAddressIds(regionRepository.findAllByNameIn(List.of("서울 송파구 가락동")));
 		Map<String, Object> requestBody = new HashMap<>();
@@ -274,7 +275,7 @@ class OauthServiceTest {
 		given(oauthClient.exchangeAccessTokenByAuthorizationCode(anyString(), anyString()))
 			.willReturn(mockAccessTokenResponse);
 		given(oauthClient.getUserProfileByAccessToken(any(OauthAccessTokenResponse.class)))
-			.willThrow(new BadRequestException(ErrorCode.WRONG_AUTHORIZATION_CODE));
+			.willThrow(new BadRequestException(OauthErrorCode.WRONG_AUTHORIZATION_CODE));
 
 		String provider = "naver";
 		String code = "1234";
@@ -293,7 +294,7 @@ class OauthServiceTest {
 
 	@DisplayName("로그인 아이디가 중복되는 경우 회원가입을 할 수 없다")
 	@Test
-	public void signUpWhenDuplicateLoginId() throws IOException {
+	void signUpWhenDuplicateLoginId() throws IOException {
 		// given
 		regionRepository.save(createRegion("서울 송파구 가락동"));
 		Member member = memberRepository.save(createMember("avatarUrlValue", "23Yong1234@gmail.com", "23Yong"));
@@ -346,7 +347,7 @@ class OauthServiceTest {
 
 	@DisplayName("로그인 아이디와 인가코드를 가지고 소셜 로그인을 한다")
 	@Test
-	public void login() throws JsonProcessingException {
+	void login() throws JsonProcessingException {
 		// given
 		Member member = new Member("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		memberRepository.save(member);
@@ -395,7 +396,7 @@ class OauthServiceTest {
 
 	@DisplayName("로그아웃을 수행한다")
 	@Test
-	public void logout() throws JsonProcessingException {
+	void logout() throws JsonProcessingException {
 		// given
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		LocalDateTime now = createNow();
@@ -415,7 +416,7 @@ class OauthServiceTest {
 
 	@DisplayName("만료된 액세스 토큰을 가지고 로그아웃을 요청하면 블랙리스트에 추가하지 않는다")
 	@Test
-	public void logoutWithExpireAccessToken() throws JsonProcessingException {
+	void logoutWithExpireAccessToken() throws JsonProcessingException {
 		// given
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		LocalDateTime now = LocalDateTime.now().minusDays(1);
@@ -435,7 +436,7 @@ class OauthServiceTest {
 
 	@DisplayName("만료된 리프레쉬 토큰을 가지고 로그아웃을 요청하면 이미 만료되어 아무 처리도 하지 않는다")
 	@Test
-	public void logoutWithExpireRefreshToken() throws JsonProcessingException {
+	void logoutWithExpireRefreshToken() throws JsonProcessingException {
 		// given
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		LocalDateTime now = createNow().minusHours(10);
@@ -456,7 +457,7 @@ class OauthServiceTest {
 
 	@DisplayName("리프레쉬 토큰을 가지고 액세스 토큰을 갱신한다")
 	@Test
-	public void refreshAccessToken() throws JsonProcessingException {
+	void refreshAccessToken() throws JsonProcessingException {
 		// given
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		LocalDateTime now = createNow();
@@ -483,7 +484,7 @@ class OauthServiceTest {
 
 	@DisplayName("유효하지 않은 토큰으로는 액세스 토큰을 갱신할 수 없다")
 	@Test
-	public void refreshAccessTokenWithInvalidRefreshToken() throws JsonProcessingException {
+	void refreshAccessTokenWithInvalidRefreshToken() throws JsonProcessingException {
 		// given
 		Member member = createMember("avatarUrlValue", "23Yong@gmail.com", "23Yong");
 		LocalDateTime now = createNow();

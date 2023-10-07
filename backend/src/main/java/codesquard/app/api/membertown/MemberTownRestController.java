@@ -15,6 +15,7 @@ import codesquard.app.api.membertown.request.MemberTownAddRequest;
 import codesquard.app.api.membertown.request.MemberTownRemoveRequest;
 import codesquard.app.api.region.request.RegionSelectionRequest;
 import codesquard.app.api.response.ApiResponse;
+import codesquard.app.api.success.successcode.MemberTownSuccessCode;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +34,14 @@ public class MemberTownRestController {
 	public ApiResponse<Void> addMemberTown(@AuthPrincipal Principal principal,
 		@Valid @RequestBody MemberTownAddRequest request) {
 		memberTownService.addMemberTown(principal, request);
-		return ApiResponse.created("동네 추가에 성공하였습니다.", null);
+		return ApiResponse.success(MemberTownSuccessCode.CREATED_MEMBER_TOWN);
 	}
 
 	@DeleteMapping
 	public ApiResponse<Void> removeMemberTown(@AuthPrincipal Principal principal,
 		@Valid @RequestBody MemberTownRemoveRequest request) {
 		memberTownService.removeMemberTown(principal, request);
-		return ApiResponse.ok("동네 삭제에 성공하였습니다.", null);
+		return ApiResponse.success(MemberTownSuccessCode.OK_DELETED_MEMBER_TOWN);
 	}
 
 	@PutMapping
@@ -48,6 +49,6 @@ public class MemberTownRestController {
 		@Valid @RequestBody RegionSelectionRequest request,
 		@AuthPrincipal Principal principal) {
 		memberTownService.selectRegion(request, principal);
-		return ApiResponse.ok("지역 선택을 완료하였습니다.", null);
+		return ApiResponse.success(MemberTownSuccessCode.OK_SELECTED_MEMBER_TOWN);
 	}
 }

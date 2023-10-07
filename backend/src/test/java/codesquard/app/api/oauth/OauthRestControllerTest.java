@@ -54,7 +54,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	private OauthService oauthService;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(oauthRestController)
 			.setControllerAdvice(globalExceptionHandler)
 			.addFilters(
@@ -69,7 +69,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("프로필 사진, 로그인 아이디, 동네를 전달하여 소셜 로그인 인증을 하고 회원가입을 한다")
 	@Test
-	public void signup() throws Exception {
+	void signup() throws Exception {
 		// given
 		Map<String, Object> responseBody = new HashMap<>();
 		responseBody.put("id", 1L);
@@ -100,7 +100,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@DisplayName("입력 형식에 맞지 않는 로그인 아이디를 전달하여 회원가입을 요청할때 에러를 응답한다")
 	@MethodSource(value = "provideInvalidLoginId")
 	@ParameterizedTest
-	public void signupWhenInvalidLoginId(String loginId) throws Exception {
+	void signupWhenInvalidLoginId(String loginId) throws Exception {
 		// given
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", loginId);
@@ -126,7 +126,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 	@DisplayName("유효하지 않은 입력 형식의 주소 등록번호를 전달하여 회원가입을 요청할 때 에러를 응답한다")
 	@MethodSource(value = "provideInvalidAddressIds")
 	@ParameterizedTest
-	public void signupWhenInvalidAddrName(List<Long> addressIds) throws Exception {
+	void signupWhenInvalidAddrName(List<Long> addressIds) throws Exception {
 		// given
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("loginId", "23Yong");
@@ -151,7 +151,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("로그아웃을 요청한다")
 	@Test
-	public void logout() throws Exception {
+	void logout() throws Exception {
 		// given
 		Map<String, String> requestBody = new HashMap<>();
 		requestBody.put("refreshToken", "refreshTokenValue");
@@ -171,7 +171,7 @@ class OauthRestControllerTest extends ControllerTestSupport {
 
 	@DisplayName("액세스 토큰 갱신을 요청한다")
 	@Test
-	public void refreshAccessToken() throws Exception {
+	void refreshAccessToken() throws Exception {
 		// given
 		given(authPrincipalArgumentResolver.supportsParameter(any())).willReturn(true);
 

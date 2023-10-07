@@ -18,15 +18,14 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import codesquard.app.api.chat.response.ChatRoomCreateResponse;
 import codesquard.app.api.chat.response.ChatRoomItemResponse;
 import codesquard.app.api.chat.response.ChatRoomListResponse;
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.ItemErrorCode;
+import codesquard.app.api.errors.errorcode.MemberErrorCode;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
-import codesquard.app.domain.chat.ChatLog;
 import codesquard.app.domain.chat.ChatLogCountRepository;
 import codesquard.app.domain.chat.ChatLogRepository;
 import codesquard.app.domain.chat.ChatRoom;
 import codesquard.app.domain.chat.ChatRoomPaginationRepository;
 import codesquard.app.domain.chat.ChatRoomRepository;
-import codesquard.app.domain.chat.QChatRoom;
 import codesquard.app.domain.item.Item;
 import codesquard.app.domain.item.ItemRepository;
 import codesquard.app.domain.member.Member;
@@ -66,12 +65,12 @@ public class ChatRoomService {
 
 	private Item findItemBy(Long itemId) {
 		return itemRepository.findById(itemId)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.ITEM_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundResourceException(ItemErrorCode.ITEM_NOT_FOUND));
 	}
 
 	private Member findMemberBy(Long memberId) {
 		return memberRepository.findById(memberId)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(MemberErrorCode.NOT_FOUND_MEMBER));
 	}
 
 	public ChatRoomListResponse readAllChatRoom(Principal principal, Pageable pageable) {
@@ -84,15 +83,15 @@ public class ChatRoomService {
 			.collect(Collectors.toUnmodifiableList());
 		log.info("회원이 판매하는 상품 아이디 : {}", itemIds);
 
-		// 1. 내가 팔고 있는 상품들의 등록번호 조회 조건
-		BooleanExpression chatRoomOfSellingItemsCondition = QChatRoom.chatRoom.item.id.in(itemIds);
-		// 2. 내가 사려고 하는 상품에 대한 채팅방 목록 조회 조건
-		BooleanExpression chatRoomOfBuyingItemsCondition = QChatRoom.chatRoom.buyer.id.eq(principal.getMemberId());
+		BooleanExpression inItemIdsOfChatRoom = chatRoomPaginationRepository.inItemIdsOfChatRoom(itemIds);
+		BooleanExpression equalBuyerIdOfChatRoom =
+			chatRoomPaginationRepository.equalBuyerIdOfChatRoom(principal.getMemberId());
+
 		BooleanBuilder whereBuilder = new BooleanBuilder();
-		whereBuilder.andAnyOf(chatRoomOfSellingItemsCondition, chatRoomOfBuyingItemsCondition);
+		whereBuilder.andAnyOf(inItemIdsOfChatRoom, equalBuyerIdOfChatRoom);
 
 		Slice<ChatRoom> slice = chatRoomPaginationRepository.searchBySlice(whereBuilder, pageable);
-		log.info("채팅방 페이징 조회 결과 개수 : {}", slice.getSize());
+		log.info("채팅방 페이징 조회 결과 : {}", slice.getContent());
 
 		List<ChatRoomItemResponse> contents = slice.getContent().stream()
 			.map(getChatRoomItemResponseMapper(newMessageMap, principal))
@@ -108,19 +107,14 @@ public class ChatRoomService {
 	private Function<ChatRoom, ChatRoomItemResponse> getChatRoomItemResponseMapper(Map<Long, Long> newMessageMap,
 		Principal principal) {
 
-		return chatRoom -> {
-			ChatLog chatLog = chatLogRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
-				.orElse(null);
-			if (chatLog == null) {
-				return null;
-			}
-			return ChatRoomItemResponse.of(
+		return chatRoom -> chatLogRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())
+			.map(chatlog -> ChatRoomItemResponse.of(
 				chatRoom,
 				chatRoom.getItem(),
 				getChatRoomPartner(principal, chatRoom),
-				chatLog,
-				newMessageMap.getOrDefault(chatRoom.getId(), 0L));
-		};
+				chatlog,
+				newMessageMap.getOrDefault(chatRoom.getId(), 0L)))
+			.orElse(null);
 	}
 
 	private Member getChatRoomPartner(Principal principal, ChatRoom chatRoom) {
@@ -145,9 +139,10 @@ public class ChatRoomService {
 
 		Item item = findItemBy(itemId);
 		BooleanBuilder whereBuilder = new BooleanBuilder();
-		whereBuilder.andAnyOf(chatRoomRepository.equalItemId(item.getId()));
+		whereBuilder.andAnyOf(chatRoomPaginationRepository.equalItemId(item.getId()));
 
 		Slice<ChatRoom> slice = chatRoomPaginationRepository.searchBySlice(whereBuilder, pageable);
+		log.info("채팅방 목록 조회 결과 : {}", slice.getContent());
 
 		List<ChatRoomItemResponse> contents = slice.getContent().stream()
 			.map(getChatRoomItemResponseMapper(newMessageMap, principal))

@@ -10,6 +10,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,6 @@ public class ChatRoomPaginationRepository {
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
-		log.info("채팅방 목록 조회 결과 : {}", chatRooms);
 		return checkLastPage(pageable, chatRooms);
 	}
 
@@ -43,4 +43,24 @@ public class ChatRoomPaginationRepository {
 		return new SliceImpl<>(chatRooms, pageable, hasNext);
 	}
 
+	public BooleanExpression equalItemId(Long itemId) {
+		if (itemId == null) {
+			return null;
+		}
+		return chatRoom.item.id.eq(itemId);
+	}
+
+	public BooleanExpression inItemIdsOfChatRoom(List<Long> itemIds) {
+		if (itemIds == null) {
+			return null;
+		}
+		return chatRoom.item.id.in(itemIds);
+	}
+
+	public BooleanExpression equalBuyerIdOfChatRoom(Long memberId) {
+		if (memberId == null) {
+			return null;
+		}
+		return chatRoom.buyer.id.eq(memberId);
+	}
 }

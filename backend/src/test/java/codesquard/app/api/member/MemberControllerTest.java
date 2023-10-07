@@ -46,7 +46,7 @@ class MemberControllerTest extends ControllerTestSupport {
 	private MemberService memberService;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(memberController)
 			.setControllerAdvice(globalExceptionHandler)
 			.setCustomArgumentResolvers(authPrincipalArgumentResolver)
@@ -61,7 +61,7 @@ class MemberControllerTest extends ControllerTestSupport {
 
 	@DisplayName("회원은 회원의 동네를 조회할 수 있다")
 	@Test
-	public void readALlMemberTowns() throws Exception {
+	void readALlMemberTowns() throws Exception {
 		// given
 		Member member = createMember("avatarUrl", "23Yong@gmail.com", "23Yong");
 		Region region = createRegion("서울 송파구 가락동");

@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import codesquard.app.api.errors.errorcode.ErrorCode;
+import codesquard.app.api.errors.errorcode.MemberErrorCode;
+import codesquard.app.api.errors.errorcode.OauthErrorCode;
+import codesquard.app.api.errors.errorcode.RegionErrorCode;
 import codesquard.app.api.errors.exception.ConflictException;
 import codesquard.app.api.errors.exception.NotFoundResourceException;
 import codesquard.app.api.errors.exception.SecondHandException;
@@ -80,7 +82,7 @@ public class OauthService {
 		int otherRegionStartIdx = 1;
 		int frontRegion = 0;
 		Region selectedRegion = regionRepository.findById(addressIds.get(frontRegion))
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_REGION));
+			.orElseThrow(() -> new NotFoundResourceException(RegionErrorCode.NOT_FOUND_REGION));
 		List<Region> notSelectedRegion = regionRepository.findAllById(
 			addressIds.subList(otherRegionStartIdx, addressIds.size()));
 
@@ -97,13 +99,13 @@ public class OauthService {
 
 	private void validateDuplicateLoginId(String loginId) {
 		if (memberRepository.existsMemberByLoginId(loginId)) {
-			throw new ConflictException(ErrorCode.ALREADY_EXIST_ID);
+			throw new ConflictException(MemberErrorCode.ALREADY_EXIST_ID);
 		}
 	}
 
 	private void validateMultipleSignUp(String email) {
 		if (memberRepository.existsMemberByEmail(email)) {
-			throw new UnAuthorizationException(ErrorCode.ALREADY_SIGNUP);
+			throw new UnAuthorizationException(OauthErrorCode.ALREADY_SIGNUP);
 		}
 	}
 
@@ -145,7 +147,7 @@ public class OauthService {
 		String loginId = request.getLoginId();
 		String email = userProfileResponse.getEmail();
 		return memberRepository.findMemberByLoginIdAndEmail(loginId, email)
-			.orElseThrow(() -> new UnAuthorizationException(ErrorCode.FAIL_LOGIN));
+			.orElseThrow(() -> new UnAuthorizationException(OauthErrorCode.FAIL_LOGIN));
 	}
 
 	public void logout(String accessToken, OauthLogoutRequest request) {
@@ -192,7 +194,7 @@ public class OauthService {
 		String email = redisService.findEmailBy(refreshToken);
 		log.debug("findEmailByRefreshToken 결과 : email={}", email);
 		Member member = memberRepository.findMemberByEmail(email)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new NotFoundResourceException(MemberErrorCode.NOT_FOUND_MEMBER));
 		log.debug("findMemberByEmail 결과 : member={}", member);
 
 		Jwt jwt = jwtProvider.createJwtWithRefreshTokenBasedOnMember(member, refreshToken, now);

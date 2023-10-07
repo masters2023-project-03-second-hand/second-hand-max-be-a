@@ -29,5 +29,5 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 		@Param("imageUrl") String imageUrl,
 		@Param("thumbnail") boolean thumbnail);
 
-	int deleteByItemId(Long itemId);
+	void deleteByItemId(Long itemId);
 }
