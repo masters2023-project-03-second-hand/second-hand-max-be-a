@@ -2,12 +2,16 @@
 
 2023 마스터즈 맥스 중고거래 프로젝트
 
+## 배포 주소
+
+- [사과마켓](http://applemarket.site)
+
 ## 팀원 소개
 
-|                                                         프론트엔드                                                          |                                                           프론트엔드                                                           |                                                           백엔드                                                           |                                                                       백엔드                                                                       |
-|:----------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------:|
-| <a href="https://github.com/jsh3418"><img src = "https://avatars.githubusercontent.com/u/57666791?v=4" width="120px;"> | <a href="https://github.com/saejinpark"><img src = "https://avatars.githubusercontent.com/u/54755633?v=4" width="120px;"> | <a href="https://github.com/pie2457"><img src = "https://avatars.githubusercontent.com/u/104147789?v=4" width="120px;"> | <a href="https://github.com/yonghwankim-dev?tab=repositories"><img src = "https://avatars.githubusercontent.com/u/33227831?v=4" width="120px;"> |                                         |                                         |
-|                                          [**쿤디**](https://github.com/jsh3418)                                          |                                         [**제페토**](https://github.com/saejinpark)                                          |                                          [**파이**](https://github.com/pie2457)                                           |                                         [**네모네모**](https://github.com/yonghwankim-dev?tab=repositories)                                         |
+|                                                         프론트엔드                                                          |                                                           백엔드                                                           |                                                                       백엔드                                                                       |
+|:----------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------:|
+| <a href="https://github.com/jsh3418"><img src = "https://avatars.githubusercontent.com/u/57666791?v=4" width="120px;"> | <a href="https://github.com/pie2457"><img src = "https://avatars.githubusercontent.com/u/104147789?v=4" width="120px;"> | <a href="https://github.com/yonghwankim-dev?tab=repositories"><img src = "https://avatars.githubusercontent.com/u/33227831?v=4" width="120px;"> |                                         |                                         |
+|                                          [**쿤디**](https://github.com/jsh3418)                                          |                                          [**파이**](https://github.com/pie2457)                                           |                                         [**네모네모**](https://github.com/yonghwankim-dev?tab=repositories)                                         |
 
 ## 브랜치 협업 전략
 
@@ -20,8 +24,6 @@
 - 일반 브랜치 생성시 dev 브랜치를 기준으로 생성하고 일반 브랜치에서 기능 구현이 완료되면 dev 브랜치에 PR 및 코드 리뷰합니다. 승인되면 PR 요청자가 머지합니다.
 - 머지는 기본적으로 스쿼시 머지를 수행합니다. 스쿼시 머지가 안된다면 일반 머지를 수행합니다.
 - dev 브랜치와 일반 브랜치는 FE 소스코드를 받지 않도록 수행합니다.
-- release 브랜치는 BE/FE 소스 코드를 모두 포함합니다.
-- CI/CD 파이프 라인 구축시 스크립트 작성은 release 브랜치를 따서 새로운 브랜치에서 작성하고 release 브랜치에 PR 및 머지합니다.
 
 ## 템플릿
 
@@ -135,11 +137,42 @@
 
 ## 관련 링크
 
-- 위키
-- API 명세서
-- ERD
+- [API 명세서](https://documenter.getpostman.com/view/18982464/2s9Y5VUQ8f)
+- [스프린트](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/milestones?state=closed)
 
-## 문서 작성 도구
+## ERD
 
-- ERD : MySQL workbench
-- API : Postman
+![image](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/b3615bdc-c569-490a-b188-86025ea89b19)
+
+## 데모 영상
+
+### 회원가입/로그인/프로필 사진 변경
+
+![member_resize](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/23ca29ce-a2d3-4598-a926-ff1c07d37337)
+
+### 회원 동네 선택/추가/삭제
+
+![member_town](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/68804c45-368d-4d2e-8477-d9d657fcbe42)
+
+
+### 상품 게시글 등록/삭제
+
+![register_remove-item_resize](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/91ecfad3-aeff-4b98-99a0-17a1afb54c21)
+
+### 상품 게시글 상태 변경 및 게시글 조회
+
+![status-item_resize](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/68610ac5-1b92-4c8f-8749-8a939fec15f6)
+
+### 상품 판매내역 조회
+
+![sales-item](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/4c109fd1-c937-44ee-a6e0-638604a8d872)
+
+### 상품 관심내역 조회
+
+![wish-item_resize](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/be2992b8-61e2-4ccd-a627-93a0c91ebe05)
+
+### 채팅
+
+![chat_resize](https://github.com/masters2023-project-03-second-hand/second-hand-max-be-a/assets/33227831/05a9e1e5-6287-4194-bff1-fa538d7dc09c)
+
+
