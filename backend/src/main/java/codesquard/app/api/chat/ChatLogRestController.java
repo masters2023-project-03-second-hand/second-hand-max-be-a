@@ -3,7 +3,6 @@ package codesquard.app.api.chat;
 import java.util.Collections;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,13 +17,13 @@ import codesquard.app.api.chat.request.ChatLogSendRequest;
 import codesquard.app.api.chat.response.ChatLogListResponse;
 import codesquard.app.api.chat.response.ChatLogSendResponse;
 import codesquard.app.api.response.ApiResponse;
+import codesquard.app.api.success.successcode.ChatLogSuccessCode;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Validated
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @RestController
@@ -41,7 +40,7 @@ public class ChatLogRestController {
 		@AuthPrincipal Principal sender) {
 		ChatLogSendResponse response = chatLogService.sendMessage(request, chatRoomId, sender);
 		chatService.onMessage(chatRoomId);
-		return ApiResponse.created("메시지 전송이 완료되었습니다.", response);
+		return ApiResponse.success(ChatLogSuccessCode.CREATED_CHAT_LOG, response);
 	}
 
 	@GetMapping("/chats/{chatRoomId}")
@@ -56,12 +55,12 @@ public class ChatLogRestController {
 
 		deferredResult.onCompletion(() -> chatService.removeMessageIndex(deferredResult));
 		deferredResult.onTimeout(() -> deferredResult.setErrorResult(
-			ApiResponse.ok("새로운 채팅 메시지가 존재하지 않습니다.", Collections.emptyList())));
+			ApiResponse.success(ChatLogSuccessCode.OK_NOT_NEW_CHAT_LOG, Collections.emptyList())));
 
 		ChatLogListResponse response = chatLogService.readMessages(chatRoomId, principal, messageId);
 
 		if (!response.isEmptyChat()) {
-			deferredResult.setResult(ApiResponse.ok("채팅 메시지 목록 조회가 완료되었습니다.", response));
+			deferredResult.setResult(ApiResponse.success(ChatLogSuccessCode.OK_CHAT_LOGS, response));
 		}
 		return deferredResult;
 	}

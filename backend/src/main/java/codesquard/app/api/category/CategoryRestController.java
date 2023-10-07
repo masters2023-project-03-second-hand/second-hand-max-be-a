@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import codesquard.app.api.category.response.CategoryListResponse;
 import codesquard.app.api.response.ApiResponse;
+import codesquard.app.api.success.successcode.CategorySuccessCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,6 +24,6 @@ public class CategoryRestController {
 	@GetMapping
 	public ApiResponse<CategoryListResponse> findAll() {
 		log.info("카테고리 목록 조회 요청");
-		return ApiResponse.of(HttpStatus.OK, "카테고리 조회에 성공하였습니다.", categoryQueryService.findAll());
+		return ApiResponse.success(CategorySuccessCode.OK_CATEGORIES, categoryQueryService.findAll());
 	}
 }

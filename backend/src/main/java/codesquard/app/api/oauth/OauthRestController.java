@@ -27,6 +27,7 @@ import codesquard.app.api.oauth.response.OauthLoginResponse;
 import codesquard.app.api.oauth.response.OauthRefreshResponse;
 import codesquard.app.api.oauth.response.OauthSignUpResponse;
 import codesquard.app.api.response.ApiResponse;
+import codesquard.app.api.success.successcode.OauthSuccessCode;
 import codesquard.app.config.ValidationSequence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,7 @@ public class OauthRestController {
 			profile, request);
 
 		oauthService.signUp(profile, request, provider, code, redirectUrl);
-		return ApiResponse.created("회원가입에 성공하였습니다.", null);
+		return ApiResponse.success(OauthSuccessCode.CREATED_SIGNUP);
 	}
 
 	@PostMapping(value = "/{provider}/login")
@@ -62,7 +63,7 @@ public class OauthRestController {
 		@RequestParam(value = "redirectUrl", required = false) String redirectUrl,
 		@Validated(ValidationSequence.class) @RequestBody OauthLoginRequest request) {
 		OauthLoginResponse response = oauthService.login(request, provider, code, LocalDateTime.now(), redirectUrl);
-		return ApiResponse.of(OK, "로그인에 성공하였습니다.", response);
+		return ApiResponse.success(OauthSuccessCode.OK_LOGIN, response);
 	}
 
 	@PostMapping(value = "/logout")
@@ -70,7 +71,7 @@ public class OauthRestController {
 		@RequestBody OauthLogoutRequest request) {
 		log.info("로그아웃 요청 입력 : acessToken={}, request={}", accessToken, request);
 		oauthService.logout(accessToken, request);
-		return ApiResponse.ok("로그아웃에 성공하였습니다.", null);
+		return ApiResponse.success(OauthSuccessCode.OK_LOGOUT);
 	}
 
 	@ResponseStatus(OK)
@@ -80,7 +81,7 @@ public class OauthRestController {
 
 		OauthRefreshResponse response = oauthService.refreshAccessToken(request, LocalDateTime.now());
 		log.debug("리프레시 토큰 API 응답 : {}", response);
-		return ApiResponse.ok("액세스 토큰 갱신에 성공하였습니다.", response);
+		return ApiResponse.success(OauthSuccessCode.OK_REFRESH_TOKEN, response);
 	}
 
 }

@@ -44,6 +44,11 @@ public class ChatLogService {
 		return ChatLogSendResponse.from(chatLogRepository.save(chatLog));
 	}
 
+	private ChatRoom findChatRoomBy(Long chatRoomId) {
+		return chatRoomRepository.findById(chatRoomId)
+			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_CHATROOM));
+	}
+
 	@Transactional
 	public ChatLogListResponse readMessages(Long chatRoomId, Principal principal, Long cursor) {
 		ChatRoom chatRoom = findChatRoomBy(chatRoomId);
@@ -69,11 +74,6 @@ public class ChatLogService {
 		}
 		return new ChatLogListResponse(chatPartnerName, ChatLogItemResponse.from(item), messageResponses,
 			nextMessageId);
-	}
-
-	private ChatRoom findChatRoomBy(Long chatRoomId) {
-		return chatRoomRepository.findById(chatRoomId)
-			.orElseThrow(() -> new NotFoundResourceException(ErrorCode.NOT_FOUND_CHATROOM));
 	}
 
 	private Item findItemBy(ChatRoom chatRoom) {

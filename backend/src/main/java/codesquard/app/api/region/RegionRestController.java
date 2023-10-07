@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import codesquard.app.api.region.response.RegionListResponse;
 import codesquard.app.api.response.ApiResponse;
+import codesquard.app.api.success.successcode.RegionSuccessCode;
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping(path = "/api/regions")
@@ -18,9 +19,9 @@ public class RegionRestController {
 
 	@GetMapping
 	public ApiResponse<RegionListResponse> findAll(
-		@RequestParam(value = "size", defaultValue = "10", required = false) int size,
-		@RequestParam(value = "cursor", required = false) Long cursor,
-		@RequestParam(value = "region", required = false) String region) {
-		return ApiResponse.ok("주소 목록 조회에 성공하였습니다.", regionService.searchBySlice(size, cursor, region));
+		@RequestParam(required = false, defaultValue = "10") int size,
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(required = false) String region) {
+		return ApiResponse.success(RegionSuccessCode.OK_REGIONS, regionService.searchBySlice(size, cursor, region));
 	}
 }

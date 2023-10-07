@@ -13,6 +13,7 @@ import codesquard.app.api.member.response.MemberProfileResponse;
 import codesquard.app.api.membertown.MemberTownService;
 import codesquard.app.api.membertown.response.MemberTownListResponse;
 import codesquard.app.api.response.ApiResponse;
+import codesquard.app.api.success.successcode.MemberSuccessCode;
 import codesquard.app.domain.oauth.support.AuthPrincipal;
 import codesquard.app.domain.oauth.support.Principal;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +29,12 @@ public class MemberController {
 	@PutMapping(value = "/{loginId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ApiResponse<MemberProfileResponse> modifyProfileImage(@RequestPart MultipartFile updateImageFile,
 		@PathVariable String loginId) {
-		return ApiResponse.ok("프로필 사진이 수정되었습니다.",
+		return ApiResponse.success(MemberSuccessCode.OK_MODIFIED_PROFILE_IMAGE,
 			memberService.modifyProfileImage(loginId, updateImageFile));
 	}
 
 	@GetMapping(value = "/regions")
 	public ApiResponse<MemberTownListResponse> readAllMemberTowns(@AuthPrincipal Principal principal) {
-		return ApiResponse.ok("회원 동네 목록 조회를 완료하였습니다.", memberTownService.readAll(principal));
+		return ApiResponse.success(MemberSuccessCode.OK_MEMBER_TOWNS, memberTownService.readAll(principal));
 	}
 }
